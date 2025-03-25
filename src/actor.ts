@@ -110,7 +110,7 @@ function make_actor(p: Position, n: Name): Actor {
 
     a.actions.tick = (a: Actor): Actor => {
         // Implémenter le comportement automatique selon le type d'acteur
-        let newActor = make_actor(a.location, a.name);
+        const newActor = make_actor(a.location, a.name);
         newActor.actions = { ...a.actions };  // Copier les actions
 
         switch (a.name) {
@@ -195,7 +195,7 @@ function die(a: Actor): Actor {
 */
 
 function init_chicken(x1: number, y1: number) {
-    let pos: Position = {
+    const pos: Position = {
         x: x1,
         y: y1
     };

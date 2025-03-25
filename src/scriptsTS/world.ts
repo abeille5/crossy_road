@@ -69,7 +69,7 @@ function run() {
 
     drawFrame();
 
-    let poulet:A.Actor = A.init_chicken(frameX + Math.floor(mapHeight / 2),frameY + Math.floor(mapHeight / 2));
+    const poulet:A.Actor = A.init_chicken(frameX + Math.floor(mapHeight / 2),frameY + Math.floor(mapHeight / 2));
     //let playerX = ;
     //let playerY = frameY + Math.floor(mapHeight / 2);
 
