@@ -1,3 +1,22 @@
+const right: Position = {
+    x: 1,
+    y: 0
+};
+const left: Position = {
+    x: -1,
+    y: 0
+};
+
+const up: Position = {
+    x: 0,
+    y: 1
+};
+
+const down: Position = {
+    x: 0,
+    y: -1
+};
+
 type Position = {
     x: number;
     y: number;
@@ -6,6 +25,12 @@ type Position = {
 type Message = {
     key: string;
     params: any[];
+}
+
+type Line = {
+    ordinate: number;
+    type: LineType;
+    data: Actor[];
 }
 
 type Actor = {
@@ -27,7 +52,13 @@ enum Name {
     Log_L,
     Car_R,
     Car_L,
-}
+};
+
+enum LineType {
+    Nature = 1,
+    Road,
+    River
+};
 
 // Return an actor with a defined position and an initialized action move
 function make_actor(p: Position, n: Name): Actor {
@@ -58,50 +89,6 @@ function position_add(current_position: Position, dx: Position): Position {
     return pos;
 }
 
-function init_chicken() {
-    let pos: Position = {
-        x: 30,
-        y: 5
-    };
-    let actor: Actor = make_actor(pos, 1);
-    let collide = (a: Actor): Actor => die(a);
-    actor.actions.collide = collide;
-    const m: Message = {
-        key: "New game has started",
-        params: []
-    };
-    return actor;
-}
-
-
-function die(a: Actor): Actor {
-    let new_actor: Actor = make_actor(a.location, a.name);
-    const m: Message = {
-        key: "The chicken hit something or drown",
-        params: []
-    }
-    new_actor.send(m);
-    return new_actor;
-}
-
-const right: Position = {
-    x: 1,
-    y: 0
-};
-const left: Position = {
-    x: -1,
-    y: 0
-};
-
-const up: Position = {
-    x: 0,
-    y: 1
-};
-
-const down: Position = {
-    x: 0,
-    y: -1
-};
 
 function tick_action(a: Actor): Actor {
     let new_actor: Actor = make_actor(a.location, a.name)
@@ -133,6 +120,32 @@ function tick_action(a: Actor): Actor {
             break;
     }
     return a;
+}
+
+function init_chicken() {
+    let pos: Position = {
+        x: 30,
+        y: 5
+    };
+    let actor: Actor = make_actor(pos, 1);
+    let collide = (a: Actor): Actor => die(a);
+    actor.actions.collide = collide;
+    const m: Message = {
+        key: "New game has started",
+        params: []
+    };
+    return actor;
+}
+
+
+function die(a: Actor): Actor {
+    let new_actor: Actor = make_actor(a.location, a.name);
+    const m: Message = {
+        key: "The chicken hit something or drown",
+        params: []
+    }
+    new_actor.send(m);
+    return new_actor;
 }
 
 function init_water_right() {
@@ -188,4 +201,78 @@ function init_car_left() {
     };
     let new_actor: Actor = make_actor(pos, 8);
     return new_actor;
+}
+
+function init_line(size_x: number, size_y: number) {
+    let random_line: number = Math.floor(Math.random() * 3) + 1;
+    let l: Line = {
+        ordinate: size_y,
+        type: random_line,
+        data: new Array(60).fill(0)
+    }
+    switch (l.type) {
+        case 1:
+            for (let i: number = 0; i < size_x; i++) {
+                if (Math.random() > 0.5) {
+                    let pos: Position = {
+                        x: i,
+                        y: l.ordinate
+                    }
+                    data[i] = init_tree(pos);
+                }
+            }
+            break;
+        case 2:
+            let left1: number = 1;
+            if (Math.random() > 0.5) {
+                left1 = 0;
+            }
+            for (let i: number = 0; i < size_x; i++) {
+                let pos: Position = {
+                    x: i,
+                    y: l.ordinate
+                };
+                if (Math.random() > 0.5) {
+                    if (left1) {
+                        data[i] = init_car_left(pos);
+                    }
+                    else {
+                        data[i] = init_car_right(pos);
+                    }
+                }
+            }
+            break;
+        case 3:
+            let left2 = 1;
+            if (Math.random() > 0.5) {
+                left2 = 0;
+            }
+            for (let i: number = 0; i < size_x; i++) {
+                let pos: Position = {
+                    x: i,
+                    y: l.ordinate
+                };
+                if (Math.random() > 0.5) {
+                    if (left2) {
+                        data[i] = init_water_left(pos);
+                    }
+                    else {
+                        data[i] = init_water_right(pos);
+                    }
+                }
+                else {
+                    if (left2) {
+                        data[i] = init_log_left(pos);
+                    }
+                    else {
+                        data[i] = init_log_right
+                    }
+                }
+            }
+            break;
+        default:
+            console.log("Inexistant type of line")
+            break;
+    };
+    return l;
 }
