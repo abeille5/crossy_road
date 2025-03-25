@@ -1,4 +1,4 @@
-all: build
+all: eslint build test
 
 build:
 	npx tsc -p tsconfig.json
