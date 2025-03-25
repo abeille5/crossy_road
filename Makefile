@@ -21,4 +21,4 @@ clean:
 	rm -f *~ src/*~ src/*/*~ test/*~ html/*~
 	rm -rf dist/*
 
-.PHONY: archive build clean eslint parcel test run watch
+.PHONY: all archive build clean eslint parcel test run watch
