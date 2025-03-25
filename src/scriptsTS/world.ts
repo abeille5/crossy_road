@@ -3,14 +3,15 @@
 
 import terminalKit from 'terminal-kit';
 
-import * as A from "../actors"
+import * as A from '../actor';
 
 const term = terminalKit.terminal;
 
 const title = "CROSSY ROAD";
 
-function make_road_left(){
-    const actor = init_car_left();
+function init_game(lines : Lines[]){
+    const lines = new Array(20);
+    return lines.map((i) => init_line(10, i));
 }
 
 function run() {
@@ -53,17 +54,14 @@ function run() {
 
     // Quitter avec 'q' ou 'CTRL_C'
     term.grabInput(true);
-    
+
     // Animation : étoile aléatoire toutes les secondes
     let lastX = 2;
     let lastY = 2;
-    const actors = [A.init_chicken(), A.init_car_left()];
+    const lines = init_game();
     const tickInterval = setInterval(() => {
-	actors.map((a) => a.send({"key" : "tick", "params" : []}));
+	lines.map((l) => l.map((a) => a.send({"key" : "tick", "params" : []})));
     }, 100);
-    const addLevelInterval = setInterval(()=>{
-	actors.map((a) => a.send({"key" : "move", "params" : [down]}));
-    }, 1000);
     term.on('key', (name: any) => {
         if (name === 'q' || name === 'CTRL_C') {
             clearInterval(tickInterval); // stop animation
