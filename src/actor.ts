@@ -31,19 +31,19 @@ enum Name {
 
 // Return an actor with a defined position and an initialized action move
 function make_actor(p: Position, n: Name): Actor {
-    let a: Actor = {
+    const a: Actor = {
         location: p,
         send: (m: Message) => {
             console.log(`${m.key}`, m.params);
         },
         actions: {},
         update: (actor: Actor): Actor => {
-            return { ...actor }
+            return { ...actor };
         },
         name: n,
-    }
-    let move = (a: Actor, dx: Position): Actor => make_actor(position_add(a.location, dx), n);
-    let tick = (a: Actor): Actor => tick_action(a);
+    };
+    const move = (a: Actor, dx: Position): Actor => make_actor(position_add(a.location, dx), n);
+    const tick = (a: Actor): Actor => tick_action(a);
     a.actions.move = move;
     a.actions.tick = tick;
     return a;
@@ -51,20 +51,20 @@ function make_actor(p: Position, n: Name): Actor {
 
 // Update the current position to a new one with dx changement.
 function position_add(current_position: Position, dx: Position): Position {
-    let pos: Position = {
+    const pos: Position = {
         x: current_position.x + dx.x,
         y: current_position.y + dx.y
-    }
+    };
     return pos;
 }
 
 function init_chicken() {
-    let pos: Position = {
+    const pos: Position = {
         x: 30,
         y: 5
     };
-    let actor: Actor = make_actor(pos, 1);
-    let collide = (a: Actor): Actor => die(a);
+    const actor: Actor = make_actor(pos, 1);
+    const collide = (a: Actor): Actor => die(a);
     actor.actions.collide = collide;
     const m: Message = {
         key: "New game has started",
@@ -75,11 +75,11 @@ function init_chicken() {
 
 
 function die(a: Actor): Actor {
-    let new_actor: Actor = make_actor(a.location, a.name);
+    const new_actor: Actor = make_actor(a.location, a.name);
     const m: Message = {
         key: "The chicken hit something or drown",
         params: []
-    }
+    };
     new_actor.send(m);
     return new_actor;
 }
@@ -104,7 +104,7 @@ const down: Position = {
 };
 
 function tick_action(a: Actor): Actor {
-    let new_actor: Actor = make_actor(a.location, a.name)
+    const new_actor: Actor = make_actor(a.location, a.name);
     switch (a.name) {
         case 1:
             break;
@@ -136,36 +136,36 @@ function tick_action(a: Actor): Actor {
 }
 
 function init_tree(pos: Position) {
-    let new_actor: Actor = make_actor(pos, 2);
+    const new_actor: Actor = make_actor(pos, 2);
     return new_actor;
 }
 
 function init_water_right(pos: Position) {
-    let new_actor: Actor = make_actor(pos, 3);
+    const new_actor: Actor = make_actor(pos, 3);
     return new_actor;
 }
 
 function init_water_left(pos: Position) {
-    let new_actor: Actor = make_actor(pos, 4);
+    const new_actor: Actor = make_actor(pos, 4);
     return new_actor;
 }
 
 function init_log_right(pos: Position) {
-    let new_actor: Actor = make_actor(pos, 5);
+    const new_actor: Actor = make_actor(pos, 5);
     return new_actor;
 }
 
 function init_log_left(pos: Position) {
-    let new_actor: Actor = make_actor(pos, 6);
+    const new_actor: Actor = make_actor(pos, 6);
     return new_actor;
 }
 
 function init_car_right(pos: Position) {
-    let new_actor: Actor = make_actor(pos, 7);
+    const new_actor: Actor = make_actor(pos, 7);
     return new_actor;
 }
 
 function init_car_left(pos: Position) {
-    let new_actor: Actor = make_actor(pos, 8);
+    const new_actor: Actor = make_actor(pos, 8);
     return new_actor;
 }

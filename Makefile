@@ -5,7 +5,7 @@ build:
 	npx tsc src/actor.ts
 
 eslint:
-	npx eslint src test
+	npx eslint src test src/scriptsTS
 
 test:
 	NODE_OPTIONS="$$NODE_OPTIONS --experimental-vm-modules" npx jest -c jest.config.ts
