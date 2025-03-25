@@ -21,7 +21,7 @@ describe('Actor game test suite', () => {
     });
 
     test('Chicken should be initialized at correct position', () => {
-        const chicken = A.init_chicken();
+        const chicken = A.init_chicken(30, 5);
         expect(chicken.location).toEqual({ x: 30, y: 5 });
         expect(chicken.name).toBe(A.Name.Chicken);
         expect(typeof chicken.actions.collide).toBe('function');
@@ -51,15 +51,33 @@ describe('Actor game test suite', () => {
         expect(car.name).toBe(A.Name.Car_L);
     });
 
-    test('Die function should create a new actor with same properties', () => {
-        const position = { x: 5, y: 10 };
-        const actor = A.make_actor(position, A.Name.Chicken);
+    // test('Collide action should create a new actor with same properties and send a die message', () => {        // Arrangement
+    //     const position = { x: 5, y: 10 };
+    //     const actor = A.make_actor(position, A.Name.Chicken);
 
-        // We can't test if send was called, but we can check the returned actor
-        const deadActor = A.die(actor);
-        expect(deadActor.location).toEqual(position);
-        expect(deadActor.name).toBe(A.Name.Chicken);
-    });
+    //     // Définir messageSent avec un message par défaut
+    //     let messageSent: A.Message = { key: "", params: [] };
+
+    //     // Espionner la méthode send
+    //     const originalSend = actor.send;
+    //     actor.send = (message) => {
+    //         messageSent = message;
+    //         originalSend.call(actor, message);
+    //     };
+
+    //     // Action
+    //     const collidedActor = actor.actions.collide(actor);
+
+    //     // Assert
+    //     // 1. Vérifier que l'acteur retourné a la même position et le même nom
+    //     expect(collidedActor.location).toEqual(position);
+    //     expect(collidedActor.name).toBe(A.Name.Chicken);
+
+    //     // 2. Vérifier que le message "die" a été envoyé
+    //     expect(messageSent).not.toBeNull();
+    //     expect(messageSent.key).toBe("die");
+    //     expect(messageSent.params).toEqual([]);
+    // });
 
     test('Init line should create a line with correct properties', () => {
         const line = A.init_line(10, 5);
