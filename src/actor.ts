@@ -62,19 +62,19 @@ enum LineType {
 
 // Return an actor with a defined position and an initialized action move
 function make_actor(p: Position, n: Name): Actor {
-    let a: Actor = {
+    const a: Actor = {
         location: p,
         send: (m: Message) => {
             console.log(`${m.key}`, m.params);
         },
         actions: {},
         update: (actor: Actor): Actor => {
-            return { ...actor }
+            return { ...actor };
         },
         name: n,
-    }
-    let move = (a: Actor, dx: Position): Actor => make_actor(position_add(a.location, dx), n);
-    let tick = (a: Actor): Actor => tick_action(a);
+    };
+    const move = (a: Actor, dx: Position): Actor => make_actor(position_add(a.location, dx), n);
+    const tick = (a: Actor): Actor => tick_action(a);
     a.actions.move = move;
     a.actions.tick = tick;
     return a;
@@ -82,16 +82,16 @@ function make_actor(p: Position, n: Name): Actor {
 
 // Update the current position to a new one with dx changement.
 function position_add(current_position: Position, dx: Position): Position {
-    let pos: Position = {
+    const pos: Position = {
         x: current_position.x + dx.x,
         y: current_position.y + dx.y
-    }
+    };
     return pos;
 }
 
 
 function tick_action(a: Actor): Actor {
-    let new_actor: Actor = make_actor(a.location, a.name)
+    const new_actor: Actor = make_actor(a.location, a.name);
     switch (a.name) {
         case 1:
             break;
@@ -148,58 +148,38 @@ function die(a: Actor): Actor {
     return new_actor;
 }
 
-function init_water_right() {
-    let pos: Position = {
-        x: 0,
-        y: 24
-    };
-    let new_actor: Actor = make_actor(pos, 3);
+function init_tree(pos: Position) {
+    const new_actor: Actor = make_actor(pos, 2);
     return new_actor;
 }
 
-function init_water_left() {
-    let pos: Position = {
-        x: 60,
-        y: 24
-    };
-    let new_actor: Actor = make_actor(pos, 4);
+function init_water_right(pos: Position) {
+    const new_actor: Actor = make_actor(pos, 3);
     return new_actor;
 }
 
-function init_log_right() {
-    let pos: Position = {
-        x: 0,
-        y: 24
-    };
-    let new_actor: Actor = make_actor(pos, 5);
+function init_water_left(pos: Position) {
+    const new_actor: Actor = make_actor(pos, 4);
     return new_actor;
 }
 
-function init_log_left() {
-    let pos: Position = {
-        x: 60,
-        y: 24
-    };
-    let new_actor: Actor = make_actor(pos, 6);
+function init_log_right(pos: Position) {
+    const new_actor: Actor = make_actor(pos, 5);
     return new_actor;
 }
 
-function init_car_right() {
-    let pos: Position = {
-        x: 0,
-        y: 24
-    };
-    let new_actor: Actor = make_actor(pos, 7);
+function init_log_left(pos: Position) {
+    const new_actor: Actor = make_actor(pos, 6);
     return new_actor;
 }
 
+function init_car_right(pos: Position) {
+    const new_actor: Actor = make_actor(pos, 7);
+    return new_actor;
+}
 
-function init_car_left() {
-    let pos: Position = {
-        x: 60,
-        y: 24
-    };
-    let new_actor: Actor = make_actor(pos, 8);
+function init_car_left(pos: Position) {
+    const new_actor: Actor = make_actor(pos, 8);
     return new_actor;
 }
 
@@ -218,7 +198,7 @@ function init_line(size_x: number, size_y: number) {
                         x: i,
                         y: l.ordinate
                     }
-                    data[i] = init_tree(pos);
+                    l.data[i] = init_tree(pos);
                 }
             }
             break;
@@ -234,10 +214,10 @@ function init_line(size_x: number, size_y: number) {
                 };
                 if (Math.random() > 0.5) {
                     if (left1) {
-                        data[i] = init_car_left(pos);
+                        l.data[i] = init_car_left(pos);
                     }
                     else {
-                        data[i] = init_car_right(pos);
+                        l.data[i] = init_car_right(pos);
                     }
                 }
             }
@@ -254,18 +234,18 @@ function init_line(size_x: number, size_y: number) {
                 };
                 if (Math.random() > 0.5) {
                     if (left2) {
-                        data[i] = init_water_left(pos);
+                        l.data[i] = init_water_left(pos);
                     }
                     else {
-                        data[i] = init_water_right(pos);
+                        l.data[i] = init_water_right(pos);
                     }
                 }
                 else {
                     if (left2) {
-                        data[i] = init_log_left(pos);
+                        l.data[i] = init_log_left(pos);
                     }
                     else {
-                        data[i] = init_log_right
+                        l.data[i] = init_log_right(pos);
                     }
                 }
             }

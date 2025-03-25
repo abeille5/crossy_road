@@ -1,17 +1,18 @@
-all: build
+all: eslint build test
 
 build:
 	npx tsc -p tsconfig.json
 	npx tsc src/actor.ts
 
 eslint:
-	npx eslint src test
+	npx eslint src test src/scriptsTS
 
 test:
 	NODE_OPTIONS="$$NODE_OPTIONS --experimental-vm-modules" npx jest -c jest.config.ts
 
 run:
-	echo "Run one game"
+	npx tsc
+	node dist/src/scriptsTS/world.js
 
 watch:
 	npx tsc -w -p tsconfig.json
@@ -20,4 +21,4 @@ clean:
 	rm -f *~ src/*~ src/*/*~ test/*~ html/*~
 	rm -rf dist/*
 
-.PHONY: archive build clean eslint parcel test run watch
+.PHONY: all archive build clean eslint parcel test run watch
