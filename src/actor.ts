@@ -120,10 +120,10 @@ function tick_action(a: Actor): Actor {
     return a;
 }
 
-function init_chicken() {
+function init_chicken(x1:number,y1:number) {
     let pos: Position = {
-        x: 30,
-        y: 5
+        x: x1,
+        y: y1
     };
     let actor: Actor = make_actor(pos, 1);
     let collide = (a: Actor): Actor => die(a);
