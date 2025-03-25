@@ -19,16 +19,16 @@ function run() {
 
     const titleWidth = title.length;
     const titleX = Math.floor((screenWidth - titleWidth) / 2);
-    const titleY = Math.floor(screenHeight / 2);
+    const titleY = 2;
 
-    const mapWidth = screenWidth /2;
-    const mapHeight = screenHeight /2;
+    const mapWidth = Math.min(screenWidth - 10, 60);
+    const mapHeight = Math.min(screenHeight - 10, 20);
 
     term.moveTo(titleX, titleY).bgBlack().white().bold(title);
 
     // Top border
-    term.moveTo(1, 1);
-    term.bgWhite().white(' '.repeat(mapWidth));
+    term.moveTo(Math.floor((screenWidth - title.length) / 2), titleY);
+    term.bgBlack().white().bold(title);
     term.styleReset();
 
     // Side borders and empty lines
