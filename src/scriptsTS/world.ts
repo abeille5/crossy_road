@@ -3,9 +3,15 @@
 
 import terminalKit from 'terminal-kit';
 
+import * as A from "../actors"
+
 const term = terminalKit.terminal;
 
 const title = "CROSSY ROAD";
+
+function make_road_left(){
+    const actor = init_car_left();
+}
 
 function run() {
     term.clear();
@@ -51,28 +57,17 @@ function run() {
     // Animation : étoile aléatoire toutes les secondes
     let lastX = 2;
     let lastY = 2;
-    const animationInterval = setInterval(() => {
-        // Effacer l’ancienne étoile
-        term.moveTo(lastX, lastY);
-        term.bgBlack().white(' ');
-
-        // Nouvelle position aléatoire dans la fenêtre (hors bordures)
-        const newX = Math.floor(Math.random() * (mapWidth - 2)) + 2;
-        const newY = Math.floor(Math.random() * (mapHeight - 3)) + 2;
-
-        // Afficher la nouvelle étoile
-        term.moveTo(newX, newY);
-        term.bgBlack().white('*');
-
-        // Mémoriser la position pour la prochaine efface
-        lastX = newX;
-        lastY = newY;
+    const actors = [A.init_chicken(), A.init_car_left()];
+    const tickInterval = setInterval(() => {
+	actors.map((a) => a.send({"key" : "tick", "params" : []}));
+    }, 100);
+    const addLevelInterval = setInterval(()=>{
+	actors.map((a) => a.send({"key" : "move", "params" : [down]}));
     }, 1000);
-
-
     term.on('key', (name: any) => {
         if (name === 'q' || name === 'CTRL_C') {
-            clearInterval(animationInterval); // stop animation
+            clearInterval(tickInterval); // stop animation
+	    clearInterval(addLevelInterval)
             term.grabInput(false);
             term.clear();
             process.exit();
