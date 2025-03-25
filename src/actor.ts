@@ -134,3 +134,58 @@ function tick_action(a: Actor): Actor {
     }
     return a;
 }
+
+function init_water_right() {
+    let pos: Position = {
+        x: 0,
+        y: 24
+    };
+    let new_actor: Actor = make_actor(pos, 3);
+    return new_actor;
+}
+
+function init_water_left() {
+    let pos: Position = {
+        x: 60,
+        y: 24
+    };
+    let new_actor: Actor = make_actor(pos, 4);
+    return new_actor;
+}
+
+function init_log_right() {
+    let pos: Position = {
+        x: 0,
+        y: 24
+    };
+    let new_actor: Actor = make_actor(pos, 5);
+    return new_actor;
+}
+
+function init_log_left() {
+    let pos: Position = {
+        x: 60,
+        y: 24
+    };
+    let new_actor: Actor = make_actor(pos, 6);
+    return new_actor;
+}
+
+function init_car_right() {
+    let pos: Position = {
+        x: 0,
+        y: 24
+    };
+    let new_actor: Actor = make_actor(pos, 7);
+    return new_actor;
+}
+
+
+function init_car_left() {
+    let pos: Position = {
+        x: 60,
+        y: 24
+    };
+    let new_actor: Actor = make_actor(pos, 8);
+    return new_actor;
+}
