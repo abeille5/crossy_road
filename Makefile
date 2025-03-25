@@ -11,7 +11,8 @@ test:
 	NODE_OPTIONS="$$NODE_OPTIONS --experimental-vm-modules" npx jest -c jest.config.ts
 
 run:
-	echo "Run one game"
+	npx tsc
+	node dist/src/scriptsTS/world.js
 
 watch:
 	npx tsc -w -p tsconfig.json
