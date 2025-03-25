@@ -64,9 +64,7 @@ enum LineType {
 function make_actor(p: Position, n: Name): Actor {
     const a: Actor = {
         location: p,
-        send: (m: Message) => {
-            console.log(`${m.key}`, m.params);
-        },
+        send: (m: Message) => { },
         actions: {},
         update: (actor: Actor): Actor => {
             return { ...actor };
@@ -131,7 +129,7 @@ function init_chicken() {
     let collide = (a: Actor): Actor => die(a);
     actor.actions.collide = collide;
     const m: Message = {
-        key: "New game has started",
+        key: "new_game",
         params: []
     };
     return actor;
@@ -141,7 +139,7 @@ function init_chicken() {
 function die(a: Actor): Actor {
     let new_actor: Actor = make_actor(a.location, a.name);
     const m: Message = {
-        key: "The chicken hit something or drown",
+        key: "die",
         params: []
     }
     new_actor.send(m);
@@ -256,3 +254,5 @@ function init_line(size_x: number, size_y: number) {
     };
     return l;
 }
+
+export { right, left, up, down, Position, Message, Actor, Line, Name, LineType, make_actor, position_add, tick_action, init_chicken, die, init_tree, init_water_right, init_water_left, init_log_right, init_log_left, init_car_right, init_car_left, init_line };
