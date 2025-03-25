@@ -14,7 +14,7 @@ type Actor = {
     actions: {
         [key: string]: (a: Actor, ...rest: any) => Actor;
     }
-    update: (a: Actor) => Actor;
+    update: (a: Actor, m: Message) => Actor;
     name: Name;
 }
 
@@ -43,10 +43,8 @@ function make_actor(p: Position, n: Name): Actor {
         name: n,
     }
     let move = (a: Actor, dx: Position): Actor => make_actor(position_add(a.location, dx), n);
-    let collide = (a: Actor): Actor => die(a);
     let tick = (a: Actor): Actor => tick_action(a);
     a.actions.move = move;
-    a.actions.collide = collide;
     a.actions.tick = tick;
     return a;
 }
@@ -58,6 +56,21 @@ function position_add(current_position: Position, dx: Position): Position {
         y: current_position.y + dx.y
     }
     return pos;
+}
+
+function init_chicken() {
+    let pos: Position = {
+        x: 30,
+        y: 5
+    };
+    let actor: Actor = make_actor(pos, 1);
+    let collide = (a: Actor): Actor => die(a);
+    actor.actions.collide = collide;
+    const m: Message = {
+        key: "New game has started",
+        params: []
+    };
+    return actor;
 }
 
 
@@ -94,60 +107,30 @@ function tick_action(a: Actor): Actor {
     let new_actor: Actor = make_actor(a.location, a.name)
     switch (a.name) {
         case 1:
-            // rien
             break;
         case 2:
-            // rien 
             break;
         case 3:
-            new_actor.actions.move(new_actor, right)
+            new_actor.actions.move(new_actor, right);
             break;
         case 4:
-            new_actor.actions.move(new_actor, left)
+            new_actor.actions.move(new_actor, left);
             break;
         case 5:
-            new_actor.actions.move(new_actor, right)
+            new_actor.actions.move(new_actor, right);
             break;
         case 6:
-            new_actor.actions.move(new_actor, left)
+            new_actor.actions.move(new_actor, left);
+            break;
         case 7:
-            new_actor.actions.move(new_actor, right)
+            new_actor.actions.move(new_actor, right);
+            break;
         case 8:
-            new_actor.actions.move(new_actor, left)
+            new_actor.actions.move(new_actor, left);
+            break;
         default:
-            console.log("Inexistant name of actor\n")
+            console.log("Inexistant name of actor\n");
             break;
     }
     return a;
 }
-
-/*
-// Return an actor who is a player
-function make_player(p: Position): Actor {
-    let a: Actor = make_actor(p);
-
-    return a;
-};
-
-// Return an actor who is a wall
-function make_wall(p: Position): Actor {
-    let a: Actor = make_actor(p);
-
-    return a;
-};
-
-// Return an actor who is a bullet
-function make_bullet(p: Position): Actor {
-    let a: Actor = make_actor(p);
-
-    return a;
-};
-
-// Return an actor who is an ennemy
-function make_ennemy(p: Position): Actor {
-    let a: Actor = make_actor(p);
-
-    return a;
-};
-*/
-
