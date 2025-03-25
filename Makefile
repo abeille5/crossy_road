@@ -2,6 +2,7 @@ all: build
 
 build:
 	npx tsc -p tsconfig.json
+	npx tsc src/actor.ts
 
 eslint:
 	npx eslint src test
