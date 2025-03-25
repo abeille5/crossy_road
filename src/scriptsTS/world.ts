@@ -55,8 +55,8 @@ function run() {
     term.grabInput(true);
 
     // Animation : étoile aléatoire toutes les secondes
-    let lastX = 2;
-    let lastY = 2;
+    const lastX = 2;
+    const lastY = 2;
     const lines:A.Line[] = init_game();
     const tickInterval = setInterval(() => {
 	lines.map((l : A.Line) => l.data.map((a : A.Actor) => a.send({"key" : "tick", "params" : []})));

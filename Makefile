@@ -7,7 +7,7 @@ build:
 eslint:
 	npx eslint src test src/scriptsTS
 
-test:
+test: build
 	NODE_OPTIONS="$$NODE_OPTIONS --experimental-vm-modules" npx jest -c jest.config.ts
 
 run:

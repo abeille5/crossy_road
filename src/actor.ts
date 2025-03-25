@@ -125,8 +125,8 @@ function init_chicken(x1:number,y1:number) {
         x: x1,
         y: y1
     };
-    let actor: Actor = make_actor(pos, 1);
-    let collide = (a: Actor): Actor => die(a);
+    const actor: Actor = make_actor(pos, 1);
+    const collide = (a: Actor): Actor => die(a);
     actor.actions.collide = collide;
     const m: Message = {
         key: "new_game",
@@ -137,11 +137,11 @@ function init_chicken(x1:number,y1:number) {
 
 
 function die(a: Actor): Actor {
-    let new_actor: Actor = make_actor(a.location, a.name);
+    const new_actor: Actor = make_actor(a.location, a.name);
     const m: Message = {
         key: "die",
         params: []
-    }
+    };
     new_actor.send(m);
     return new_actor;
 }
@@ -182,20 +182,20 @@ function init_car_left(pos: Position) {
 }
 
 function init_line(size_x: number, size_y: number) {
-    let random_line: number = Math.floor(Math.random() * 3) + 1;
-    let l: Line = {
+    const random_line: number = Math.floor(Math.random() * 3) + 1;
+    const l: Line = {
         ordinate: size_y,
         type: random_line,
         data: new Array(60).fill(0)
-    }
+    };
     switch (l.type) {
         case 1:
             for (let i: number = 0; i < size_x; i++) {
                 if (Math.random() > 0.5) {
-                    let pos: Position = {
+                    const pos: Position = {
                         x: i,
                         y: l.ordinate
-                    }
+                    };
                     l.data[i] = init_tree(pos);
                 }
             }
@@ -206,7 +206,7 @@ function init_line(size_x: number, size_y: number) {
                 left1 = 0;
             }
             for (let i: number = 0; i < size_x; i++) {
-                let pos: Position = {
+                const pos: Position = {
                     x: i,
                     y: l.ordinate
                 };
@@ -226,7 +226,7 @@ function init_line(size_x: number, size_y: number) {
                 left2 = 0;
             }
             for (let i: number = 0; i < size_x; i++) {
-                let pos: Position = {
+                const pos: Position = {
                     x: i,
                     y: l.ordinate
                 };
@@ -249,7 +249,7 @@ function init_line(size_x: number, size_y: number) {
             }
             break;
         default:
-            console.log("Inexistant type of line")
+            console.log("Inexistant type of line");
             break;
     };
     return l;
