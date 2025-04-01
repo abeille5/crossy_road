@@ -77,13 +77,8 @@ function make_actor(p: Position, n: Name): Actor {
             // Copier les actions
             updatedActor.actions = { ...actor.actions };
 
-            // Traiter chaque message de la boîte aux lettres
-            for (const message of actor.mailbox) {
-                if (actor.actions[message.key]) {
-                    // Si l'acteur possède une action correspondant à la clé du message
-                    updatedActor = actor.actions[message.key](updatedActor, ...message.params);
-                }
-            }
+            const valid_actions = actor.mailbox.filter((msg) => Boolean(actor.actions[msg.key]));
+            updatedActor = valid_actions.reduce((updatedActor, msg) => actor.actions[msg.key](updatedActor, ...msg.params), updatedActor);
 
             // Vider la boîte aux lettres
             updatedActor.mailbox = [];
@@ -143,100 +138,6 @@ function position_add(current_position: Position, dx: Position): Position {
     return pos;
 }
 
-/*
-
-function tick_action(a: Actor): Actor {
-    const new_actor: Actor = make_actor(a.location, a.name);
-    switch (a.name) {
-        case 1:
-            break;
-        case 2:
-            break;
-        case 3:
-            new_actor.actions.move(new_actor, right);
-            break;
-        case 4:
-            new_actor.actions.move(new_actor, left);
-            break;
-        case 5:
-            new_actor.actions.move(new_actor, right);
-            break;
-        case 6:
-            new_actor.actions.move(new_actor, left);
-            break;
-        case 7:
-            new_actor.actions.move(new_actor, right);
-            break;
-        case 8:
-            new_actor.actions.move(new_actor, left);
-            break;
-        default:
-            console.log("Inexistant name of actor\n");
-            break;
-    }
-    return a;
-}
-
-function tick_action(a: Actor): Actor {
-    // Cette fonction peut être simplifiée puisqu'elle est remplacée par a.actions.tick
-    return a.actions.tick(a);
-}
-
-function die(a: Actor): Actor {
-    const new_actor: Actor = make_actor(a.location, a.name);
-    const m: Message = {
-        key: "die",
-        params: []
-    };
-    new_actor.send(m);
-    return new_actor;
-}
-
-*/
-
-function init_chicken(x1: number, y1: number) {
-    const pos: Position = {
-        x: x1,
-        y: y1
-    };
-    const actor: Actor = make_actor(pos, Name.Chicken);
-    return actor;
-}
-
-function init_tree(pos: Position) {
-    const new_actor: Actor = make_actor(pos, 2);
-    return new_actor;
-}
-
-function init_water_right(pos: Position) {
-    const new_actor: Actor = make_actor(pos, 3);
-    return new_actor;
-}
-
-function init_water_left(pos: Position) {
-    const new_actor: Actor = make_actor(pos, 4);
-    return new_actor;
-}
-
-function init_log_right(pos: Position) {
-    const new_actor: Actor = make_actor(pos, 5);
-    return new_actor;
-}
-
-function init_log_left(pos: Position) {
-    const new_actor: Actor = make_actor(pos, 6);
-    return new_actor;
-}
-
-function init_car_right(pos: Position) {
-    const new_actor: Actor = make_actor(pos, 7);
-    return new_actor;
-}
-
-function init_car_left(pos: Position) {
-    const new_actor: Actor = make_actor(pos, 8);
-    return new_actor;
-}
 
 function init_line(size_x: number, size_y: number) {
     const random_line: number = Math.floor(Math.random() * 3) + 1;
@@ -247,63 +148,33 @@ function init_line(size_x: number, size_y: number) {
     };
     switch (l.type) {
         case 1:
-            for (let i: number = 0; i < size_x; i++) {
-                if (Math.random() > 0.5) {
-                    const pos: Position = {
-                        x: i,
-                        y: l.ordinate
-                    };
-                    l.data[i] = init_tree(pos);
-                }
-            }
+            l.data = Array.from({ length: size_x }, (_, i) =>
+                Math.random() > 0.5 ? make_actor({ x: i, y: l.ordinate }, Name.Tree) : l.data[i]
+            );
             break;
         case 2:
             let left1: number = 1;
             if (Math.random() > 0.5) {
                 left1 = 0;
             }
-            for (let i: number = 0; i < size_x; i++) {
-                const pos: Position = {
-                    x: i,
-                    y: l.ordinate
-                };
-                if (Math.random() > 0.5) {
-                    if (left1) {
-                        l.data[i] = init_car_left(pos);
-                    }
-                    else {
-                        l.data[i] = init_car_right(pos);
-                    }
-                }
-            }
+
+            l.data = Array.from({ length: size_x }, (_, i) =>
+                (Math.random() > 0.5)
+                    ? (left1 ? make_actor({ x: i, y: l.ordinate }, Name.Car_L) : make_actor({ x: i, y: l.ordinate }, Name.Car_R))
+                    : l.data[i]
+            );
             break;
         case 3:
             let left2 = 1;
             if (Math.random() > 0.5) {
                 left2 = 0;
             }
-            for (let i: number = 0; i < size_x; i++) {
-                const pos: Position = {
-                    x: i,
-                    y: l.ordinate
-                };
-                if (Math.random() > 0.5) {
-                    if (left2) {
-                        l.data[i] = init_water_left(pos);
-                    }
-                    else {
-                        l.data[i] = init_water_right(pos);
-                    }
-                }
-                else {
-                    if (left2) {
-                        l.data[i] = init_log_left(pos);
-                    }
-                    else {
-                        l.data[i] = init_log_right(pos);
-                    }
-                }
-            }
+
+            l.data = Array.from({ length: size_x }, (_, i) =>
+                (Math.random() > 0.5)
+                    ? (left2 ? make_actor({ x: i, y: l.ordinate }, Name.Water_L) : make_actor({ x: i, y: l.ordinate }, Name.Water_R))
+                    : (left2 ? make_actor({ x: i, y: l.ordinate }, Name.Log_L) : make_actor({ x: i, y: l.ordinate }, Name.Log_R))
+            );
             break;
         default:
             console.log("Inexistant type of line");
@@ -313,8 +184,7 @@ function init_line(size_x: number, size_y: number) {
 }
 
 export {
-    right, left, up, down, Position, Message, Actor, Line, Name, LineType, make_actor, position_add,
-    init_chicken, init_tree, init_water_right, init_water_left, init_log_right, init_log_left, init_car_right, init_car_left, init_line
+    right, left, up, down, Position, Message, Actor, Line, Name, LineType, make_actor, position_add, init_line
 };
 
 /*      EXEMPLES D'UTILISATION:
