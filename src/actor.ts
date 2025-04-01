@@ -68,7 +68,6 @@ function make_actor(p: Position, n: Name): Actor {
         mailbox: [],  // Boîte aux lettres vide au départ
         send: (m: Message): void => {
             // console.log(`Actor ${n} sent message: ${m.key}`, m.params);
-            a.mailbox.push(m);
         },
         actions: {},
         update: (actor: Actor): Actor => {

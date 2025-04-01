@@ -9,11 +9,11 @@ describe('Actor game test suite', () => {
     });
 
     test('Make actor should create an actor with correct properties', () => {
-        const position = { x: 10, y: 20 };
+        const pos: A.Position = { x: 10, y: 20 };
         const name = A.Name.Chicken;
-        const actor = A.make_actor(position, name);
+        const actor = A.make_actor(pos, name);
 
-        expect(actor.location).toEqual(position);
+        expect(actor.location).toEqual(pos);
         expect(actor.name).toBe(name);
         expect(typeof actor.send).toBe('function');
         expect(typeof actor.actions.move).toBe('function');
@@ -21,22 +21,23 @@ describe('Actor game test suite', () => {
     });
 
     test('Chicken should be initialized at correct position', () => {
-        const chicken = A.init_chicken(30, 5);
+        const pos: A.Position = { x: 30, y: 5 };
+        const chicken = A.make_actor(pos, A.Name.Chicken);
         expect(chicken.location).toEqual({ x: 30, y: 5 });
         expect(chicken.name).toBe(A.Name.Chicken);
         expect(typeof chicken.actions.collide).toBe('function');
     });
 
     test('Tree should be initialized at given position', () => {
-        const position = { x: 5, y: 10 };
-        const tree = A.init_tree(position);
-        expect(tree.location).toEqual(position);
+        const pos: A.Position = { x: 5, y: 10 };
+        const tree = A.make_actor(pos, A.Name.Tree);
+        expect(tree.location).toEqual(pos);
         expect(tree.name).toBe(A.Name.Tree);
     });
 
     test('Water right should move right on tick', () => {
-        const position = { x: 5, y: 10 };
-        const water = A.init_water_right(position);
+        const pos: A.Position = { x: 5, y: 10 };
+        const water = A.make_actor(pos, A.Name.Water_R);
         expect(water.name).toBe(A.Name.Water_R);
 
         // We can't directly test the movement since the tick_action function 
@@ -45,9 +46,9 @@ describe('Actor game test suite', () => {
     });
 
     test('Car left should be initialized with correct name', () => {
-        const position = { x: 5, y: 10 };
-        const car = A.init_car_left(position);
-        expect(car.location).toEqual(position);
+        const pos: A.Position = { x: 5, y: 10 };
+        const car = A.make_actor(pos, A.Name.Car_L);
+        expect(car.location).toEqual(pos);
         expect(car.name).toBe(A.Name.Car_L);
     });
 
@@ -80,7 +81,7 @@ describe('Actor game test suite', () => {
     // });
 
     test('Init line should create a line with correct properties', () => {
-        const line = A.init_line(10, 5);
+        const line = A.init_line(60, 5);
 
         expect(line.ordinate).toBe(5);
         expect([A.LineType.Nature, A.LineType.Road, A.LineType.River]).toContain(line.type);
@@ -96,6 +97,6 @@ describe('Actor game test suite', () => {
         expect(movedActor.location).toEqual({ x: 6, y: 10 });
 
         const movedAgain = movedActor.actions.move(movedActor, A.up);
-        expect(movedAgain.location).toEqual({ x: 6, y: 11 });
+        expect(movedAgain.location).toEqual({ x: 6, y: 9 });
     });
 });

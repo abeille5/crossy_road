@@ -73,7 +73,7 @@ function run() {
     
     drawFrame();
 
-    let posInit:A.Position = {x:frameX + Math.floor(mapWidth / 2)-2,y:frameY + Math.floor(mapHeight / 2)};
+    const posInit:A.Position = {x:frameX + Math.floor(mapWidth / 2)-2,y:frameY + Math.floor(mapHeight / 2)};
     let poulet:A.Actor = A.make_actor(posInit,A.Name.Chicken);
 
     function drawPlayer() {
@@ -153,7 +153,7 @@ function run() {
 
         // Place entre 5 et 10 murs aléatoires
         const wallCount = Math.floor(Math.random() * 6) + 5;
-        let indices:number[] = [];
+        const indices:number[] = [];
         while (indices.length < wallCount) {
             indices.push(Math.floor(Math.random() * (mapWidth - 2)));
         }
