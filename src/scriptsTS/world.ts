@@ -73,7 +73,8 @@ function run() {
     
     drawFrame();
 
-    let poulet:A.Actor = A.init_chicken(frameX + Math.floor(mapHeight / 2),frameY + Math.floor(mapHeight / 2));
+    let posInit:A.Position = {x:frameX + Math.floor(mapWidth / 2)-2,y:frameY + Math.floor(mapHeight / 2)};
+    let poulet:A.Actor = A.make_actor(posInit,A.Name.Chicken);
 
     function drawPlayer() {
         term.moveTo(poulet.location.x,poulet.location.y);
@@ -152,16 +153,18 @@ function run() {
 
         // Place entre 5 et 10 murs aléatoires
         const wallCount = Math.floor(Math.random() * 6) + 5;
-        const indices = new Set<number>();
-        while (indices.size < wallCount) {
-            indices.add(Math.floor(Math.random() * (mapWidth - 2)));
+        let indices:number[] = [];
+        while (indices.length < wallCount) {
+            indices.push(Math.floor(Math.random() * (mapWidth - 2)));
         }
-        for (const i of indices) newLine[i] = true;
+
+        indices.map(i=>{newLine[i]=true;});
+
 
         obstacles.unshift(newLine);
-        if (obstacles.length > mapHeight - 2) {
+        if (obstacles.length > mapHeight - 2)
             obstacles.pop();
-        }
+
 
         drawObstacles();
         drawPlayer();
@@ -189,7 +192,7 @@ function run() {
         else if (name === 'DOWN' && poulet.location.y < frameY + mapHeight - 2) poulet.mailbox.push({"key":"move","params":[A.down]});
         else if (name === 'LEFT' && poulet.location.x > frameX + 1) poulet.mailbox.push({"key":"move","params":[A.left]});
         else if (name === 'RIGHT' && poulet.location.x < frameX + mapWidth - 2) poulet.mailbox.push({"key":"move","params":[A.right]});
-
+        
         if (checkCollision()) {
             gameOver();
         } else {
