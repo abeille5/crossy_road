@@ -59,6 +59,8 @@ function run() {
     const tickInterval = setInterval(() => {
 	lines.map((l : A.Line) => l.data.map((a : A.Actor) => a.send({"key" : "tick", "params" : []})));
 	console.log("Tick Done");}, 100);
+
+    
     term.on('key', (name: any) => {
         term.moveTo(frameX, frameY + mapHeight - 1);
         term.bgWhite().white(' '.repeat(mapWidth));
@@ -166,7 +168,7 @@ function run() {
         if (checkCollision()) {
             gameOver();
         }
-    }, 500);
+    }, 300);
 
     term.grabInput(true);
     term.on('key', (name: string) => {
