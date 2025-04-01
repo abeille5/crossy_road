@@ -50,8 +50,6 @@ function run() {
     term.moveTo(1, mapHeight);
     term.bgWhite().white(' '.repeat(mapWidth));
     term.styleReset();
-
-
     term.grabInput(true);
 
     // Animation : étoile aléatoire toutes les secondes
@@ -60,7 +58,7 @@ function run() {
     const lines:A.Line[] = init_game();
     const tickInterval = setInterval(() => {
 	lines.map((l : A.Line) => l.data.map((a : A.Actor) => a.send({"key" : "tick", "params" : []})));
-    }, 100);
+	console.log("Tick Done");}, 100);
     term.on('key', (name: any) => {
         term.moveTo(frameX, frameY + mapHeight - 1);
         term.bgWhite().white(' '.repeat(mapWidth));
