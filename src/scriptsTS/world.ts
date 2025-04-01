@@ -9,9 +9,13 @@ const term = terminalKit.terminal;
 
 const title = "CROSSY ROAD";
 
+const nb_line = 14;
+
+const line_length = 60;
+
 function init_game() : A.Line[]{
-    const lines = new Array(20);
-    return lines.map((i : any) => A.init_line(10, i));
+    const lines = new Array(nb_line);
+    return lines.map((i : any) => A.init_line(line_length, i));
 }
 
 function run() {
@@ -51,9 +55,22 @@ function run() {
     term.styleReset();
     term.grabInput(true);
 
+    function tickLine(l : A.Line):A.Line{
+	if (l.ordinate===-1)
+	    return A.init_line(10, 20);
+	l.data.map((a : A.Actor) => a.mailbox.push({"key":"move", "params":[A.down]}));
+	l.data.map((a : A.Actor) => a.actions.tick(a));
+	l.ordinate -= 1;
+	return l;
+    }
+
+    // Animation : étoile aléatoire toutes les secondes
+    const lastX = 2;
+    const lastY = 2;
     const lines:A.Line[] = init_game();
     const tickInterval = setInterval(() => {
-	lines.map((l : A.Line) => l.data.map((a : A.Actor) => a.actions.tick(a)));
+	lines.map((l : A.Line) => tickLine(l));
+	poulet = poulet.actions.tick(poulet);
 	}, 100);
 
 
