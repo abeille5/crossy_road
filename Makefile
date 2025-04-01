@@ -8,9 +8,9 @@ build:
 
 eslint:
 	@echo "Running ESLint..."
-	@npx eslint src test src/scriptsTS
+	@npx eslint -c eslint.config.js
 
-test: build
+test:
 	@echo "Running tests..."
 	@NODE_OPTIONS="$$NODE_OPTIONS --experimental-vm-modules" npx jest -c jest.config.ts
 
