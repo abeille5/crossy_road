@@ -11,8 +11,7 @@ const title = "CROSSY ROAD";
 
 function init_game(): A.Line[] {
     const lines = new Array(20);
-    //return lines.map((i : any) => A.init_line(10, i));
-    return lines.map((i: any) => A.init_line(10, i, 0, []))
+    return lines.map((i: any) => A.init_line(10, i));
 }
 
 function run() {
@@ -80,7 +79,7 @@ function run() {
 
     function drawPlayer() {
         term.moveTo(poulet.location.x, poulet.location.y);
-        term.bgBlack().white('🐔');
+        term.bgBlack().yellow('█');
         term.styleReset();
         term.hideCursor();
     }
@@ -131,7 +130,7 @@ function run() {
             mapY < obstacles.length &&
             mapX >= 0 &&
             mapX < mapWidth - 2 &&
-            obstacles[mapY][mapX + 1]
+            obstacles[mapY][mapX]
         ) {
             return true;
         }
@@ -160,7 +159,7 @@ function run() {
             indices.push(Math.floor(Math.random() * (mapWidth - 2)));
         }
 
-        indices.forEach(ind => { newLine[ind] = true; });
+        indices.map(i => { newLine[i] = true; });
 
 
         obstacles.unshift(newLine);
