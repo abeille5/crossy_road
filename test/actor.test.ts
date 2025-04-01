@@ -36,10 +36,48 @@ describe('Actor game test suite', () => {
     });
 
     test('Water right should move right on tick', () => {
-        // test incomplet
         const pos: A.Position = { x: 5, y: 10 };
         const water = A.make_actor(pos, A.Name.Water_R);
         expect(water.name).toBe(A.Name.Water_R);
+
+        const afterTick = water.actions.tick(water);
+        expect(afterTick.location).toEqual({ x: 6, y: 10 });
+    });
+
+    test('Water left should move left on tick', () => {
+        const pos: A.Position = { x: 5, y: 10 };
+        const water = A.make_actor(pos, A.Name.Water_L);
+        expect(water.name).toBe(A.Name.Water_L);
+
+        const afterTick = water.actions.tick(water);
+        expect(afterTick.location).toEqual({ x: 4, y: 10 });
+    });
+
+    test('Log right should move right on tick', () => {
+        const pos: A.Position = { x: 5, y: 10 };
+        const log = A.make_actor(pos, A.Name.Log_R);
+        expect(log.name).toBe(A.Name.Log_R);
+
+        const afterTick = log.actions.tick(log);
+        expect(afterTick.location).toEqual({ x: 6, y: 10 });
+    });
+
+    test('Log left should move left on tick', () => {
+        const pos: A.Position = { x: 5, y: 10 };
+        const log = A.make_actor(pos, A.Name.Log_L);
+        expect(log.name).toBe(A.Name.Log_L);
+
+        const afterTick = log.actions.tick(log);
+        expect(afterTick.location).toEqual({ x: 4, y: 10 });
+    });
+
+    test('Car right should move right on tick', () => {
+        const pos: A.Position = { x: 5, y: 10 };
+        const car = A.make_actor(pos, A.Name.Car_R);
+        expect(car.name).toBe(A.Name.Car_R);
+
+        const afterTick = car.actions.tick(car);
+        expect(afterTick.location).toEqual({ x: 6, y: 10 });
     });
 
     test('Car left should be initialized with correct name', () => {
@@ -47,37 +85,52 @@ describe('Actor game test suite', () => {
         const car = A.make_actor(pos, A.Name.Car_L);
         expect(car.location).toEqual(pos);
         expect(car.name).toBe(A.Name.Car_L);
+
+        const afterTick = car.actions.tick(car);
+        expect(afterTick.location).toEqual({ x: 4, y: 10 });
     });
 
-    /*
-    test('Collide action should create a new actor with same properties and send a die message', () => {        // test à corriger
-        const position = { x: 5, y: 10 };
-        const actor = A.make_actor(position, A.Name.Chicken);
+    test('Actor update should handle empty mailbox', () => {
+        const pos: A.Position = { x: 5, y: 10 };
+        const actor = A.make_actor(pos, A.Name.Chicken);
 
-        // Définir messageSent avec un message par défaut
-        let messageSent: A.Message = { key: "", params: [] };
-
-        // Espionner la méthode send
-        const originalSend = actor.send;
-        actor.send = (message) => {
-            messageSent = message;
-            originalSend.call(actor, message);
-        };
-
-        // Action
-        const collidedActor = actor.actions.collide(actor);
-
-        // Assert
-        // 1. Vérifier que l'acteur retourné a la même position et le même nom
-        expect(collidedActor.location).toEqual(position);
-        expect(collidedActor.name).toBe(A.Name.Chicken);
-
-        // 2. Vérifier que le message "die" a été envoyé
-        expect(messageSent).not.toBeNull();
-        expect(messageSent.key).toBe("die");
-        expect(messageSent.params).toEqual([]);
+        const updatedActor = actor.update(actor);
+        expect(updatedActor.location).toEqual(pos);
+        expect(updatedActor.mailbox).toEqual([]);
     });
-    */
+
+    test('Chicken should not move on tick', () => {
+        const pos: A.Position = { x: 5, y: 10 };
+        const chicken = A.make_actor(pos, A.Name.Chicken);
+
+        const afterTick = chicken.actions.tick(chicken);
+        expect(afterTick.location).toEqual(pos);
+    });
+
+    test('Tree should not move on tick', () => {
+        const pos: A.Position = { x: 5, y: 10 };
+        const tree = A.make_actor(pos, A.Name.Tree);
+
+        const afterTick = tree.actions.tick(tree);
+        expect(afterTick.location).toEqual(pos);
+    });
+
+    test('Actor can move in all directions', () => {
+        const pos: A.Position = { x: 5, y: 10 };
+        const actor = A.make_actor(pos, A.Name.Chicken);
+
+        const movedRight = actor.actions.move(actor, A.right);
+        expect(movedRight.location).toEqual({ x: 6, y: 10 });
+
+        const movedLeft = actor.actions.move(actor, A.left);
+        expect(movedLeft.location).toEqual({ x: 4, y: 10 });
+
+        const movedUp = actor.actions.move(actor, A.up);
+        expect(movedUp.location).toEqual({ x: 5, y: 9 });
+
+        const movedDown = actor.actions.move(actor, A.down);
+        expect(movedDown.location).toEqual({ x: 5, y: 11 });
+    });
 
     test('Init line should create a valid line structure', () => {
         const line = A.init_line(60, 5);
@@ -121,4 +174,35 @@ describe('Actor game test suite', () => {
         const movedAgain = movedActor.actions.move(movedActor, A.up);
         expect(movedAgain.location).toEqual({ x: 6, y: 9 });
     });
+
+    /*
+    test('Collide action should create a new actor with same properties and send a die message', () => {        // test à corriger
+        const position = { x: 5, y: 10 };
+        const actor = A.make_actor(position, A.Name.Chicken);
+
+        // Définir messageSent avec un message par défaut
+        let messageSent: A.Message = { key: "", params: [] };
+
+        // Espionner la méthode send
+        const originalSend = actor.send;
+        actor.send = (message) => {
+            messageSent = message;
+            originalSend.call(actor, message);
+        };
+
+        // Action
+        const collidedActor = actor.actions.collide(actor);
+        
+        // Assert
+        // 1. Vérifier que l'acteur retourné a la même position et le même nom
+        expect(collidedActor.location).toEqual(position);
+        expect(collidedActor.name).toBe(A.Name.Chicken);
+
+        // 2. Vérifier que le message "die" a été envoyé
+        expect(messageSent).not.toBeNull();
+        expect(messageSent.key).toBe("die");
+        expect(messageSent.params).toEqual([]);
+    });
+    */
+
 });
