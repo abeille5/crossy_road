@@ -35,7 +35,7 @@ type Line = {
 
 type Actor = {
     location: Position;
-    mailbox: Message[];  // Ajout d'une boîte aux lettres
+    mailbox: Message[];
     send: (m: Message) => void;
     actions: {
         [key: string]: (a: Actor, ...rest: any) => Actor;
