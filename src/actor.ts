@@ -1,3 +1,5 @@
+import { group } from "console";
+
 const right: Position = {
     x: 1,
     y: 0
@@ -140,6 +142,7 @@ function position_add(current_position: Position, dx: Position): Position {
 }
 
 // Initialise une ligne avec des acteurs aléatoires selon son type
+/*
 function init_line(size_x: number, size_y: number): Line {
     const random_line: number = Math.floor(Math.random() * 3) + 1;
     const l: Line = {
@@ -162,8 +165,7 @@ function init_line(size_x: number, size_y: number): Line {
             l.data = Array.from({ length: size_x }, (_, i) =>
                 (Math.random() > 0.5)
                     ? (left1 ? make_actor({ x: i, y: l.ordinate }, Name.Car_L) : make_actor({ x: i, y: l.ordinate }, Name.Car_R))
-                    : make_actor({ x: i, y: l.ordinate }, Name.Empty
-                    );
+                    : make_actor({ x: i, y: l.ordinate }, Name.Empty));
             break;
         case 3:
             let left2 = 1;
@@ -182,7 +184,65 @@ function init_line(size_x: number, size_y: number): Line {
             break;
     };
     return l;
+};*/
+
+
+function init_line(size_x: number, size_y: number, difficulty: number, previousLines: Line[]): Line {
+    const random_line: number = Math.floor(Math.random() * 3) + 1;
+    const obstacleProbability = Math.min(0.3 + difficulty * 0.05, 0.8);  // De 30% à 80%
+
+    let l: Line = {
+        ordinate: size_y,
+        type: random_line,
+        data: new Array(size_x).fill(make_actor({ x: 0, y: size_y }, Name.Empty))
+    };
+
+    do {
+        switch (l.type) {
+            case 1:
+                l.data = generatePatternedLine(size_x, Name.Tree, obstacleProbability, l.ordinate);
+                break;
+            case 2:
+                l.data = generatePatternedLine(size_x, Math.random() > 0.5 ? Name.Car_L : Name.Car_R, obstacleProbability, l.ordinate);
+                break;
+            case 3:
+                l.data = generatePatternedLine(size_x, Math.random() > 0.5 ? Name.Log_L : Name.Log_R, obstacleProbability, l.ordinate);
+                break;
+            default:
+                console.log("Inexistant type of line");
+                break;
+        }
+    } while (!hasValidPath(l));
+
+    return l;
+};
+
+function generatePatternedLine(size_x: number, obstacleType: Name, probability: number, y: number): Array<any> {
+    let j = 0
+    return [...Array(size_x)].map((_, i, arr) => {
+        if (j !== 0) {
+            j--;
+            return arr[i];
+        }
+
+        if (Math.random() < probability) {
+            const groupSize = Math.min(Math.floor(Math.random() * 3) + 1, size_x - i);
+            j = groupSize;
+            arr.slice(i + 1, i + groupSize).map((k) => make_actor({ x: i + k, y }, obstacleType));
+            return make_actor({ x: i, y }, obstacleType);
+        }
+
+        return make_actor({ x: i, y }, Name.Empty);
+    });
 }
+
+
+
+function hasValidPath(line: Line): boolean {
+    let freeCells = line.data.map((cell, index) => (cell.name === Name.Empty ? index : -1)).filter(index => index !== -1);
+    return freeCells.length > 0 && freeCells.some((_, i) => i > 0 && freeCells[i] - freeCells[i - 1] === 1);
+};
+
 
 export {
     right, left, up, down, Position, Message, Actor, Line, Name, LineType, make_actor, position_add, init_line
