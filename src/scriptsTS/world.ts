@@ -13,17 +13,6 @@ const nb_line:number = 14;
 
 const line_length:number = 60;
 
-function init_game() : A.Line[]{
-    const lines: A.Line[]= Array.from({length : nb_line}, () => A.init_line(0, 0));
-    lines.map((l : A.Line) => A.init_line(line_length, lines.indexOf(l)));
-    console.log(typeof(lines[0]));
-    for (let i = 0; i < nb_line; i++)
-	for (let j = 0; j<line_length; j++)
-	    console.log(typeof(lines[i].data[j]));
-    return lines;
-}
-
-
 function run() {
     term.clear();
     const screenWidth = term.width;
@@ -62,8 +51,8 @@ function run() {
     term.grabInput(true);
 
     function tickLine(l : A.Line):A.Line{
-	if (l.ordinate===-1)
-	    return A.init_line(10, 20);
+	if (l.ordinate < 0)
+	    return A.init_line(line_length, nb_line - 1);
 	l.data.map((a : A.Actor) => a.mailbox.push({"key":"move", "params":[A.down]}));
 	l.data.map((a : A.Actor) => a.actions.tick(a));
 	l.ordinate -= 1;
@@ -73,9 +62,10 @@ function run() {
     // Animation : étoile aléatoire toutes les secondes
     const lastX = 2;
     const lastY = 2;
-    const lines:A.Line[] = init_game();
+    let lines:A.Line[] = new Array(nb_line).fill(null).map((_, i:number) => A.init_line(line_length, i));
+    
     const tickInterval = setInterval(() => {
-	lines.map((l : A.Line) => tickLine(l));
+	lines = lines.map((l : A.Line) => tickLine(l));
 	poulet = poulet.actions.tick(poulet);
 	}, 100);
 
@@ -103,28 +93,36 @@ function run() {
     }
 
     function drawActor(a:A.Actor, x:number, y:number): A.Actor{
-	term.moveTo(0, 0);
-	console.log(a.name);
-	term.moveTo(x, y);
+	if (y > nb_line)
+	    return a.update(a);
+	term.moveTo(frameX + x, frameY + y);
 	if (a.name === A.Name.Tree)
 	    term.bgBlack().green('A');
 	else if (a.name === A.Name.Water_R || a.name === A.Name.Water_L)
 	    term.bgBlack().blue('A');
 	else if (a.name === A.Name.Log_R || a.name === A.Name.Log_L)
-	    term.bgBlack().brown('A');
+	    term.bgBlack().brightBlack('A');
 	else if (a.name === A.Name.Car_R || a.name === A.Name.Car_L)
 	    term.bgBlack().grey('A');
 	else if (a.name === A.Name.Chicken)
-	    term.bgBlack().white('C');
+	    term.bgBlack().white('🐔');
 	else
 	    term.bgBlack().black(' ');
 	term.styleReset();
 	return a.update(a);
     }
 
-    const updateInterval = setInterval(() => {
+    function drawLine(l:A.Line):A.Line{
+	l.data = l.data.map((a : A.Actor) => drawActor(a, a.location.x, nb_line - l.ordinate));
+	return l;
+    }
+    
+    const frameInterval = setInterval(() => {
 	drawFrame();
-	lines.map((l: A.Line) => l.data.map((a : A.Actor) => drawActor(a, nb_line - l.ordinate, a.location.y)));
+    }, 300);
+
+    const updateInterval = setInterval(() => {
+	lines = lines.map((l: A.Line) => drawLine(l));
 	poulet = poulet.update(poulet);
 	drawActor(poulet, poulet.location.x, poulet.location.y);
 	}, 10);
@@ -178,6 +176,7 @@ function run() {
         term("\x1B[?25h");
         clearInterval(tick);
         clearInterval(tickInterval);
+	clearInterval(frameInterval);
         term.grabInput(false);
         term.moveTo(frameX, frameY + mapHeight + 1);
         term.red.bold("💥 Game Over !\n");
@@ -228,6 +227,7 @@ function run() {
             clearInterval(tickInterval); 
             clearInterval(updateInterval);
             clearInterval(tick);
+	    clearInterval(frameInterval);
             term.grabInput(false);
             term.clear();
             term("\x1B[?25h");
