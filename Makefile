@@ -4,6 +4,7 @@ build:
 	@echo "Building files..."
 	@npx tsc -p tsconfig.json
 	@npx tsc src/actor.ts
+	@npx tsc src/scriptsTS/world.ts
 
 eslint:
 	@echo "Running ESLint..."

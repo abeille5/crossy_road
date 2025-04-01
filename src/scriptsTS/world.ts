@@ -47,7 +47,7 @@ function run() {
         }}
 
     // Bottom border
-    term.moveTo(1, mapHeight);
+    term.moveTo(frameX, frameY + mapHeight - 1);
     term.bgWhite().white(' '.repeat(mapWidth));
     term.styleReset();
     term.grabInput(true);
@@ -57,21 +57,23 @@ function run() {
     const lastY = 2;
     const lines:A.Line[] = init_game();
     const tickInterval = setInterval(() => {
-	lines.map((l : A.Line) => l.data.map((a : A.Actor) => a.send({"key" : "tick", "params" : []})));
-	console.log("Tick Done");}, 100);
+	lines.map((l : A.Line) => l.data.map((a : A.Actor) => a.actions.tick(a)));
+	}, 100);
 
-    
+
     term.on('key', (name: any) => {
         term.moveTo(frameX, frameY + mapHeight - 1);
         term.bgWhite().white(' '.repeat(mapWidth));
         term.styleReset();
     });
 
+    const updateInterval = setInterval(() => {
+	lines.map((l: A.Line) => l.data.map((a : A.Actor) => a.update(a)));
+	}, 10);
+    
     drawFrame();
 
     const poulet:A.Actor = A.init_chicken(frameX + Math.floor(mapHeight / 2),frameY + Math.floor(mapHeight / 2));
-    //let playerX = ;
-    //let playerY = frameY + Math.floor(mapHeight / 2);
 
     function drawPlayer() {
         term.moveTo(poulet.location.x,poulet.location.y);
@@ -174,6 +176,7 @@ function run() {
     term.on('key', (name: string) => {
         if (name === 'q' || name === 'CTRL_C') {
             clearInterval(tickInterval); // stop animation
+	    clearInterval(updateInterval);
             clearInterval(tick);
             term.grabInput(false);
             term.clear();
@@ -182,10 +185,10 @@ function run() {
 
         erasePlayer();
 
-        if (name === 'UP' && poulet.location.y > frameY + 1) poulet.send({'key':'move','params':[A.up]});
-        else if (name === 'DOWN' && poulet.location.y < frameY + mapHeight - 2) poulet.send({'key':'move','params':[A.down]});
-        else if (name === 'LEFT' && poulet.location.x > frameX + 1) poulet.send({'key':'move','params':[A.left]});
-        else if (name === 'RIGHT' && poulet.location.x < frameX + mapWidth - 2) poulet.send({'key':'move','params':[A.right]});
+        if (name === 'UP' && poulet.location.y > frameY + 1) poulet.actions.move(poulet,A.up);
+        else if (name === 'DOWN' && poulet.location.y < frameY + mapHeight - 2) poulet.actions.move(poulet,A.down);
+else if (name === 'LEFT' && poulet.location.x > frameX + 1) poulet.actions.move(poulet,A.left);
+else if (name === 'RIGHT' && poulet.location.x < frameX + mapWidth - 2) poulet.actions.move(poulet,A.right);
 
         if (checkCollision()) {
             gameOver();
