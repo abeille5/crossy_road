@@ -184,6 +184,5 @@ function init_line(size_x: number, size_y: number): Line {
     return l;
 }
 
-export {
-    right, left, up, down, Position, Message, Actor, Line, Name, LineType, make_actor, position_add, init_line
+export {    right, left, up, down, Position, Message, Actor, Line, Name, LineType, make_actor, position_add, init_line
 };
