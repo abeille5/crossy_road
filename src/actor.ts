@@ -97,7 +97,7 @@ function make_actor(p: Position, n: Name): Actor {
     // Définir les actions standard
     a.actions.move = (a: Actor, dx: Position): Actor => {
         const newActor = make_actor(position_add(a.location, dx), n);
-        newActor.actions = { ...a.actions };  // Copier les actions
+        newActor.actions = { ...a.actions };
         return newActor;
     };
 
@@ -111,7 +111,7 @@ function make_actor(p: Position, n: Name): Actor {
     a.actions.tick = (a: Actor): Actor => {
         // Implémenter le comportement automatique selon le type d'acteur
         const newActor = make_actor(a.location, a.name);
-        newActor.actions = { ...a.actions };  // Copier les actions
+        newActor.actions = { ...a.actions };
 
         switch (a.name) {
             case Name.Water_R:
@@ -312,7 +312,10 @@ function init_line(size_x: number, size_y: number) {
     return l;
 }
 
-export { right, left, up, down, Position, Message, Actor, Line, Name, LineType, make_actor, position_add, init_chicken, init_tree, init_water_right, init_water_left, init_log_right, init_log_left, init_car_right, init_car_left, init_line };
+export {
+    right, left, up, down, Position, Message, Actor, Line, Name, LineType, make_actor, position_add,
+    init_chicken, init_tree, init_water_right, init_water_left, init_log_right, init_log_left, init_car_right, init_car_left, init_line
+};
 
 /*      EXEMPLES D'UTILISATION:
 

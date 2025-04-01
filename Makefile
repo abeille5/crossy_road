@@ -1,24 +1,29 @@
 all: eslint build test
 
 build:
-	npx tsc -p tsconfig.json
-	npx tsc src/actor.ts
+	@echo "Building files..."
+	@npx tsc -p tsconfig.json
+	@npx tsc src/actor.ts
 
 eslint:
-	npx eslint src test src/scriptsTS
+	@echo "Running ESLint..."
+	@npx eslint src test src/scriptsTS
 
 test: build
-	NODE_OPTIONS="$$NODE_OPTIONS --experimental-vm-modules" npx jest -c jest.config.ts
+	@echo "Running tests..."
+	@NODE_OPTIONS="$$NODE_OPTIONS --experimental-vm-modules" npx jest -c jest.config.ts
 
 run:
-	npx tsc
-	node dist/src/scriptsTS/world.js
+	@echo "Running the script..."
+	@npx tsc
+	@node dist/src/scriptsTS/world.js
 
 watch:
-	npx tsc -w -p tsconfig.json
+	@npx tsc -w -p tsconfig.json
 
 clean:
-	rm -f *~ src/*~ src/*/*~ test/*~ html/*~
-	rm -rf dist/*
+	@echo "Cleaning up..."
+	@rm -f *~ src/*~ src/*/*~ test/*~ html/*~
+	@rm -rf dist/*
 
 .PHONY: all archive build clean eslint parcel test run watch
