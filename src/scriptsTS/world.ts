@@ -9,14 +9,20 @@ const term = terminalKit.terminal;
 
 const title = "CROSSY ROAD";
 
-const nb_line = 14;
+const nb_line:number = 14;
 
-const line_length = 60;
+const line_length:number = 60;
 
 function init_game() : A.Line[]{
-    const lines = new Array(nb_line);
-    return lines.map((i : any) => A.init_line(line_length, i));
+    const lines: A.Line[]= Array.from({length : nb_line}, () => A.init_line(0, 0));
+    lines.map((l : A.Line) => A.init_line(line_length, lines.indexOf(l)));
+    console.log(typeof(lines[0]));
+    for (let i = 0; i < nb_line; i++)
+	for (let j = 0; j<line_length; j++)
+	    console.log(typeof(lines[i].data[j]));
+    return lines;
 }
+
 
 function run() {
     term.clear();
@@ -80,13 +86,6 @@ function run() {
         term.styleReset();
     });
 
-    const updateInterval = setInterval(() => {
-	lines.map((l: A.Line) => l.data.map((a : A.Actor) => drawActor(a)));
-    poulet = poulet.update(poulet);
-	}, 10);
-    
-    drawFrame();
-
     const posInit:A.Position = {x:frameX + Math.floor(mapWidth / 2)-2,y:frameY + Math.floor(mapHeight / 2)};
     let poulet:A.Actor = A.make_actor(posInit,A.Name.Chicken);
 
@@ -103,19 +102,32 @@ function run() {
         term.styleReset();
     }
 
-    function drawActor(a:A.Actor): A.Actor{
-	if (a.name === A.Tree)
-	    term.bgBlack().green(' ');
-	else if (a.name === A.Water_R || a.name === A.Water_L)
-	    term.bgBlack().blue(' ');
-	else if (a.name === A.Log_R || a.name === A.Log_L)
-	    term.bgBlack().brown(' ');
-	else if (a.name === A.Car_R || a.name === A.Car_L)
-	    term.bgBlack().grey(' ');
+    function drawActor(a:A.Actor, x:number, y:number): A.Actor{
+	term.moveTo(0, 0);
+	console.log(a.name);
+	term.moveTo(x, y);
+	if (a.name === A.Name.Tree)
+	    term.bgBlack().green('A');
+	else if (a.name === A.Name.Water_R || a.name === A.Name.Water_L)
+	    term.bgBlack().blue('A');
+	else if (a.name === A.Name.Log_R || a.name === A.Name.Log_L)
+	    term.bgBlack().brown('A');
+	else if (a.name === A.Name.Car_R || a.name === A.Name.Car_L)
+	    term.bgBlack().grey('A');
+	else if (a.name === A.Name.Chicken)
+	    term.bgBlack().white('C');
+	else
+	    term.bgBlack().black(' ');
+	term.styleReset();
 	return a.update(a);
     }
-    
-    drawPlayer();
+
+    const updateInterval = setInterval(() => {
+	drawFrame();
+	lines.map((l: A.Line) => l.data.map((a : A.Actor) => drawActor(a, nb_line - l.ordinate, a.location.y)));
+	poulet = poulet.update(poulet);
+	drawActor(poulet, poulet.location.x, poulet.location.y);
+	}, 10);
 
     const obstacles: boolean[][] = [];
 
@@ -138,7 +150,6 @@ function run() {
             }
         });
     }
-
 
     function checkCollision(): boolean {
         const mapY = poulet.location.y - frameY - 1;
@@ -173,7 +184,9 @@ function run() {
         term.styleReset();
         process.exit(0);
     }
-    const tick = setInterval(() => {
+
+    const tick = setInterval(() => {/*
+
         const newLine = new Array(mapWidth - 2).fill(false);
     
         // Largeurs aléatoires des courbes
@@ -207,7 +220,7 @@ function run() {
         if (checkCollision()) {
             gameOver();
         }
-    }, 300);
+    */}, 300);
 
     term.grabInput(true);
     term.on('key', (name: string) => {
