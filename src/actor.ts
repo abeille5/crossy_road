@@ -9,12 +9,12 @@ const left: Position = {
 
 const up: Position = {
     x: 0,
-    y: 1
+    y: -1
 };
 
 const down: Position = {
     x: 0,
-    y: -1
+    y: 1
 };
 
 type Position = {
@@ -68,6 +68,7 @@ function make_actor(p: Position, n: Name): Actor {
         mailbox: [],  // Boîte aux lettres vide au départ
         send: (m: Message): void => {
             // console.log(`Actor ${n} sent message: ${m.key}`, m.params);
+            a.mailbox.push(m);
         },
         actions: {},
         update: (actor: Actor): Actor => {
@@ -238,7 +239,7 @@ function init_car_left(pos: Position) {
     return new_actor;
 }
 
-function init_line(size_x: number, size_y: number) {
+function init_line(size_x: number, size_y: number):Line{
     const random_line: number = Math.floor(Math.random() * 3) + 1;
     const l: Line = {
         ordinate: size_y,
