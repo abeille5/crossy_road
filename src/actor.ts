@@ -162,8 +162,8 @@ function init_line(size_x: number, size_y: number): Line {
             l.data = Array.from({ length: size_x }, (_, i) =>
                 (Math.random() > 0.5)
                     ? (left1 ? make_actor({ x: i, y: l.ordinate }, Name.Car_L) : make_actor({ x: i, y: l.ordinate }, Name.Car_R))
-                    : make_actor({ x: i, y: l.ordinate }, Name.Empty
-                    );
+                    : make_actor({ x: i, y: l.ordinate }, Name.Empty)
+            );
             break;
         case 3:
             let left2 = 1;
