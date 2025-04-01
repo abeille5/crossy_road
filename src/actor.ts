@@ -68,7 +68,6 @@ function make_actor(p: Position, n: Name): Actor {
         mailbox: [],  // Boîte aux lettres vide au départ
         send: (m: Message): void => {
             // console.log(`Actor ${n} sent message: ${m.key}`, m.params);
-            a.mailbox.push(m);
         },
         actions: {},
         update: (actor: Actor): Actor => {
@@ -87,7 +86,7 @@ function make_actor(p: Position, n: Name): Actor {
             // Retourner l'acteur mis à jour
             return updatedActor;
         },
-        name: n,
+        name: n
     };
 
     // Définir les actions standard

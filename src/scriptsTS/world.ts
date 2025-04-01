@@ -73,12 +73,12 @@ function run() {
     
     drawFrame();
 
-    let posInit:A.Position = {x:frameX + Math.floor(mapWidth / 2)-2,y:frameY + Math.floor(mapHeight / 2)};
+    const posInit:A.Position = {x:frameX + Math.floor(mapWidth / 2)-2,y:frameY + Math.floor(mapHeight / 2)};
     let poulet:A.Actor = A.make_actor(posInit,A.Name.Chicken);
 
     function drawPlayer() {
         term.moveTo(poulet.location.x,poulet.location.y);
-        term.bgBlack().yellow('█');
+        term.bgBlack().white('🐔');
         term.styleReset();
         term.hideCursor();
     }
@@ -129,7 +129,7 @@ function run() {
             mapY < obstacles.length &&
             mapX >= 0 &&
             mapX < mapWidth - 2 &&
-            obstacles[mapY][mapX]
+            obstacles[mapY][mapX +1]
         ) {
             return true;
         }
@@ -153,12 +153,12 @@ function run() {
 
         // Place entre 5 et 10 murs aléatoires
         const wallCount = Math.floor(Math.random() * 6) + 5;
-        let indices:number[] = [];
+        const indices:number[] = [];
         while (indices.length < wallCount) {
             indices.push(Math.floor(Math.random() * (mapWidth - 2)));
         }
 
-        indices.map(i=>{newLine[i]=true;});
+        indices.forEach(ind=>{newLine[ind]=true;});
 
 
         obstacles.unshift(newLine);
@@ -178,7 +178,7 @@ function run() {
     term.on('key', (name: string) => {
         if (name === 'q' || name === 'CTRL_C') {
             clearInterval(tickInterval); 
-	        clearInterval(updateInterval);
+            clearInterval(updateInterval);
             clearInterval(tick);
             term.grabInput(false);
             term.clear();
