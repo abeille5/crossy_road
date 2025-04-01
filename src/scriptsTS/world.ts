@@ -81,7 +81,7 @@ function run() {
     });
 
     const updateInterval = setInterval(() => {
-	lines.map((l: A.Line) => l.data.map((a : A.Actor) => a.update(a)));
+	lines.map((l: A.Line) => l.data.map((a : A.Actor) => drawActor(a)));
     poulet = poulet.update(poulet);
 	}, 10);
     
@@ -103,6 +103,18 @@ function run() {
         term.styleReset();
     }
 
+    function drawActor(a:A.Actor): A.Actor{
+	if (a.name === A.Tree)
+	    term.bgBlack().green(' ');
+	else if (a.name === A.Water_R || a.name === A.Water_L)
+	    term.bgBlack().blue(' ');
+	else if (a.name === A.Log_R || a.name === A.Log_L)
+	    term.bgBlack().brown(' ');
+	else if (a.name === A.Car_R || a.name === A.Car_L)
+	    term.bgBlack().grey(' ');
+	return a.update(a);
+    }
+    
     drawPlayer();
 
     const obstacles: boolean[][] = [];
