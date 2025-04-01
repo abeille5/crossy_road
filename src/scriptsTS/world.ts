@@ -25,7 +25,7 @@ function run() {
     }
 
     const titleX = Math.floor((screenWidth - title.length) / 2);
-    const titleY = 2;
+    const titleY = 7;
     term.moveTo(titleX, titleY).bgBlack().white().bold(title);
 
     const mapWidth = Math.floor(screenWidth / 2);
@@ -35,7 +35,7 @@ function run() {
 
     function drawFrame() {
         term.moveTo(frameX, frameY);
-        term.bgWhite().white(' '.repeat(mapWidth));
+        term.bgWhite().yellow(' '.repeat(mapWidth));
         term.styleReset();
 
         for (let y = 1; y < mapHeight - 1; y++) {
@@ -51,9 +51,6 @@ function run() {
     term.styleReset();
     term.grabInput(true);
 
-    // Animation : étoile aléatoire toutes les secondes
-    const lastX = 2;
-    const lastY = 2;
     const lines:A.Line[] = init_game();
     const tickInterval = setInterval(() => {
 	lines.map((l : A.Line) => l.data.map((a : A.Actor) => a.actions.tick(a)));
@@ -94,30 +91,24 @@ function run() {
     const obstacles: boolean[][] = [];
 
     function drawObstacles() {
-        // Efface l'intérieur de la map
-        for (let y = 1; y < mapHeight - 1; y++) {
-            term.moveTo(frameX + 1, frameY + y);
-            term.bgBlack().white(' '.repeat(mapWidth - 2));
-        }
+        // Redessine uniquement les obstacles
 
-        // Redessine les obstacles
-        for (let i = 0; i < obstacles.length; i++) {
-            const line = obstacles[i];
+        obstacles.forEach((line, i) => {
             const y = frameY + 1 + i;
-            if (y >= frameY + mapHeight - 1) continue;
-
-            term.moveTo(frameX + 1, y);
-            for (let x = 0; x < line.length; x++) {
-                if (line[x]) {
-                    term.bgWhite().white(' ');
-                } else {
-                    term.bgBlack().white(' ');
-                }
+            if (y < frameY + mapHeight - 1)
+            {
+                term.moveTo(frameX + 1, y);
+                line.forEach((x)=>{
+                    if (x) {
+                        term.bgGreen().white(' ');
+                    } else {
+                        term.bgBlack().white(' ');
+                    }
+                });      
+                term.styleReset();
             }
-            term.styleReset();
-        }
+        });
     }
-
 
 
     function checkCollision(): boolean {
@@ -135,6 +126,13 @@ function run() {
         }
         return false;
     }
+    function clearMap() {
+        for (let y = 0; y < mapHeight - 2; y++) {
+            term.moveTo(frameX + 1, frameY + 1 + y);
+            term.bgBlack().white(' '.repeat(mapWidth - 2)); // Redessine une ligne vide
+        }
+        term.styleReset();
+    }
 
     function gameOver() {
         term("\x1B[?25h");
@@ -146,29 +144,37 @@ function run() {
         term.styleReset();
         process.exit(0);
     }
-
     const tick = setInterval(() => {
-
         const newLine = new Array(mapWidth - 2).fill(false);
-
-        // Place entre 5 et 10 murs aléatoires
-        const wallCount = Math.floor(Math.random() * 6) + 5;
-        const indices:number[] = [];
-        while (indices.length < wallCount) {
-            indices.push(Math.floor(Math.random() * (mapWidth - 2)));
+    
+        // Largeurs aléatoires des courbes
+        const leftWidth = Math.floor(Math.random() * 6) + 5; // Entre 5 et 10
+        const rightWidth = Math.floor(Math.random() * 6) + 5; // Entre 5 et 10
+    
+        // Générer la courbe à gauche
+        for (let x = 0; x < leftWidth; x++) {
+            newLine[x] = true;
         }
-
-        indices.forEach(ind=>{newLine[ind]=true;});
-
-
+    
+        // Générer la courbe à droite
+        for (let x = mapWidth - 3; x >= mapWidth - 3 - rightWidth; x--) {
+            newLine[x] = true;
+        }
+    
+        // Ajouter la nouvelle ligne en haut
         obstacles.unshift(newLine);
-        if (obstacles.length > mapHeight - 2)
+    
+        // Supprimer les lignes dépassant la hauteur de la carte
+        if (obstacles.length > mapHeight - 2) {
             obstacles.pop();
-
-
+        }
+    
+        // Redessiner les obstacles et le joueur
+        clearMap();
         drawObstacles();
         drawPlayer();
-
+    
+        // Vérifier les collisions
         if (checkCollision()) {
             gameOver();
         }
@@ -196,6 +202,7 @@ function run() {
         if (checkCollision()) {
             gameOver();
         } else {
+            drawObstacles();
             drawPlayer();
         }
     });
