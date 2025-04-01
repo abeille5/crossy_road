@@ -1,8 +1,7 @@
 *~
 dist/
-node_modules/*
+node_modules/
 package-lock.json
 *.js
 *#*
 *example*
-!node_modules/.gitkeep
