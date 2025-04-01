@@ -36,13 +36,10 @@ describe('Actor game test suite', () => {
     });
 
     test('Water right should move right on tick', () => {
+        // test incomplet
         const pos: A.Position = { x: 5, y: 10 };
         const water = A.make_actor(pos, A.Name.Water_R);
         expect(water.name).toBe(A.Name.Water_R);
-
-        // We can't directly test the movement since the tick_action function 
-        // doesn't actually return the moved actor, it would need to be fixed
-        // in the original code to properly test this functionality
     });
 
     test('Car left should be initialized with correct name', () => {
@@ -52,42 +49,67 @@ describe('Actor game test suite', () => {
         expect(car.name).toBe(A.Name.Car_L);
     });
 
-    // test('Collide action should create a new actor with same properties and send a die message', () => {        // Arrangement
-    //     const position = { x: 5, y: 10 };
-    //     const actor = A.make_actor(position, A.Name.Chicken);
+    /*
+    test('Collide action should create a new actor with same properties and send a die message', () => {        // test à corriger
+        const position = { x: 5, y: 10 };
+        const actor = A.make_actor(position, A.Name.Chicken);
 
-    //     // Définir messageSent avec un message par défaut
-    //     // let messageSent: A.Message = { key: "", params: [] };
+        // Définir messageSent avec un message par défaut
+        let messageSent: A.Message = { key: "", params: [] };
 
-    //     // Espionner la méthode send
-    //     // const originalSend = actor.send;
-    //     // actor.send = (message) => {
-    //     //     messageSent = message;
-    //     //     originalSend.call(actor, message);
-    //     // };
+        // Espionner la méthode send
+        const originalSend = actor.send;
+        actor.send = (message) => {
+            messageSent = message;
+            originalSend.call(actor, message);
+        };
 
-    //     // Action
-    //     const collidedActor = actor.actions.collide(actor);
+        // Action
+        const collidedActor = actor.actions.collide(actor);
 
-    //     // Assert
-    //     // 1. Vérifier que l'acteur retourné a la même position et le même nom
-    //     expect(collidedActor.location).toEqual(position);
-    //     expect(collidedActor.name).toBe(A.Name.Chicken);
+        // Assert
+        // 1. Vérifier que l'acteur retourné a la même position et le même nom
+        expect(collidedActor.location).toEqual(position);
+        expect(collidedActor.name).toBe(A.Name.Chicken);
 
-    //     // 2. Vérifier que le message "die" a été envoyé
-    //     // expect(messageSent).not.toBeNull();
-    //     // expect(messageSent.key).toBe("die");
-    //     // expect(messageSent.params).toEqual([]);
-    // });
+        // 2. Vérifier que le message "die" a été envoyé
+        expect(messageSent).not.toBeNull();
+        expect(messageSent.key).toBe("die");
+        expect(messageSent.params).toEqual([]);
+    });
+    */
 
-    test('Init line should create a line with correct properties', () => {
+    test('Init line should create a valid line structure', () => {
         const line = A.init_line(60, 5);
 
         expect(line.ordinate).toBe(5);
-        expect([A.LineType.Nature, A.LineType.Road, A.LineType.River]).toContain(line.type);
         expect(line.data.length).toBe(60);
+        expect([A.LineType.Nature, A.LineType.Road, A.LineType.River]).toContain(line.type);
+
+        // Vérifier que certains éléments sont initialisés
+        const hasElements = line.data.some(actor => actor !== null && actor !== undefined);
+        expect(hasElements).toBe(true);
     });
 
+    test('Init line should preserve the ordinate value', () => {
+        const line1 = A.init_line(10, 1);
+        const line2 = A.init_line(10, 5);
+        const line3 = A.init_line(10, 10);
+
+        expect(line1.ordinate).toBe(1);
+        expect(line2.ordinate).toBe(5);
+        expect(line3.ordinate).toBe(10);
+    });
+
+    test('Init line should handle different sizes', () => {
+        const line1 = A.init_line(5, 1);
+        const line2 = A.init_line(15, 1);
+        const line3 = A.init_line(20, 1);
+
+        expect(line1.data.length).toBe(5);
+        expect(line2.data.length).toBe(15);
+        expect(line3.data.length).toBe(20);
+    });
 
     test('Actor movement should update position', () => {
         const position = { x: 5, y: 10 };

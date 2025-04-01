@@ -61,13 +61,13 @@ enum LineType {
     River
 };
 
-// Return an actor with a defined position and an initialized action move
+// Retourne un acteur avec une position définie et une action de déplacement initialisée
 function make_actor(p: Position, n: Name): Actor {
     const a: Actor = {
         location: p,
         mailbox: [],  // Boîte aux lettres vide au départ
         send: (m: Message): void => {
-            // console.log(`Actor ${n} sent message: ${m.key}`, m.params);
+            // console.log(`The actor ${n} sent the message: ${m.key}`, m.params);
         },
         actions: {},
         update: (actor: Actor): Actor => {
@@ -129,7 +129,7 @@ function make_actor(p: Position, n: Name): Actor {
     return a;
 }
 
-// Update the current position to a new one with dx changement.
+// Mettre à jour la position courante avec un changement dx
 function position_add(current_position: Position, dx: Position): Position {
     const pos: Position = {
         x: current_position.x + dx.x,
@@ -138,7 +138,7 @@ function position_add(current_position: Position, dx: Position): Position {
     return pos;
 }
 
-
+// Initialise une ligne avec des acteurs aléatoires selon son type
 function init_line(size_x: number, size_y: number): Line {
     const random_line: number = Math.floor(Math.random() * 3) + 1;
     const l: Line = {
