@@ -10,11 +10,11 @@ const jestConfig: JestConfigWithTsJest = {
             'ts-jest',
             {
                 useESM: true,
-                diagnostics: { ignoreCodes: [ 'TS151001' ] }
+                diagnostics: { ignoreCodes: ['TS151001'] }
             },
         ],
     },
-    roots: [ "src", "test" ]
+    roots: ["src", "test"]
 };
 
 export default jestConfig;
