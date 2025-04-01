@@ -9,12 +9,12 @@ const left: Position = {
 
 const up: Position = {
     x: 0,
-    y: 1
+    y: -1
 };
 
 const down: Position = {
     x: 0,
-    y: -1
+    y: 1
 };
 
 type Position = {
@@ -35,7 +35,7 @@ type Line = {
 
 type Actor = {
     location: Position;
-    mailbox: Message[];  // Ajout d'une boîte aux lettres
+    mailbox: Message[];
     send: (m: Message) => void;
     actions: {
         [key: string]: (a: Actor, ...rest: any) => Actor;
@@ -68,6 +68,7 @@ function make_actor(p: Position, n: Name): Actor {
         mailbox: [],  // Boîte aux lettres vide au départ
         send: (m: Message): void => {
             // console.log(`Actor ${n} sent message: ${m.key}`, m.params);
+            a.mailbox.push(m);
         },
         actions: {},
         update: (actor: Actor): Actor => {
@@ -139,7 +140,7 @@ function position_add(current_position: Position, dx: Position): Position {
 }
 
 
-function init_line(size_x: number, size_y: number) {
+function init_line(size_x: number, size_y: number):Line{
     const random_line: number = Math.floor(Math.random() * 3) + 1;
     const l: Line = {
         ordinate: size_y,
