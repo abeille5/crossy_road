@@ -140,7 +140,7 @@ function position_add(current_position: Position, dx: Position): Position {
 }
 
 
-function init_line(size_x: number, size_y: number):Line{
+function init_line(size_x: number, size_y: number): Line {
     const random_line: number = Math.floor(Math.random() * 3) + 1;
     const l: Line = {
         ordinate: size_y,
@@ -187,80 +187,3 @@ function init_line(size_x: number, size_y: number):Line{
 export {
     right, left, up, down, Position, Message, Actor, Line, Name, LineType, make_actor, position_add, init_line
 };
-
-/*      EXEMPLES D'UTILISATION:
-
-        // Créer un poulet
-const chicken = init_chicken();
-
-// Envoyer un message de déplacement vers la droite
-chicken.send({
-    key: "move",
-    params: [right]
-});
-
-// Mettre à jour le poulet pour traiter le message
-const updatedChicken = chicken.update(chicken);
-// updatedChicken est maintenant à la position {x: 31, y: 5}
-
-
-        // Le poulet rencontre un obstacle
-chicken.send({
-    key: "collide",
-    params: []
-});
-
-// Mettre à jour le poulet pour traiter la collision
-const deadChicken = chicken.update(chicken);
-// Le message "die" devrait avoir été envoyé et le poulet devrait être mort
-
-
-        // Dans une boucle de jeu, tous les acteurs reçoivent un "tick"
-const allActors = [chicken, car1, car2, log1];
-
-// Envoyer un tick à tous les acteurs
-allActors.forEach(actor => {
-    actor.send({
-        key: "tick",
-        params: []
-    });
-});
-
-// Mettre à jour tous les acteurs
-const updatedActors = allActors.map(actor => actor.update(actor));
-// Les voitures et les bûches se seront déplacées automatiquement
-
-
-        POUR WORLD:
-
-// Dans world.ts
-function processMessages() {
-    // Si vous utilisez la console
-    // Lire les messages de la console (simulé ici)
-    
-    // Ou si vous utilisez une file d'attente globale
-    for (const { actorName, message } of globalMessageQueue) {
-        if (message.key === "die") {
-            // Arrêter la partie
-            stopGame();
-        }
-        // Traiter d'autres types de messages...
-    }
-    
-    // Vider la file après traitement
-    globalMessageQueue = [];
-}
-
-
-        // Exemple de logique de détection de collision dans world.ts
-function checkCollisions(chicken: Actor, otherActors: Actor[]) {
-    for (const actor of otherActors) {
-        if (isColliding(chicken, actor)) {
-            // Envoyer le message collide UNIQUEMENT au poulet
-            chicken.send({ key: "collide", params: [] });
-            return; // Optionnel : arrêter après la première collision
-        }
-    }
-}
-
-*/
