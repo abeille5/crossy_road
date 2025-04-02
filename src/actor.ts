@@ -223,18 +223,17 @@ function generatePatternedLine(size_x: number, obstacleType: Name, probability: 
     return [...Array(size_x)].map((_, i, arr) => {
         if (j !== 0) {
             j--;
-            return arr[i];
+            return make_actor({ x: i, y }, obstacleType);
         }
 
         if (Math.random() < probability) {
             const groupSize = Math.min(Math.floor(Math.random() * 3) + 1, size_x - i);
             j = groupSize;
-            arr.slice(i + 1, i + groupSize).map((k) => make_actor({ x: i + k, y }, obstacleType));
             return make_actor({ x: i, y }, obstacleType);
         }
 
         return make_actor({ x: i, y }, Name.Empty);
-    });
+    })
 }
 
 

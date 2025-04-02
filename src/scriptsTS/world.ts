@@ -11,7 +11,7 @@ const title = "CROSSY ROAD";
 
 function init_game(): A.Line[] {
     const lines = new Array(20);
-    return lines.map((i: any) => A.init_line(10, i));
+    return lines.map((i: any) => A.init_line(10, i, 0, []));
 }
 
 function run() {
