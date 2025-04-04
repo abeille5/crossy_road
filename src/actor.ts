@@ -192,7 +192,7 @@ function init_line(size_x: number, size_y: number, difficulty: number, previousL
     const random_line: number = Math.floor(Math.random() * 3) + 1;
     const obstacleProbability = Math.min(0.3 + difficulty * 0.05, 0.8);  // De 30% à 80%
 
-    let l: Line = {
+    const l: Line = {
         ordinate: size_y,
         type: random_line,
         data: new Array(size_x).fill(make_actor({ x: 0, y: size_y }, Name.Empty))
@@ -219,7 +219,7 @@ function init_line(size_x: number, size_y: number, difficulty: number, previousL
 };
 
 function generatePatternedLine(size_x: number, obstacleType: Name, probability: number, y: number): Array<any> {
-    let j = 0
+    let j = 0;
     return [...Array(size_x)].map((_, i, arr) => {
         if (j !== 0) {
             j--;
@@ -233,13 +233,13 @@ function generatePatternedLine(size_x: number, obstacleType: Name, probability: 
         }
 
         return make_actor({ x: i, y }, Name.Empty);
-    })
+    });
 }
 
 
 
 function hasValidPath(line: Line): boolean {
-    let freeCells = line.data.map((cell, index) => (cell.name === Name.Empty ? index : -1)).filter(index => index !== -1);
+    const freeCells = line.data.map((cell, index) => (cell.name === Name.Empty ? index : -1)).filter(index => index !== -1);
     return freeCells.length > 0 && freeCells.some((_, i) => i > 0 && freeCells[i] - freeCells[i - 1] === 1);
 };
 
