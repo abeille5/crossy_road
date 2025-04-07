@@ -159,7 +159,7 @@ function run() {
             indices.push(Math.floor(Math.random() * (mapWidth - 2)));
         }
 
-        indices.map(i => { newLine[i] = true; });
+        indices.forEach(i => { newLine[i] = true; });
 
 
         obstacles.unshift(newLine);
