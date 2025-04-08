@@ -27,8 +27,8 @@ function run() {
     const mapHeight = Math.floor(screenHeight / 1.5);
     const frameX = Math.floor((screenWidth - mapWidth) / 2);
     const frameY = titleY + 2;
-    const line_length:number = mapWidth - 2;
-    const nb_line:number = mapHeight - 2;
+    const line_length: number = mapWidth - 2;
+    const nb_line: number = mapHeight - 2;
 
     function drawFrame() {
         term.moveTo(frameX, frameY);
@@ -54,9 +54,9 @@ function run() {
     const lastY = 2;
     const lines: A.Line[] = init_game();
     const tickInterval = setInterval(() => {
-	lines = lines.map((l : A.Line) => tickLine(l));
-	poulet = poulet.actions.tick(poulet);
-	}, 500);
+        lines = lines.map((l: A.Line) => tickLine(l));
+        poulet = poulet.actions.tick(poulet);
+    }, 500);
 
     term.on('key', (name: any) => {
         term.moveTo(frameX, frameY + mapHeight - 1);
@@ -88,44 +88,45 @@ function run() {
     }
 
 
-    function drawActor(a:A.Actor, x:number, y:number): A.Actor{
-	if (y > nb_line)
-	    return a.update(a);
-	if (x===poulet.location.x && y===poulet.location.y){
-	    term.moveTo(5, 5);
-	    console.log(`Poulet ! (${a.name})`);
-	    return a.update(a);}
-	term.moveTo(frameX + x + 1, frameY + y);
-	if (a.name === A.Name.Tree)
-	    term.bgBlack().green('A');
-	else if (a.name === A.Name.Water_R || a.name === A.Name.Water_L)
-	    term.bgBlack().blue('A');
-	else if (a.name === A.Name.Log_R || a.name === A.Name.Log_L)
-	    term.bgBlack().red('A');
-	else if (a.name === A.Name.Car_R || a.name === A.Name.Car_L)
-	    term.bgBlack().grey('A');
-	else if (a.name === A.Name.Chicken){
-	    term.bgBlack().white('🐔');
-	    term.hideCursor();
-	}
-	else
-	    term.bgBlack().black(' ');
-	term.styleReset();
-	return a.update(a);
+    function drawActor(a: A.Actor, x: number, y: number): A.Actor {
+        if (y > nb_line)
+            return a.update(a);
+        if (x === poulet.location.x && y === poulet.location.y) {
+            term.moveTo(5, 5);
+            console.log(`Poulet ! (${a.name})`);
+            return a.update(a);
+        }
+        term.moveTo(frameX + x + 1, frameY + y);
+        if (a.name === A.Name.Tree)
+            term.bgBlack().green('A');
+        else if (a.name === A.Name.Water_R || a.name === A.Name.Water_L)
+            term.bgBlack().blue('A');
+        else if (a.name === A.Name.Log_R || a.name === A.Name.Log_L)
+            term.bgBlack().red('A');
+        else if (a.name === A.Name.Car_R || a.name === A.Name.Car_L)
+            term.bgBlack().grey('A');
+        else if (a.name === A.Name.Chicken) {
+            term.bgBlack().white('🐔');
+            term.hideCursor();
+        }
+        else
+            term.bgBlack().black(' ');
+        term.styleReset();
+        return a.update(a);
     }
 
-    function drawLine(l:A.Line):A.Line{
-	l.data = l.data.map((a : A.Actor) => drawActor(a, a.location.x, nb_line - l.ordinate));
-	return l;
+    function drawLine(l: A.Line): A.Line {
+        l.data = l.data.map((a: A.Actor) => drawActor(a, a.location.x, nb_line - l.ordinate));
+        return l;
     }
-    
-    const updateInterval = setInterval(() => {
-	//drawFrame();
-	lines = lines.map((l: A.Line) => drawLine(l));
-	poulet = drawActor(poulet, poulet.location.x, poulet.location.y);
+
+    updateInterval = setInterval(() => {
+        //drawFrame();
+        lines = lines.map((l: A.Line) => drawLine(l));
+        poulet = drawActor(poulet, poulet.location.x, poulet.location.y);
     }, 300);
 
-    const pouletInterval = setInterval(() => {poulet=drawActor(poulet, poulet.location.x, poulet.location.y);}, 10);
+    const pouletInterval = setInterval(() => { poulet = drawActor(poulet, poulet.location.x, poulet.location.y); }, 10);
 
     const obstacles: boolean[][] = [];
 
@@ -221,10 +222,10 @@ function run() {
             term("\x1B[?25h");
             process.exit();
         }
-        if (name === 'UP' && poulet.location.y > frameY + 1) poulet.mailbox.push({"key":"move","params":[A.up]});
-        else if (name === 'DOWN' && poulet.location.y < frameY + mapHeight - 2) poulet.mailbox.push({"key":"move","params":[A.down]});
-        else if (name === 'LEFT' && poulet.location.x > frameX + 1) poulet.mailbox.push({"key":"move","params":[A.left]});
-        else if (name === 'RIGHT' && poulet.location.x < frameX + mapWidth - 2) poulet.mailbox.push({"key":"move","params":[A.right]});
+        if (name === 'UP' && poulet.location.y > frameY + 1) poulet.mailbox.push({ "key": "move", "params": [A.up] });
+        else if (name === 'DOWN' && poulet.location.y < frameY + mapHeight - 2) poulet.mailbox.push({ "key": "move", "params": [A.down] });
+        else if (name === 'LEFT' && poulet.location.x > frameX + 1) poulet.mailbox.push({ "key": "move", "params": [A.left] });
+        else if (name === 'RIGHT' && poulet.location.x < frameX + mapWidth - 2) poulet.mailbox.push({ "key": "move", "params": [A.right] });
 
         if (checkCollision()) {
             gameOver();
