@@ -79,8 +79,7 @@ function run() {
 
     const posInit: A.Position = { x: frameX + Math.floor(mapWidth / 2) - 2, y: frameY + Math.floor(mapHeight / 2) };
     let poulet: A.Actor = A.make_actor(posInit, A.Name.Chicken);
-
-
+    let lifes: number = 5;
 
     function drawActor(a: A.Actor, x: number, y: number): A.Actor {
         if (y > nb_line)
@@ -96,7 +95,7 @@ function run() {
         else if (a.name === A.Name.Water_R || a.name === A.Name.Water_L)
             term.bgBlue().white(' ');
         else if (a.name === A.Name.Log_R || a.name === A.Name.Log_L)
-            term.bgRed().white(' ');
+            term.bgColorRgb(139, 69, 19).white(' ');
         else if (a.name === A.Name.Car_R || a.name === A.Name.Car_L)
             term.bgGrey().white(' ');
         else if (a.name === A.Name.Chicken) {
@@ -115,28 +114,40 @@ function run() {
     }
 
     const updateInterval = setInterval(() => {
+	if (checkCollision()){
+	    lifes = lifes - 1;
+	}
+	if (lifes < 0)
+	    gameOver();
+	else {
+	    term.moveTo(5, 7);
+            term.bgBlack().red('❤️ '.repeat(lifes));}
+	
         lines = lines.map((l: A.Line) => drawLine(l));
         poulet = drawActor(poulet, poulet.location.x, poulet.location.y);
-	if (checkCollision())
-	    gameOver();
+	
     }, 100);
 
-    const pouletInterval = setInterval(() => { poulet = drawActor(poulet, poulet.location.x, poulet.location.y); }, 10);
+    const pouletInterval = setInterval(() => { /*poulet = drawActor(poulet, poulet.location.x, poulet.location.y); */}, 10);
 
     const obstacles: boolean[][] = [];
 
 
     function isCollision(a:A.Actor): boolean {
-        if (a.name === A.Name.Log_R || a.name === A.Name.Log_L) {
-	    return false;}
-	else {
-	    if (a.location.x === poulet.location.x && a.location.y === poulet.location.y)
+	if (a.location.x === poulet.location.x && a.location.y === poulet.location.y){
+	    term.moveTo(5, 6);
+            console.log(`Collision ! (${a.name})`);
+            if (a.name === A.Name.Log_R || a.name === A.Name.Log_L)
+		return false;
+	    else if (a.name === A.Name.Car_R || a.name === A.Name.Car_L)
 		return true;
+	    else if (a.name === A.Name.Water_R || a.name === A.Name.Water_L)
+		return true;
+	    else return false;
 	}
 	return false;
     }
 
-    
     function checkCollision(): boolean {
 	let flag = false;
         lines.forEach((l : A.Line) => {
@@ -172,12 +183,6 @@ function run() {
         else if (name === 'DOWN' && poulet.location.y < frameY + mapHeight - 2) poulet.mailbox.push({ "key": "move", "params": [A.down] });
         else if (name === 'LEFT' && poulet.location.x > frameX + 1) poulet.mailbox.push({ "key": "move", "params": [A.left] });
         else if (name === 'RIGHT' && poulet.location.x < frameX + mapWidth - 2) poulet.mailbox.push({ "key": "move", "params": [A.right] });
-
-        if (checkCollision()) {
-            gameOver();
-        } else {
-            //drawPlayer();
-        }
     });
 }
 
