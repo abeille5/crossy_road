@@ -3,7 +3,7 @@
 
 import terminalKit from 'terminal-kit';
 
-import * as A from '../actor.js';
+import * as A from './actor.js';
 
 const term = terminalKit.terminal;
 
@@ -62,9 +62,7 @@ function run() {
 	return l;
     }
 	
-    // Animation : étoile aléatoire toutes les secondes
-    const lastX = 2;
-    const lastY = 2;
+    
     let lines:A.Line[] = new Array(nb_line).fill(null).map((_, i:number) => A.init_line(line_length, i, 0, []));
     const tickInterval = setInterval(() => {
         lines = lines.map((l: A.Line) => tickLine(l));
@@ -80,12 +78,7 @@ function run() {
     const posInit: A.Position = { x: frameX + Math.floor(mapWidth / 2) - 2, y: frameY + Math.floor(mapHeight / 2) };
     let poulet: A.Actor = A.make_actor(posInit, A.Name.Chicken);
 
-    function erasePlayer() {
-        term.moveTo(poulet.location.x, poulet.location.y);
-        term.bgBlack().white(' ');
-        term.styleReset();
-    }
-
+    
 
     function drawActor(a: A.Actor, x: number, y: number): A.Actor {
         if (y > nb_line)
@@ -97,13 +90,13 @@ function run() {
         }
         term.moveTo(frameX + x + 1, frameY + y);
         if (a.name === A.Name.Tree)
-            term.bgBlack().green('A');
+            term.bgGreen().white(' ');
         else if (a.name === A.Name.Water_R || a.name === A.Name.Water_L)
-            term.bgBlack().blue('A');
+            term.bgBlue().white(' ');
         else if (a.name === A.Name.Log_R || a.name === A.Name.Log_L)
-            term.bgBlack().red('A');
+            term.bgRed().white(' ');
         else if (a.name === A.Name.Car_R || a.name === A.Name.Car_L)
-            term.bgBlack().grey('A');
+            term.bgGrey().white(' ');
         else if (a.name === A.Name.Chicken) {
             term.bgBlack().white('🐔');
             term.hideCursor();
@@ -120,7 +113,6 @@ function run() {
     }
 
     const updateInterval = setInterval(() => {
-        //drawFrame();
         lines = lines.map((l: A.Line) => drawLine(l));
         poulet = drawActor(poulet, poulet.location.x, poulet.location.y);
     }, 300);
@@ -129,30 +121,6 @@ function run() {
 
     const obstacles: boolean[][] = [];
 
-    function drawObstacles() {
-        // Efface l'intérieur de la map
-        for (let y = 1; y < mapHeight - 1; y++) {
-            term.moveTo(frameX + 1, frameY + y);
-            term.bgBlack().white(' '.repeat(mapWidth - 2));
-        }
-
-        // Redessine les obstacles
-        for (let i = 0; i < obstacles.length; i++) {
-            const line = obstacles[i];
-            const y = frameY + 1 + i;
-            if (y >= frameY + mapHeight - 1) continue;
-
-            term.moveTo(frameX + 1, y);
-            for (let x = 0; x < line.length; x++) {
-                if (line[x]) {
-                    term.bgWhite().white(' ');
-                } else {
-                    term.bgBlack().white(' ');
-                }
-            }
-            term.styleReset();
-        }
-    }
 
 
 
@@ -167,7 +135,6 @@ function run() {
             mapX < mapWidth - 2 &&
             obstacles[mapY][mapX]
         ) {
-            a.actions.collide(poulet);
             return true;
         }
         return false;
@@ -175,7 +142,6 @@ function run() {
 
     function gameOver() {
         term("\x1B[?25h");
-        clearInterval(tick);
         clearInterval(tickInterval);
         term.grabInput(false);
         term.moveTo(frameX, frameY + mapHeight + 1);
@@ -184,39 +150,11 @@ function run() {
         process.exit(0);
     }
 
-    const tick = setInterval(() => {
-/*
-        const newLine = new Array(mapWidth - 2).fill(false);
-
-        // Place entre 5 et 10 murs aléatoires
-        const wallCount = Math.floor(Math.random() * 6) + 5;
-        const indices: number[] = [];
-        while (indices.length < wallCount) {
-            indices.push(Math.floor(Math.random() * (mapWidth - 2)));
-        }
-
-        indices.forEach(i => { newLine[i] = true; });
-
-
-        obstacles.unshift(newLine);
-        if (obstacles.length > mapHeight - 2)
-            obstacles.pop();
-
-
-        drawObstacles();
-        drawPlayer();
-
-        if (checkCollision()) {
-            gameOver();
-        }*/
-    }, 300);
-
     term.grabInput(true);
     term.on('key', (name: string) => {
         if (name === 'q' || name === 'CTRL_C') {
             clearInterval(tickInterval);
             clearInterval(updateInterval);
-            clearInterval(tick);
             term.grabInput(false);
             term.clear();
             term("\x1B[?25h");
