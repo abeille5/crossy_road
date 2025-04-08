@@ -4,6 +4,7 @@
 import terminalKit from 'terminal-kit';
 
 import * as A from '../actor.js';
+import { count } from 'console';
 
 const term = terminalKit.terminal;
 
@@ -48,22 +49,22 @@ function run() {
     term.bgWhite().white(' '.repeat(mapWidth));
     term.styleReset();
     term.grabInput(true);
-
-    drawFrame();
-    
-    function tickLine(l : A.Line): A.Line {
-	if (l.ordinate < 0)
-	    return A.init_line(line_length, nb_line - 1, 0, []);
- 	l.data.map((a : A.Actor) => a.mailbox.push({"key":"move", "params":[A.down]}));
- 	l.data.map((a : A.Actor) => a.actions.tick(a));
- 	l.ordinate -= 1;
-	return l;
+    let count_void = 0;
+    function tickLine(l: A.Line): A.Line {
+        if (l.ordinate < 0) {
+            count_void++;
+            return A.init_line(line_length, nb_line - 1, 0, count_void % 2, []);
+        }
+        l.data.map((a: A.Actor) => a.mailbox.push({ "key": "move", "params": [A.down] }));
+        l.data.map((a: A.Actor) => a.actions.tick(a));
+        l.ordinate -= 1;
+        return l;
     }
-	
+
     // Animation : étoile aléatoire toutes les secondes
     const lastX = 2;
     const lastY = 2;
-    let lines:A.Line[] = new Array(nb_line).fill(null).map((_, i:number) => A.init_line(line_length, i, 0, []));
+    let lines: A.Line[] = new Array(nb_line).fill(null).map((_, i: number) => A.init_line(line_length, i, 0, i % 2, []));
     const tickInterval = setInterval(() => {
         lines = lines.map((l: A.Line) => tickLine(l));
         poulet = poulet.actions.tick(poulet);
@@ -78,6 +79,13 @@ function run() {
     const posInit: A.Position = { x: frameX + Math.floor(mapWidth / 2) - 2, y: frameY + Math.floor(mapHeight / 2) };
     let poulet: A.Actor = A.make_actor(posInit, A.Name.Chicken);
 
+    function drawPlayer() {
+        term.moveTo(poulet.location.x, poulet.location.y);
+        term.bgBlack().yellow('█');
+        term.styleReset();
+        term.hideCursor();
+    }
+
     function erasePlayer() {
         term.moveTo(poulet.location.x, poulet.location.y);
         term.bgBlack().white(' ');
@@ -88,7 +96,7 @@ function run() {
     function drawActor(a: A.Actor, x: number, y: number): A.Actor {
         if (y > nb_line)
             return a.update(a);
-        if (a.name != A.Name.Chicken && (x === poulet.location.x && y === poulet.location.y)) {
+        if (x === poulet.location.x && y === poulet.location.y) {
             term.moveTo(5, 5);
             console.log(`Poulet ! (${a.name})`);
             return a.update(a);
@@ -117,7 +125,7 @@ function run() {
         return l;
     }
 
-    const updateInterval = setInterval(() => {
+    let updateInterval = setInterval(() => {
         //drawFrame();
         lines = lines.map((l: A.Line) => drawLine(l));
         poulet = drawActor(poulet, poulet.location.x, poulet.location.y);
@@ -182,30 +190,30 @@ function run() {
     }
 
     const tick = setInterval(() => {
-/*
-        const newLine = new Array(mapWidth - 2).fill(false);
-
-        // Place entre 5 et 10 murs aléatoires
-        const wallCount = Math.floor(Math.random() * 6) + 5;
-        const indices: number[] = [];
-        while (indices.length < wallCount) {
-            indices.push(Math.floor(Math.random() * (mapWidth - 2)));
-        }
-
-        indices.forEach(i => { newLine[i] = true; });
-
-
-        obstacles.unshift(newLine);
-        if (obstacles.length > mapHeight - 2)
-            obstacles.pop();
-
-
-        drawObstacles();
-        drawPlayer();
-
-        if (checkCollision()) {
-            gameOver();
-        }*/
+        /*
+                const newLine = new Array(mapWidth - 2).fill(false);
+        
+                // Place entre 5 et 10 murs aléatoires
+                const wallCount = Math.floor(Math.random() * 6) + 5;
+                const indices: number[] = [];
+                while (indices.length < wallCount) {
+                    indices.push(Math.floor(Math.random() * (mapWidth - 2)));
+                }
+        
+                indices.forEach(i => { newLine[i] = true; });
+        
+        
+                obstacles.unshift(newLine);
+                if (obstacles.length > mapHeight - 2)
+                    obstacles.pop();
+        
+        
+                drawObstacles();
+                drawPlayer();
+        
+                if (checkCollision()) {
+                    gameOver();
+                }*/
     }, 300);
 
     term.grabInput(true);
@@ -227,7 +235,7 @@ function run() {
         if (checkCollision()) {
             gameOver();
         } else {
-            //drawPlayer();
+            drawPlayer();
         }
     });
 }

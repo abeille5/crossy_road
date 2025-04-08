@@ -188,15 +188,19 @@ function init_line(size_x: number, size_y: number): Line {
 };*/
 
 
-function init_line(size_x: number, size_y: number, difficulty: number, previousLines: Line[]): Line {
+function init_line(size_x: number, size_y: number, difficulty: number, is_void: number, previousLines: Line[]): Line {
     const random_line: number = Math.floor(Math.random() * 3) + 1;
     const obstacleProbability = Math.min(0.3 + difficulty * 0.05, 0.8);  // De 30% à 80%
 
-    const l: Line = {
+    let l: Line = {
         ordinate: size_y,
         type: random_line,
         data: new Array(size_x).fill(make_actor({ x: 0, y: size_y }, Name.Empty))
     };
+    if (is_void == 0) {
+        l.data = l.data.map((_, i) => make_actor({ x: i, y: size_y }, Name.Empty));
+        return l;
+    }
 
     do {
         switch (l.type) {
