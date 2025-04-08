@@ -12,6 +12,14 @@ const title = "CROSSY ROAD";
 function run() {
     term.fullscreen(true);
     term.clear();
+
+    const screenBuffer = new terminalKit.ScreenBuffer({
+        dst: term,
+        width: term.width,
+        height: term.height
+    });
+
+    
     const screenWidth = term.width;
     let screenHeight = term.height;
     if (screenHeight % 2 == 1) 
@@ -34,26 +42,45 @@ function run() {
     const nb_line: number = mapHeight - 2;
 
     function drawFrame() {
-
-        term.moveTo(frameX, frameY);
-        term.bgWhite().white(' '.repeat(mapWidth));
-        term.styleReset();
-
+        // Ligne du haut
+        for (let x = 0; x < mapWidth; x++) {
+            screenBuffer.put({
+                x: frameX + x,
+                y: frameY,
+                attr: { bgColor: 'white', color: 'white' }
+            }, ' ');
+        }
+    
+        // Ligne du bas
+        for (let x = 0; x < mapWidth; x++) {
+            screenBuffer.put({
+                x: frameX + x,
+                y: frameY + mapHeight - 1,
+                attr: { bgColor: 'white', color: 'white' }
+            }, ' ');
+        }
+    
+        // Colonnes gauche/droite
         for (let y = 1; y < mapHeight - 1; y++) {
-            term.moveTo(frameX, frameY + y);
-            term.bgWhite().white(' ');
-            term.bgBlack().white(' '.repeat(mapWidth - 2));
-            term.bgWhite().white(' ');
-            term.styleReset();
+            screenBuffer.put({
+                x: frameX,
+                y: frameY + y,
+                attr: { bgColor: 'white', color: 'white' }
+            }, ' ');
+            screenBuffer.put({
+                x: frameX + mapWidth - 1,
+                y: frameY + y,
+                attr: { bgColor: 'white', color: 'white' }
+            }, ' ');
         }
     }
+    
+    
 
     
 
     drawFrame();
-    term.moveTo(frameX, frameY + mapHeight - 1);
-    term.bgWhite().white(' '.repeat(mapWidth));
-    term.styleReset();
+    
     term.grabInput(true);
     let count_void = 0;
     function tickLine(l: A.Line): A.Line {
@@ -66,21 +93,23 @@ function run() {
         l.ordinate -= 1;
         return l;
     }
+    
 
     // Animation : étoile aléatoire toutes les secondes
-    const lastX = 2;
-    const lastY = 2;
+    
     let lines: A.Line[] = new Array(nb_line).fill(null).map((_, i: number) => A.init_line(line_length, i, 0, i % 2, []));
     const tickInterval = setInterval(() => {
         lines = lines.map((l: A.Line) => tickLine(l));
         poulet = poulet.actions.tick(poulet);
     }, 500);
 
+    /*
     term.on('key', (name: any) => {
         term.moveTo(frameX, frameY + mapHeight - 1);
         term.bgWhite().white(' '.repeat(mapWidth));
         term.styleReset();
     });
+    */
 
     // Remplacer la ligne de posInit par
     const posInit: A.Position = { 
@@ -91,35 +120,24 @@ function run() {
     let lifes: number = 5;
 
     function drawActor(a: A.Actor, x: number, y: number): A.Actor {
-        if (y > nb_line)
-            return a.update(a);
-        if (a.name !== A.Name.Chicken && (x === poulet.location.x && y === poulet.location.y)) {
-            term.moveTo(5, 5);
-            return a.update(a);
-        }
+        if (y > nb_line) return a.update(a);
     
-        // Convertir les coordonnées logiques en coordonnées d'affichage
-        const screenX = frameX + x + 1;
-        const screenY = frameY + y;
+        let screenX = frameX + x + 1;
+        let screenY = frameY + y;
     
-        term.moveTo(screenX, screenY);
-        if (a.name === A.Name.Tree)
-            term.bgGreen().white(' ');
-        else if (a.name === A.Name.Water_R || a.name === A.Name.Water_L)
-            term.bgBrightBlue().white(' ');
-        else if (a.name === A.Name.Log_R || a.name === A.Name.Log_L)
-            term.bgColorRgb(139, 69, 19).white(' ');
-        else if (a.name === A.Name.Car_R || a.name === A.Name.Car_L)
-            term.bgGrey().white(' ');
-        else if (a.name === A.Name.Chicken) {
-            term.bgBlack().white('🐔');
-            term.hideCursor();
-        }
-        else
-            term.bgBlack().black(' ');
-        term.styleReset();
+        let attr = { color: 'white', bgColor: 'black' };
+        let char = ' ';
+    
+        if (a.name === A.Name.Tree) attr.bgColor = 'green';
+        else if ([A.Name.Water_R, A.Name.Water_L].includes(a.name)) attr.bgColor = 'cyan';
+        else if ([A.Name.Log_R, A.Name.Log_L].includes(a.name)) attr.bgColor = 94 as any;
+        else if ([A.Name.Car_R, A.Name.Car_L].includes(a.name)) attr.bgColor = 'grey';
+        else if (a.name === A.Name.Chicken) char = '🐔';
+        
+        screenBuffer.put({ x: screenX, y: screenY, attr }, char);
         return a.update(a);
     }
+    
 
     function drawLine(l: A.Line): A.Line {
         l.data = l.data.map((a: A.Actor) => drawActor(a,a .location.x, nb_line - l.ordinate));
@@ -138,7 +156,7 @@ function run() {
 	
         lines = lines.map((l: A.Line) => drawLine(l));
         poulet = drawActor(poulet, poulet.location.x, poulet.location.y);
-	
+        screenBuffer.draw({delta:true});
     }, 100);
 
     const pouletInterval = setInterval(() => { poulet = drawActor(poulet, poulet.location.x, poulet.location.y); }, 10);
@@ -190,9 +208,9 @@ function run() {
             process.exit();
         }
         if (name === 'UP' && poulet.location.y > 1) poulet.mailbox.push({ "key": "move", "params": [A.up] });
-        else if (name === 'DOWN' && poulet.location.y < mapHeight-4) poulet.mailbox.push({ "key": "move", "params": [A.down] });
+        else if (name === 'DOWN' && poulet.location.y < nb_line) poulet.mailbox.push({ "key": "move", "params": [A.down] });
         else if (name === 'LEFT' && poulet.location.x > 0) poulet.mailbox.push({ "key": "move", "params": [A.left] });
-        else if (name === 'RIGHT' && poulet.location.x < mapWidth -5) poulet.mailbox.push({ "key": "move", "params": [A.right] });
+        else if (name === 'RIGHT' && poulet.location.x < line_length - 2) poulet.mailbox.push({ "key": "move", "params": [A.right] });
 
     });
 }
