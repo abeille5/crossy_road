@@ -28,8 +28,8 @@ function run() {
     const mapHeight = Math.floor(screenHeight / 1.5);
     const frameX = Math.floor((screenWidth - mapWidth) / 2);
     const frameY = titleY + 2;
-    const line_length:number = mapWidth - 2;
-    const nb_line:number = mapHeight - 2;
+    const line_length: number = mapWidth - 2;
+    const nb_line: number = mapHeight - 2;
 
     function drawFrame() {
         
@@ -51,27 +51,31 @@ function run() {
     term.styleReset();
     term.grabInput(true);
 
+    function tickLine(l : A.Line): A.Line {
+	if (l.ordinate===-1)
+	    return A.init_line(10, 20, 0, []);
+	if (l.ordinate < 0)
+	    return A.init_line(line_length, nb_line - 1, 0, []);
+ 	l.data.map((a : A.Actor) => a.mailbox.push({"key":"move", "params":[A.down]}));
+ 	l.data.map((a : A.Actor) => a.actions.tick(a));
+ 	l.ordinate -= 1;
+	return l;
+    }
+	
     // Animation : étoile aléatoire toutes les secondes
     const lastX = 2;
     const lastY = 2;
-    const lines: A.Line[] = init_game();
+    let lines:A.Line[] = new Array(nb_line).fill(null).map((_, i:number) => A.init_line(line_length, i, 0, []));
     const tickInterval = setInterval(() => {
-	lines = lines.map((l : A.Line) => tickLine(l));
-	poulet = poulet.actions.tick(poulet);
-	}, 500);
+        lines = lines.map((l: A.Line) => tickLine(l));
+        poulet = poulet.actions.tick(poulet);
+    }, 500);
 
     term.on('key', (name: any) => {
         term.moveTo(frameX, frameY + mapHeight - 1);
         term.bgWhite().white(' '.repeat(mapWidth));
         term.styleReset();
     });
-
-    const updateInterval = setInterval(() => {
-        lines.map((l: A.Line) => l.data.map((a: A.Actor) => a.update(a)));
-        poulet = poulet.update(poulet);
-    }, 10);
-
-    drawFrame();
 
     const posInit: A.Position = { x: frameX + Math.floor(mapWidth / 2) - 2, y: frameY + Math.floor(mapHeight / 2) };
     let poulet: A.Actor = A.make_actor(posInit, A.Name.Chicken);
@@ -90,44 +94,45 @@ function run() {
     }
 
 
-    function drawActor(a:A.Actor, x:number, y:number): A.Actor{
-	if (y > nb_line)
-	    return a.update(a);
-	if (x===poulet.location.x && y===poulet.location.y){
-	    term.moveTo(5, 5);
-	    console.log(`Poulet ! (${a.name})`);
-	    return a.update(a);}
-	term.moveTo(frameX + x + 1, frameY + y);
-	if (a.name === A.Name.Tree)
-	    term.bgBlack().green('A');
-	else if (a.name === A.Name.Water_R || a.name === A.Name.Water_L)
-	    term.bgBlack().blue('A');
-	else if (a.name === A.Name.Log_R || a.name === A.Name.Log_L)
-	    term.bgBlack().red('A');
-	else if (a.name === A.Name.Car_R || a.name === A.Name.Car_L)
-	    term.bgBlack().grey('A');
-	else if (a.name === A.Name.Chicken){
-	    term.bgBlack().white('🐔');
-	    term.hideCursor();
-	}
-	else
-	    term.bgBlack().black(' ');
-	term.styleReset();
-	return a.update(a);
+    function drawActor(a: A.Actor, x: number, y: number): A.Actor {
+        if (y > nb_line)
+            return a.update(a);
+        if (x === poulet.location.x && y === poulet.location.y) {
+            term.moveTo(5, 5);
+            console.log(`Poulet ! (${a.name})`);
+            return a.update(a);
+        }
+        term.moveTo(frameX + x + 1, frameY + y);
+        if (a.name === A.Name.Tree)
+            term.bgBlack().green('A');
+        else if (a.name === A.Name.Water_R || a.name === A.Name.Water_L)
+            term.bgBlack().blue('A');
+        else if (a.name === A.Name.Log_R || a.name === A.Name.Log_L)
+            term.bgBlack().red('A');
+        else if (a.name === A.Name.Car_R || a.name === A.Name.Car_L)
+            term.bgBlack().grey('A');
+        else if (a.name === A.Name.Chicken) {
+            term.bgBlack().white('🐔');
+            term.hideCursor();
+        }
+        else
+            term.bgBlack().black(' ');
+        term.styleReset();
+        return a.update(a);
     }
 
-    function drawLine(l:A.Line):A.Line{
-	l.data = l.data.map((a : A.Actor) => drawActor(a, a.location.x, nb_line - l.ordinate));
-	return l;
+    function drawLine(l: A.Line): A.Line {
+        l.data = l.data.map((a: A.Actor) => drawActor(a, a.location.x, nb_line - l.ordinate));
+        return l;
     }
-    
-    const updateInterval = setInterval(() => {
-	//drawFrame();
-	lines = lines.map((l: A.Line) => drawLine(l));
-	poulet = drawActor(poulet, poulet.location.x, poulet.location.y);
+
+    updateInterval = setInterval(() => {
+        //drawFrame();
+        lines = lines.map((l: A.Line) => drawLine(l));
+        poulet = drawActor(poulet, poulet.location.x, poulet.location.y);
     }, 300);
 
-    const pouletInterval = setInterval(() => {poulet=drawActor(poulet, poulet.location.x, poulet.location.y);}, 10);
+    const pouletInterval = setInterval(() => { poulet = drawActor(poulet, poulet.location.x, poulet.location.y); }, 10);
 
     const obstacles: boolean[][] = [];
 
@@ -187,7 +192,7 @@ function run() {
     }
 
     const tick = setInterval(() => {
-
+/*
         const newLine = new Array(mapWidth - 2).fill(false);
 
         // Place entre 5 et 10 murs aléatoires
@@ -210,7 +215,7 @@ function run() {
 
         if (checkCollision()) {
             gameOver();
-        }
+        }*/
     }, 300);
 
     term.grabInput(true);
@@ -224,10 +229,10 @@ function run() {
             term("\x1B[?25h");
             process.exit();
         }
-        if (name === 'UP' && poulet.location.y > frameY + 1) poulet.mailbox.push({"key":"move","params":[A.up]});
-        else if (name === 'DOWN' && poulet.location.y < frameY + mapHeight - 2) poulet.mailbox.push({"key":"move","params":[A.down]});
-        else if (name === 'LEFT' && poulet.location.x > frameX + 1) poulet.mailbox.push({"key":"move","params":[A.left]});
-        else if (name === 'RIGHT' && poulet.location.x < frameX + mapWidth - 2) poulet.mailbox.push({"key":"move","params":[A.right]});
+        if (name === 'UP' && poulet.location.y > frameY + 1) poulet.mailbox.push({ "key": "move", "params": [A.up] });
+        else if (name === 'DOWN' && poulet.location.y < frameY + mapHeight - 2) poulet.mailbox.push({ "key": "move", "params": [A.down] });
+        else if (name === 'LEFT' && poulet.location.x > frameX + 1) poulet.mailbox.push({ "key": "move", "params": [A.left] });
+        else if (name === 'RIGHT' && poulet.location.x < frameX + mapWidth - 2) poulet.mailbox.push({ "key": "move", "params": [A.right] });
 
         if (checkCollision()) {
             gameOver();
