@@ -59,7 +59,8 @@ enum Name {
 };
 
 enum LineType {
-    Nature = 1,
+    FirstLine = 0,
+    Nature,
     Road,
     River
 };
@@ -141,54 +142,8 @@ function position_add(current_position: Position, dx: Position): Position {
     return pos;
 }
 
-// Initialise une ligne avec des acteurs aléatoires selon son type
-/*
-function init_line(size_x: number, size_y: number): Line {
-    const random_line: number = Math.floor(Math.random() * 3) + 1;
-    const l: Line = {
-        ordinate: size_y,
-        type: random_line,
-        data: new Array(60).fill(0)
-    };
-    switch (l.type) {
-        case 1:
-            l.data = Array.from({ length: size_x }, (_, i) =>
-                Math.random() > 0.5 ? make_actor({ x: i, y: l.ordinate }, Name.Tree) : make_actor({ x: i, y: l.ordinate }, Name.Empty)
-            );
-            break;
-        case 2:
-            let left1: number = 1;
-            if (Math.random() > 0.5) {
-                left1 = 0;
-            }
+function init_line(size_x: number, size_y: number, difficulty: number, is_void: number, is_start: boolean): Line {
 
-            l.data = Array.from({ length: size_x }, (_, i) =>
-                (Math.random() > 0.5)
-                    ? (left1 ? make_actor({ x: i, y: l.ordinate }, Name.Car_L) : make_actor({ x: i, y: l.ordinate }, Name.Car_R))
-                    : make_actor({ x: i, y: l.ordinate }, Name.Empty)
-            );
-            break;
-        case 3:
-            let left2 = 1;
-            if (Math.random() > 0.5) {
-                left2 = 0;
-            }
-
-            l.data = Array.from({ length: size_x }, (_, i) =>
-                (Math.random() > 0.5)
-                    ? (left2 ? make_actor({ x: i, y: l.ordinate }, Name.Water_L) : make_actor({ x: i, y: l.ordinate }, Name.Water_R))
-                    : (left2 ? make_actor({ x: i, y: l.ordinate }, Name.Log_L) : make_actor({ x: i, y: l.ordinate }, Name.Log_R))
-            );
-            break;
-        default:
-            console.log("Inexistant type of line");
-            break;
-    };
-    return l;
-};*/
-
-
-function init_line(size_x: number, size_y: number, difficulty: number, is_void: number, previousLines: Line[]): Line {
     const random_line: number = Math.floor(Math.random() * 3) + 1;
     const obstacleProbability = Math.min(0.15 + difficulty * 0.05, 0.8);  // De 15% à 80%
 
@@ -197,11 +152,10 @@ function init_line(size_x: number, size_y: number, difficulty: number, is_void: 
         type: random_line,
         data: new Array(size_x).fill(make_actor({ x: 0, y: size_y }, Name.Empty))
     };
-    if (is_void === 0) {
+    if (is_start || is_void === 0) {
         l.data = l.data.map((_, i) => make_actor({ x: i, y: size_y }, Name.Empty));
         return l;
     }
-
 
     switch (l.type) {
         case 1:
@@ -214,10 +168,9 @@ function init_line(size_x: number, size_y: number, difficulty: number, is_void: 
             l.data = generatePatternedLine(size_x, Math.random() > 0.5 ? Name.Log_L : Name.Log_R, obstacleProbability, l.ordinate);
             break;
         default:
-            console.log("Inexistant type of line");
+            console.log("Inexistant type of line or start line that shouldn't be here");
             break;
     }
-
     return l;
 };
 
@@ -243,14 +196,6 @@ function generatePatternedLine(size_x: number, obstacleType: Name, probability: 
         return make_actor({ x: i, y }, Name.Empty);
     });
 }
-
-
-
-function hasValidPath(line: Line): boolean {
-    const freeCells = line.data.map((cell, index) => (cell.name === Name.Empty ? index : -1)).filter(index => index !== -1);
-    return freeCells.length > 0 && freeCells.some((_, i) => i > 0 && freeCells[i] - freeCells[i - 1] === 1);
-};
-
 
 export {
     right, left, up, down, Position, Message, Actor, Line, Name, LineType, make_actor, position_add, init_line
