@@ -1,4 +1,5 @@
 import * as A from '#src/actor';
+//import * as W from '#src/scriptTS/world';
 
 describe('Actor game test suite', () => {
     test('Position add should work correctly', () => {

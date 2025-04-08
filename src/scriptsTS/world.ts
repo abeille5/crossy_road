@@ -10,6 +10,7 @@ const term = terminalKit.terminal;
 const title = "CROSSY ROAD";
 
 function run() {
+    term.fullscreen(true);
     term.clear();
     const screenWidth = term.width;
     const screenHeight = term.height;
@@ -31,6 +32,7 @@ function run() {
     const nb_line:number = mapHeight - 2;
 
     function drawFrame() {
+        
         term.moveTo(frameX, frameY);
         term.bgWhite().white(' '.repeat(mapWidth));
         term.styleReset();
@@ -167,6 +169,7 @@ function run() {
             mapX < mapWidth - 2 &&
             obstacles[mapY][mapX]
         ) {
+            a.actions.collide(poulet);
             return true;
         }
         return false;
