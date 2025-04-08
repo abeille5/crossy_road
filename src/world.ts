@@ -54,7 +54,7 @@ function run() {
     function tickLine(l: A.Line): A.Line {
         if (l.ordinate < 0) {
             count_void++;
-            return A.init_line(line_length, nb_line - 1, 0, count_void % 2, []);
+            return A.init_line(line_length, nb_line - 1, 0, count_void % 2);
         }
         l.data.map((a: A.Actor) => a.mailbox.push({ "key": "move", "params": [A.down] }));
         l.data.map((a: A.Actor) => a.actions.tick(a));
@@ -65,7 +65,7 @@ function run() {
     // Animation : étoile aléatoire toutes les secondes
     const lastX = 2;
     const lastY = 2;
-    let lines: A.Line[] = new Array(nb_line).fill(null).map((_, i: number) => A.init_line(line_length, i, 0, i % 2, []));
+    let lines: A.Line[] = new Array(nb_line).fill(null).map((_, i: number) => A.init_line(line_length, i, 0, i % 2));
     const tickInterval = setInterval(() => {
         lines = lines.map((l: A.Line) => tickLine(l));
         poulet = poulet.actions.tick(poulet);
