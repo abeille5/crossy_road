@@ -142,7 +142,8 @@ function position_add(current_position: Position, dx: Position): Position {
     return pos;
 }
 
-function init_line(size_x: number, size_y: number, difficulty: number, is_void: number): Line {
+function init_line(size_x: number, size_y: number, difficulty: number, is_void: number, is_start: boolean): Line {
+
     const random_line: number = Math.floor(Math.random() * 3) + 1;
     const obstacleProbability = Math.min(0.15 + difficulty * 0.05, 0.8);  // De 15% à 80%
 
@@ -151,7 +152,7 @@ function init_line(size_x: number, size_y: number, difficulty: number, is_void: 
         type: random_line,
         data: new Array(size_x).fill(make_actor({ x: 0, y: size_y }, Name.Empty))
     };
-    if (is_void === 0) {
+    if (is_start || is_void === 0) {
         l.data = l.data.map((_, i) => make_actor({ x: i, y: size_y }, Name.Empty));
         return l;
     }
