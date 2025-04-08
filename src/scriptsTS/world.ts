@@ -51,6 +51,8 @@ function run() {
     term.styleReset();
     term.grabInput(true);
 
+    drawFrame();
+    
     function tickLine(l : A.Line): A.Line {
 	if (l.ordinate===-1)
 	    return A.init_line(10, 20, 0, []);
@@ -79,13 +81,6 @@ function run() {
 
     const posInit: A.Position = { x: frameX + Math.floor(mapWidth / 2) - 2, y: frameY + Math.floor(mapHeight / 2) };
     let poulet: A.Actor = A.make_actor(posInit, A.Name.Chicken);
-
-    function drawPlayer() {
-        term.moveTo(poulet.location.x, poulet.location.y);
-        term.bgBlack().yellow('█');
-        term.styleReset();
-        term.hideCursor();
-    }
 
     function erasePlayer() {
         term.moveTo(poulet.location.x, poulet.location.y);
@@ -126,7 +121,7 @@ function run() {
         return l;
     }
 
-    updateInterval = setInterval(() => {
+    const updateInterval = setInterval(() => {
         //drawFrame();
         lines = lines.map((l: A.Line) => drawLine(l));
         poulet = drawActor(poulet, poulet.location.x, poulet.location.y);
@@ -237,7 +232,7 @@ function run() {
         if (checkCollision()) {
             gameOver();
         } else {
-            drawPlayer();
+            //drawPlayer();
         }
     });
 }
