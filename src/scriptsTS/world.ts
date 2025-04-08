@@ -49,10 +49,21 @@ function run() {
     term.styleReset();
     term.grabInput(true);
 
+    function tickLine(l : A.Line): A.Line {
+	if (l.ordinate===-1)
+	    return A.init_line(10, 20, 0, []);
+	if (l.ordinate < 0)
+	    return A.init_line(line_length, nb_line - 1, 0, []);
+ 	l.data.map((a : A.Actor) => a.mailbox.push({"key":"move", "params":[A.down]}));
+ 	l.data.map((a : A.Actor) => a.actions.tick(a));
+ 	l.ordinate -= 1;
+	return l;
+    }
+	
     // Animation : étoile aléatoire toutes les secondes
     const lastX = 2;
     const lastY = 2;
-    const lines: A.Line[] = init_game();
+    let lines:A.Line[] = new Array(nb_line).fill(null).map((_, i:number) => A.init_line(line_length, i, 0, []));
     const tickInterval = setInterval(() => {
         lines = lines.map((l: A.Line) => tickLine(l));
         poulet = poulet.actions.tick(poulet);
@@ -63,13 +74,6 @@ function run() {
         term.bgWhite().white(' '.repeat(mapWidth));
         term.styleReset();
     });
-
-    const updateInterval = setInterval(() => {
-        lines.map((l: A.Line) => l.data.map((a: A.Actor) => a.update(a)));
-        poulet = poulet.update(poulet);
-    }, 10);
-
-    drawFrame();
 
     const posInit: A.Position = { x: frameX + Math.floor(mapWidth / 2) - 2, y: frameY + Math.floor(mapHeight / 2) };
     let poulet: A.Actor = A.make_actor(posInit, A.Name.Chicken);
@@ -185,7 +189,7 @@ function run() {
     }
 
     const tick = setInterval(() => {
-
+/*
         const newLine = new Array(mapWidth - 2).fill(false);
 
         // Place entre 5 et 10 murs aléatoires
@@ -208,7 +212,7 @@ function run() {
 
         if (checkCollision()) {
             gameOver();
-        }
+        }*/
     }, 300);
 
     term.grabInput(true);
