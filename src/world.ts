@@ -117,34 +117,39 @@ function run() {
     const updateInterval = setInterval(() => {
         lines = lines.map((l: A.Line) => drawLine(l));
         poulet = drawActor(poulet, poulet.location.x, poulet.location.y);
-    }, 300);
+	if (checkCollision())
+	    gameOver();
+    }, 100);
 
     const pouletInterval = setInterval(() => { poulet = drawActor(poulet, poulet.location.x, poulet.location.y); }, 10);
 
     const obstacles: boolean[][] = [];
 
 
+    function isCollision(a:A.Actor): boolean {
+        if (a.name === A.Name.Log_R || a.name === A.Name.Log_L) {
+	    return false;}
+	else {
+	    if (a.location.x === poulet.location.x && a.location.y === poulet.location.y)
+		return true;
+	}
+	return false;
+    }
 
-
+    
     function checkCollision(): boolean {
-        const mapY = poulet.location.y - frameY - 1;
-        const mapX = poulet.location.x - frameX - 1;
-
-        if (
-            mapY >= 0 &&
-            mapY < obstacles.length &&
-            mapX >= 0 &&
-            mapX < mapWidth - 2 &&
-            obstacles[mapY][mapX]
-        ) {
-            return true;
-        }
-        return false;
+	let flag = false;
+        lines.forEach((l : A.Line) => {
+	    l.data.forEach((a : A.Actor) => {if (isCollision(a)) flag = true; });
+	});
+	return flag;
     }
 
     function gameOver() {
         term("\x1B[?25h");
         clearInterval(tickInterval);
+	clearInterval(pouletInterval);
+	clearInterval(updateInterval);
         term.grabInput(false);
         term.moveTo(frameX, frameY + mapHeight + 1);
         term.red.bold("💥 Game Over !\n");
@@ -157,6 +162,7 @@ function run() {
         if (name === 'q' || name === 'CTRL_C') {
             clearInterval(tickInterval);
             clearInterval(updateInterval);
+	    clearInterval(pouletInterval);
             term.grabInput(false);
             term.clear();
             term("\x1B[?25h");
