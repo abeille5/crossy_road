@@ -22,7 +22,7 @@ function run() {
     
     const screenWidth = term.width;
     let screenHeight = term.height;
-    if (screenHeight % 2 == 1)
+    if (screenHeight % 2 === 1)
         screenHeight = screenHeight - 1;
 
     if (!screenWidth || !screenHeight) {
@@ -122,10 +122,10 @@ function run() {
     function drawActor(a: A.Actor, x: number, y: number): A.Actor {
         if (y > nb_line) return a.update(a);
     
-        let screenX = frameX + x + 1;
-        let screenY = frameY + y;
+        const screenX = frameX + x + 1;
+        const screenY = frameY + y;
     
-        let attr = { color: 'white', bgColor: 'black' };
+        const attr = { color: 'white', bgColor: 'black' };
         let char = ' ';
     
         if (a.name === A.Name.Tree) attr.bgColor = 'green';
