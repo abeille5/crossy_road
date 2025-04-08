@@ -13,7 +13,9 @@ function run() {
     term.fullscreen(true);
     term.clear();
     const screenWidth = term.width;
-    const screenHeight = term.height;
+    let screenHeight = term.height;
+    if (screenHeight % 2 == 1) 
+        screenHeight = screenHeight -1 ;
 
     if (!screenWidth || !screenHeight) {
         console.error("Could not determine terminal dimensions.");
@@ -21,7 +23,7 @@ function run() {
     }
 
     const titleX = Math.floor((screenWidth - title.length) / 2);
-    const titleY = 2;
+    const titleY = 6;
     term.moveTo(titleX, titleY).bgBlack().white().bold(title);
 
     const mapWidth = Math.floor(screenWidth / 1.5);
@@ -46,6 +48,9 @@ function run() {
         }
     }
 
+    
+
+    drawFrame();
     term.moveTo(frameX, frameY + mapHeight - 1);
     term.bgWhite().white(' '.repeat(mapWidth));
     term.styleReset();
@@ -77,7 +82,11 @@ function run() {
         term.styleReset();
     });
 
-    const posInit: A.Position = { x: frameX + Math.floor(mapWidth / 2) - 2, y: frameY + Math.floor(mapHeight / 2) };
+    // Remplacer la ligne de posInit par
+    const posInit: A.Position = { 
+        x: Math.floor(line_length / 2), // Utiliser line_length au lieu de mapWidth
+        y: Math.floor(nb_line / 2)      // Utiliser nb_line au lieu de mapHeight
+    };
     let poulet: A.Actor = A.make_actor(posInit, A.Name.Chicken);
     let lifes: number = 5;
 
@@ -86,14 +95,18 @@ function run() {
             return a.update(a);
         if (a.name !== A.Name.Chicken && (x === poulet.location.x && y === poulet.location.y)) {
             term.moveTo(5, 5);
-            console.log(`Poulet ! (${a.name})`);
             return a.update(a);
         }
-        term.moveTo(frameX + x + 1, frameY + y);
+    
+        // Convertir les coordonnées logiques en coordonnées d'affichage
+        const screenX = frameX + x + 1;
+        const screenY = frameY + y;
+    
+        term.moveTo(screenX, screenY);
         if (a.name === A.Name.Tree)
             term.bgGreen().white(' ');
         else if (a.name === A.Name.Water_R || a.name === A.Name.Water_L)
-            term.bgBlue().white(' ');
+            term.bgBrightBlue().white(' ');
         else if (a.name === A.Name.Log_R || a.name === A.Name.Log_L)
             term.bgColorRgb(139, 69, 19).white(' ');
         else if (a.name === A.Name.Car_R || a.name === A.Name.Car_L)
@@ -120,7 +133,7 @@ function run() {
 	if (lifes < 0)
 	    gameOver();
 	else {
-	    term.moveTo(5, 7);
+	    term.moveTo(screenWidth/10, screenHeight/10);
             term.bgBlack().red('❤️ '.repeat(lifes));}
 	
         lines = lines.map((l: A.Line) => drawLine(l));
@@ -128,9 +141,7 @@ function run() {
 	
     }, 100);
 
-    const pouletInterval = setInterval(() => { /*poulet = drawActor(poulet, poulet.location.x, poulet.location.y); */}, 10);
-
-    const obstacles: boolean[][] = [];
+    const pouletInterval = setInterval(() => { poulet = drawActor(poulet, poulet.location.x, poulet.location.y); }, 10);
 
 
     function isCollision(a:A.Actor): boolean {
@@ -159,8 +170,8 @@ function run() {
     function gameOver() {
         term("\x1B[?25h");
         clearInterval(tickInterval);
-	clearInterval(pouletInterval);
-	clearInterval(updateInterval);
+	    clearInterval(pouletInterval);
+	    clearInterval(updateInterval);
         term.grabInput(false);
         term.moveTo(frameX, frameY + mapHeight + 1);
         term.red.bold("💥 Game Over !\n");
@@ -168,7 +179,6 @@ function run() {
         process.exit(0);
     }
 
-    term.grabInput(true);
     term.on('key', (name: string) => {
         if (name === 'q' || name === 'CTRL_C') {
             clearInterval(tickInterval);
@@ -179,10 +189,11 @@ function run() {
             term("\x1B[?25h");
             process.exit();
         }
-        if (name === 'UP' && poulet.location.y > frameY + 1) poulet.mailbox.push({ "key": "move", "params": [A.up] });
-        else if (name === 'DOWN' && poulet.location.y < frameY + mapHeight - 2) poulet.mailbox.push({ "key": "move", "params": [A.down] });
-        else if (name === 'LEFT' && poulet.location.x > frameX + 1) poulet.mailbox.push({ "key": "move", "params": [A.left] });
-        else if (name === 'RIGHT' && poulet.location.x < frameX + mapWidth - 2) poulet.mailbox.push({ "key": "move", "params": [A.right] });
+        if (name === 'UP' && poulet.location.y > 1) poulet.mailbox.push({ "key": "move", "params": [A.up] });
+        else if (name === 'DOWN' && poulet.location.y < mapHeight-4) poulet.mailbox.push({ "key": "move", "params": [A.down] });
+        else if (name === 'LEFT' && poulet.location.x > 0) poulet.mailbox.push({ "key": "move", "params": [A.left] });
+        else if (name === 'RIGHT' && poulet.location.x < mapWidth -5) poulet.mailbox.push({ "key": "move", "params": [A.right] });
+
     });
 }
 
