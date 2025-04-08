@@ -54,8 +54,6 @@ function run() {
     drawFrame();
     
     function tickLine(l : A.Line): A.Line {
-	if (l.ordinate===-1)
-	    return A.init_line(10, 20, 0, []);
 	if (l.ordinate < 0)
 	    return A.init_line(line_length, nb_line - 1, 0, []);
  	l.data.map((a : A.Actor) => a.mailbox.push({"key":"move", "params":[A.down]}));
@@ -92,7 +90,7 @@ function run() {
     function drawActor(a: A.Actor, x: number, y: number): A.Actor {
         if (y > nb_line)
             return a.update(a);
-        if (x === poulet.location.x && y === poulet.location.y) {
+        if (a.name != A.Name.Chicken && (x === poulet.location.x && y === poulet.location.y)) {
             term.moveTo(5, 5);
             console.log(`Poulet ! (${a.name})`);
             return a.update(a);
