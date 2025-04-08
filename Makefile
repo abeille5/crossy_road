@@ -4,7 +4,7 @@ build:
 	@echo "Building files..."
 	@npx tsc -p tsconfig.json
 	@npx tsc src/actor.ts
-	@npx tsc src/scriptsTS/world.ts
+	@npx tsc src/world.ts
 
 eslint:
 	@echo "Running ESLint..."
@@ -17,7 +17,7 @@ test:
 run:
 	@echo "Running the script..."
 	@npx tsc
-	@node dist/src/scriptsTS/world.js
+	@node dist/src/world.js
 
 watch:
 	@npx tsc -w -p tsconfig.json

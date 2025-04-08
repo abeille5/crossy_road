@@ -190,7 +190,7 @@ function init_line(size_x: number, size_y: number): Line {
 
 function init_line(size_x: number, size_y: number, difficulty: number, is_void: number, previousLines: Line[]): Line {
     const random_line: number = Math.floor(Math.random() * 3) + 1;
-    const obstacleProbability = Math.min(0.3 + difficulty * 0.05, 0.8);  // De 30% à 80%
+    const obstacleProbability = Math.min(0.15 + difficulty * 0.05, 0.8);  // De 15% à 80%
 
     let l: Line = {
         ordinate: size_y,
