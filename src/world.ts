@@ -110,7 +110,7 @@ function run() {
     }
 
     function drawLine(l: A.Line): A.Line {
-        l.data = l.data.map((a: A.Actor) => drawActor(a, a.location.x, nb_line - l.ordinate));
+        l.data = l.data.map((a: A.Actor) => drawActor(a,a .location.x, nb_line - l.ordinate));
         return l;
     }
 
