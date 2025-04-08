@@ -101,6 +101,8 @@ function run() {
     const tickInterval = setInterval(() => {
         lines = lines.map((l: A.Line) => tickLine(l));
         poulet = poulet.actions.tick(poulet);
+	if (checkCollision()){
+	    gameOver();}
     }, 500);
 
     /*
@@ -117,7 +119,6 @@ function run() {
         y: Math.floor(nb_line / 2)      // Utiliser nb_line au lieu de mapHeight
     };
     let poulet: A.Actor = A.make_actor(posInit, A.Name.Chicken);
-    let lifes: number = 5;
 
     function drawActor(a: A.Actor, x: number, y: number): A.Actor {
         if (y > nb_line) return a.update(a);
@@ -145,16 +146,6 @@ function run() {
     }
 
     const updateInterval = setInterval(() => {
-        if (checkCollision()) {
-            lifes = lifes - 1;
-        }
-        if (lifes < 0)
-            gameOver();
-        else {
-            term.moveTo(screenWidth / 10, screenHeight / 10);
-            term.bgBlack().red('❤️ '.repeat(lifes));
-        }
-
         lines = lines.map((l: A.Line) => drawLine(l));
         poulet = drawActor(poulet, poulet.location.x, poulet.location.y);
         screenBuffer.draw({ delta: true });
