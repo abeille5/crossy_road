@@ -234,7 +234,7 @@ function run() {
         if (checkCollision()) {
             gameOver();
         } else {
-            drawPlayer();
+            //drawPlayer();
         }
     });
 }
