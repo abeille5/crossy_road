@@ -197,27 +197,26 @@ function init_line(size_x: number, size_y: number, difficulty: number, is_void: 
         type: random_line,
         data: new Array(size_x).fill(make_actor({ x: 0, y: size_y }, Name.Empty))
     };
-    if (is_void == 0) {
+    if (is_void === 0) {
         l.data = l.data.map((_, i) => make_actor({ x: i, y: size_y }, Name.Empty));
         return l;
     }
 
-    do {
-        switch (l.type) {
-            case 1:
-                l.data = generatePatternedLine(size_x, Name.Tree, obstacleProbability, l.ordinate);
-                break;
-            case 2:
-                l.data = generatePatternedLine(size_x, Math.random() > 0.5 ? Name.Car_L : Name.Car_R, obstacleProbability, l.ordinate);
-                break;
-            case 3:
-                l.data = generatePatternedLine(size_x, Math.random() > 0.5 ? Name.Log_L : Name.Log_R, obstacleProbability, l.ordinate);
-                break;
-            default:
-                console.log("Inexistant type of line");
-                break;
-        }
-    } while (!hasValidPath(l));
+
+    switch (l.type) {
+        case 1:
+            l.data = generatePatternedLine(size_x, Name.Tree, obstacleProbability, l.ordinate);
+            break;
+        case 2:
+            l.data = generatePatternedLine(size_x, Math.random() > 0.5 ? Name.Car_L : Name.Car_R, obstacleProbability, l.ordinate);
+            break;
+        case 3:
+            l.data = generatePatternedLine(size_x, Math.random() > 0.5 ? Name.Log_L : Name.Log_R, obstacleProbability, l.ordinate);
+            break;
+        default:
+            console.log("Inexistant type of line");
+            break;
+    }
 
     return l;
 };
@@ -235,7 +234,12 @@ function generatePatternedLine(size_x: number, obstacleType: Name, probability: 
             j = groupSize;
             return make_actor({ x: i, y }, obstacleType);
         }
-
+        else if (obstacleType === Name.Log_L) {
+            return make_actor({ x: i, y }, Name.Water_L);
+        }
+        else if (obstacleType === Name.Log_R) {
+            return make_actor({ x: i, y }, Name.Water_R);
+        }
         return make_actor({ x: i, y }, Name.Empty);
     });
 }
