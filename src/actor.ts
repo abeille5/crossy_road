@@ -147,7 +147,7 @@ function init_line(size_x: number, size_y: number, difficulty: number, is_void: 
     const random_line: number = Math.floor(Math.random() * 3) + 1;
     const obstacleProbability = Math.min(0.15 + difficulty * 0.05, 0.8);  // De 15% à 80%
 
-    let l: Line = {
+    const l: Line = {
         ordinate: size_y,
         type: random_line,
         data: new Array(size_x).fill(make_actor({ x: 0, y: size_y }, Name.Empty))
