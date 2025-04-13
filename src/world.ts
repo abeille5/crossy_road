@@ -144,6 +144,76 @@ function run() {
 
     const pouletInterval = setInterval(() => { poulet = drawActor(poulet, poulet.location.x, poulet.location.y); }, 10);
 
+    function getDirection(actors: A.Actor[]): 'left' | 'right' | null {
+        for (const actor of actors) {
+            if (actor.name === A.Name.Car_R || actor.name === A.Name.Log_R || actor.name === A.Name.Water_R) return 'right';
+            if (actor.name === A.Name.Car_L || actor.name === A.Name.Log_L || actor.name === A.Name.Water_L) return 'left';
+        }
+        return null; // aucune voiture trouvée
+    }
+
+    let obstacleProbability = 0.3;
+    const carInterval = setInterval(() => {
+        let roads = lines.filter((l) => l.type === 2);
+        roads.map((r) => {
+            const l = r.data.length;
+            if (getDirection(r.data) === 'left') {
+                r.data = r.data.slice(1);
+                r.data.map((a) => a.mailbox.push({ "key": "move", "params": [A.left] }));
+                if (Math.random() < obstacleProbability) {
+                    obstacleProbability -= 0.1;
+                    r.data.push(A.make_actor({ x: l - 1, y: r.ordinate }, A.Name.Car_L));
+                }
+                else {
+                    r.data.push(A.make_actor({ x: l - 1, y: r.ordinate }, A.Name.Empty));
+                    obstacleProbability += 0.1;
+                }
+            }
+            else if (getDirection(r.data) === 'right') {
+                r.data = r.data.slice(0, -1);
+                r.data.map((a) => a.mailbox.push({ "key": "move", "params": [A.right] }));
+                if (Math.random() < obstacleProbability) {
+                    obstacleProbability -= 0.1;
+                    r.data.unshift(A.make_actor({ x: 0, y: r.ordinate }, A.Name.Car_R));
+                }
+                else {
+                    r.data.unshift(A.make_actor({ x: 0, y: r.ordinate }, A.Name.Empty));
+                    obstacleProbability += 0.1;
+                }
+            }
+        });
+    }, 200);
+
+    const logInterval = setInterval(() => {
+        let rivers = lines.filter((l) => l.type === 3);
+        rivers.map((r) => {
+            const l = r.data.length;
+            if (getDirection(r.data) === 'left') {
+                r.data = r.data.slice(1);
+                r.data.map((a) => a.mailbox.push({ "key": "move", "params": [A.left] }));
+                if (Math.random() < obstacleProbability) {
+                    obstacleProbability -= 0.1;
+                    r.data.push(A.make_actor({ x: l - 1, y: r.ordinate }, A.Name.Log_L));
+                }
+                else {
+                    r.data.push(A.make_actor({ x: l - 1, y: r.ordinate }, A.Name.Water_L));
+                    obstacleProbability += 0.1;
+                }
+            }
+            else if (getDirection(r.data) === 'right') {
+                r.data = r.data.slice(0, -1);
+                r.data.map((a) => a.mailbox.push({ "key": "move", "params": [A.right] }));
+                if (Math.random() < obstacleProbability) {
+                    obstacleProbability -= 0.1;
+                    r.data.unshift(A.make_actor({ x: 0, y: r.ordinate }, A.Name.Log_R));
+                }
+                else {
+                    r.data.unshift(A.make_actor({ x: 0, y: r.ordinate }, A.Name.Water_R));
+                    obstacleProbability += 0.1;
+                }
+            }
+        });
+    }, 400);
 
     function isCollision(a: A.Actor): boolean {
         if (a.location.x === poulet.location.x && a.location.y === poulet.location.y) {
@@ -172,6 +242,7 @@ function run() {
         term("\x1B[?25h");
         clearInterval(tickInterval);
         clearInterval(pouletInterval);
+        clearInterval(carInterval);
         clearInterval(updateInterval);
         term.grabInput(false);
         term.moveTo(frameX, frameY + mapHeight + 1);
@@ -184,6 +255,7 @@ function run() {
         if (name === 'q' || name === 'CTRL_C') {
             clearInterval(tickInterval);
             clearInterval(updateInterval);
+            clearInterval(carInterval);
             clearInterval(pouletInterval);
             term.grabInput(false);
             term.clear();
