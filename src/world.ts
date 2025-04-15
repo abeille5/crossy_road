@@ -46,7 +46,7 @@ function run() {
         const topBorder = Array.from({ length: mapWidth })
             .map((_, x) => ({
                 x: frameX + x,
-                y: frameY+1,
+                y: frameY + 1,
                 attr: { bgColor: 'white', color: 'white' }
             }));
 
@@ -83,7 +83,7 @@ function run() {
     function tickLine(l: A.Line): A.Line {
         if (l.ordinate < 0) {
             count_void++;
-            return A.init_line(line_length, nb_line - 1, 0, count_void % 2, false);
+            return A.init_line(line_length, nb_line - 1, 0, 1, false);
         }
         l.data.map((a: A.Actor) => a.mailbox.push({ "key": "move", "params": [A.down] }));
         l.data.map((a: A.Actor) => a.actions.tick(a));
@@ -141,7 +141,7 @@ function run() {
 
 
     function drawLine(l: A.Line): A.Line {
-        l.data = l.data.map((a: A.Actor) => drawActor(a, a.location.x, nb_line - l.ordinate+1));
+        l.data = l.data.map((a: A.Actor) => drawActor(a, a.location.x, nb_line - l.ordinate + 1));
         return l;
     }
 
@@ -199,10 +199,10 @@ function run() {
             r.data.forEach((a) => {
                 const realY_log = nb_line - r.ordinate + 1;
                 if (a.location.x === poulet.location.x && realY_log === poulet.location.y && a.name === A.Name.Log_R)
-                    poulet.mailbox.push({ "key": "move", "params": [A.right]});
+                    poulet.mailbox.push({ "key": "move", "params": [A.right] });
                 else if (a.location.x === poulet.location.x && realY_log === poulet.location.y && a.name === A.Name.Log_L)
                     poulet.mailbox.push({ "key": "move", "params": [A.left] });
-                
+
             });
             const l = r.data.length;
             if (getDirection(r.data) === 'left') {

@@ -146,7 +146,17 @@ function position_add(current_position: Position, dx: Position): Position {
 
 function init_line(size_x: number, size_y: number, difficulty: number, is_void: number, is_start: boolean): Line {
 
-    const random_line: number = Math.floor(Math.random() * 3) + 1;
+    let random_line: number = Math.random();
+    if (random_line < 0.4) {
+        random_line = 1;
+    }
+    else if (random_line > 0.4 && random_line < 0.8) {
+        random_line = 2;
+    }
+    else {
+        random_line = 3;
+    }
+
     const obstacleProbability = Math.min(0.15 + difficulty * 0.05, 0.8);  // De 15% à 80%
 
     const l: Line = {
