@@ -24,7 +24,7 @@ watch:
 
 clean:
 	@echo "Cleaning up..."
-	@rm -f *~ src/*~ src/*/*~ test/*~ html/*~
+	@rm -f *~ src/*~ src/*.js test/*~ html/*~
 	@rm -rf dist/*
 
 .PHONY: all archive build clean eslint parcel test run watch
