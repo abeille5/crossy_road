@@ -42,42 +42,39 @@ function run() {
     const nb_line: number = mapHeight - 2;
 
     function drawFrame() {
-        // Ligne du haut
-        for (let x = 0; x < mapWidth; x++) {
-            screenBuffer.put({
+        // Generate positions for all borders
+        const topBorder = Array.from({ length: mapWidth })
+            .map((_, x) => ({
                 x: frameX + x,
                 y: frameY,
                 attr: { bgColor: 'white', color: 'white' }
-            }, ' ');
-        }
+            }));
 
-        // Ligne du bas
-        for (let x = 0; x < mapWidth; x++) {
-            screenBuffer.put({
+        const bottomBorder = Array.from({ length: mapWidth })
+            .map((_, x) => ({
                 x: frameX + x,
                 y: frameY + mapHeight - 1,
                 attr: { bgColor: 'white', color: 'white' }
-            }, ' ');
-        }
+            }));
 
-        // Colonnes gauche/droite
-        for (let y = 1; y < mapHeight - 1; y++) {
-            screenBuffer.put({
-                x: frameX,
-                y: frameY + y,
-                attr: { bgColor: 'white', color: 'white' }
-            }, ' ');
-            screenBuffer.put({
-                x: frameX + mapWidth - 1,
-                y: frameY + y,
-                attr: { bgColor: 'white', color: 'white' }
-            }, ' ');
-        }
+        const sideBorders = Array.from({ length: mapHeight - 2 })
+            .flatMap((_, y) => [
+                {
+                    x: frameX,
+                    y: frameY + y + 1,
+                    attr: { bgColor: 'white', color: 'white' }
+                },
+                {
+                    x: frameX + mapWidth - 1,
+                    y: frameY + y + 1,
+                    attr: { bgColor: 'white', color: 'white' }
+                }
+            ]);
+
+        // Combine all border positions and draw them
+        [...topBorder, ...bottomBorder, ...sideBorders]
+            .forEach(position => screenBuffer.put(position, ' '));
     }
-
-
-
-
 
     drawFrame();
 
@@ -100,11 +97,12 @@ function run() {
     let lines: A.Line[] = new Array(nb_line).fill(null).map((_, i: number) => A.init_line(line_length, i, 0, i % 2, [] as any));
     const tickInterval = setInterval(() => {
         lines = lines.map((l: A.Line) => tickLine(l));
-	if (poulet.location.y < mapHeight-2){
-        poulet.mailbox.push({ "key": "move", "params": [A.down]});
-        poulet = poulet.update(poulet);}
-	else
-        gameOver();
+        if (poulet.location.y < mapHeight - 2) {
+            poulet.mailbox.push({ "key": "move", "params": [A.down] });
+            poulet = poulet.update(poulet);
+        }
+        else
+            gameOver();
     }, 1000);
 
     /*
@@ -151,8 +149,9 @@ function run() {
         lines = lines.map((l: A.Line) => drawLine(l));
         poulet = drawActor(poulet, poulet.location.x, poulet.location.y);
         screenBuffer.draw({ delta: true });
-	if (checkCollision()){
-        gameOver();}	
+        if (checkCollision()) {
+            gameOver();
+        }
     }, 100);
 
     const pouletInterval = setInterval(() => {/*poulet = drawActor(poulet, poulet.location.x, poulet.location.y);*/ }, 10);
