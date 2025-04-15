@@ -149,10 +149,7 @@ function run() {
         lines = lines.map((l: A.Line) => drawLine(l));
         poulet = drawActor(poulet, poulet.location.x, poulet.location.y);
         screenBuffer.draw({ delta: true });
-        if (checkCollision()) {
-            gameOver();
-        }
-    }, 100);
+    }, 10);
 
     const pouletInterval = setInterval(() => {/*poulet = drawActor(poulet, poulet.location.x, poulet.location.y);*/ }, 10);
 
@@ -269,6 +266,12 @@ function run() {
             line.data.some(actor => isCollision(actor))
         );
     }
+
+    const colision = setInterval(() => { {
+        if (checkCollision()) {
+            gameOver();
+        }
+    }},1);
 
     function gameOver() {
         term("\x1B[?25h");
