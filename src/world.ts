@@ -19,7 +19,7 @@ function run() {
         height: term.height
     });
 
-    
+
     const screenWidth = term.width;
     let screenHeight = term.height;
     if (screenHeight % 2 === 1)
@@ -50,7 +50,7 @@ function run() {
                 attr: { bgColor: 'white', color: 'white' }
             }, ' ');
         }
-    
+
         // Ligne du bas
         for (let x = 0; x < mapWidth; x++) {
             screenBuffer.put({
@@ -59,7 +59,7 @@ function run() {
                 attr: { bgColor: 'white', color: 'white' }
             }, ' ');
         }
-    
+
         // Colonnes gauche/droite
         for (let y = 1; y < mapHeight - 1; y++) {
             screenBuffer.put({
@@ -74,13 +74,13 @@ function run() {
             }, ' ');
         }
     }
-    
-    
+
+
 
 
 
     drawFrame();
-    
+
     term.grabInput(true);
     let count_void = 0;
     function tickLine(l: A.Line): A.Line {
@@ -93,10 +93,10 @@ function run() {
         l.ordinate -= 1;
         return l;
     }
-    
+
 
     // Animation : étoile aléatoire toutes les secondes
-    
+
     let lines: A.Line[] = new Array(nb_line).fill(null).map((_, i: number) => A.init_line(line_length, i, 0, i % 2, [] as any));
     const tickInterval = setInterval(() => {
         lines = lines.map((l: A.Line) => tickLine(l));
@@ -121,23 +121,23 @@ function run() {
 
     function drawActor(a: A.Actor, x: number, y: number): A.Actor {
         if (y > nb_line) return a.update(a);
-    
+
         const screenX = frameX + x + 1;
         const screenY = frameY + y;
-    
+
         const attr = { color: 'white', bgColor: 'black' };
         let char = ' ';
-    
+
         if (a.name === A.Name.Tree) attr.bgColor = 'green';
         else if ([A.Name.Water_R, A.Name.Water_L].includes(a.name)) attr.bgColor = 'cyan';
         else if ([A.Name.Log_R, A.Name.Log_L].includes(a.name)) attr.bgColor = 94 as any;
         else if ([A.Name.Car_R, A.Name.Car_L].includes(a.name)) attr.bgColor = 'grey';
         else if (a.name === A.Name.Chicken) char = '🐔';
-        
+
         screenBuffer.put({ x: screenX, y: screenY, attr }, char);
         return a.update(a);
     }
-    
+
 
     function drawLine(l: A.Line): A.Line {
         l.data = l.data.map((a: A.Actor) => drawActor(a, a.location.x, nb_line - l.ordinate));
@@ -157,7 +157,7 @@ function run() {
 
         lines = lines.map((l: A.Line) => drawLine(l));
         poulet = drawActor(poulet, poulet.location.x, poulet.location.y);
-        screenBuffer.draw({delta:true});
+        screenBuffer.draw({ delta: true });
     }, 100);
 
     const pouletInterval = setInterval(() => { poulet = drawActor(poulet, poulet.location.x, poulet.location.y); }, 10);
@@ -172,7 +172,7 @@ function run() {
 
     let obstacleProbability = 0.3;
     const carInterval = setInterval(() => {
-        let roads = lines.filter((l) => l.type === 2);
+        const roads = lines.filter((l) => l.type === 2);
         roads.map((r) => {
             const l = r.data.length;
             if (getDirection(r.data) === 'left') {
@@ -199,11 +199,12 @@ function run() {
                     obstacleProbability += 0.1;
                 }
             }
+            return r;
         });
     }, 200);
 
     const logInterval = setInterval(() => {
-        let rivers = lines.filter((l) => l.type === 3);
+        const rivers = lines.filter((l) => l.type === 3);
         rivers.map((r) => {
             const l = r.data.length;
             if (getDirection(r.data) === 'left') {
@@ -230,6 +231,7 @@ function run() {
                     obstacleProbability += 0.1;
                 }
             }
+            return r;
         });
     }, 400);
 
