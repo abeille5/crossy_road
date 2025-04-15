@@ -101,10 +101,10 @@ function run() {
     const tickInterval = setInterval(() => {
         lines = lines.map((l: A.Line) => tickLine(l));
 	if (poulet.location.y < mapHeight-2){
-	    poulet.mailbox.push({ "key": "move", "params": [A.down] });
-	    poulet = poulet.update(poulet);}
+        poulet.mailbox.push({ "key": "move", "params": [A.down]});
+        poulet = poulet.update(poulet);}
 	else
-	    gameOver();
+        gameOver();
     }, 1000);
 
     /*
@@ -152,7 +152,7 @@ function run() {
         poulet = drawActor(poulet, poulet.location.x, poulet.location.y);
         screenBuffer.draw({ delta: true });
 	if (checkCollision()){
-	    gameOver();}	
+        gameOver();}	
     }, 100);
 
     const pouletInterval = setInterval(() => {/*poulet = drawActor(poulet, poulet.location.x, poulet.location.y);*/ }, 10);
@@ -275,7 +275,7 @@ function run() {
             term.grabInput(false);
             term.clear();
             term("\x1B[?25h");
-            process.exit();
+            process.exit(0);
         }
         if (name === 'UP' && poulet.location.y > 1) poulet.mailbox.push({ "key": "move", "params": [A.up] });
         else if (name === 'DOWN' && poulet.location.y < nb_line) poulet.mailbox.push({ "key": "move", "params": [A.down] });
