@@ -164,35 +164,31 @@ function run() {
         return null; // aucune voiture trouvée
     }
 
-    let obstacleProbability = 0.3;
     const carInterval = setInterval(() => {
-        const roads = lines.filter((l) => l.type === 2);
+        const roads = lines.filter((l) => l.type === A.LineType.Road);
         roads.map((r) => {
             const l = r.data.length;
             if (getDirection(r.data) === 'left') {
                 r.data = r.data.slice(1);
                 r.data.map((a) => a.mailbox.push({ "key": "move", "params": [A.left] }));
-                if (Math.random() < obstacleProbability) {
-                    obstacleProbability -= 0.1;
+                if (r.pattern[r.patternIndex] === 1) {
                     r.data.push(A.make_actor({ x: l - 1, y: r.ordinate }, A.Name.Car_L));
                 }
                 else {
                     r.data.push(A.make_actor({ x: l - 1, y: r.ordinate }, A.Name.Empty));
-                    obstacleProbability += 0.1;
                 }
             }
             else if (getDirection(r.data) === 'right') {
                 r.data = r.data.slice(0, -1);
                 r.data.map((a) => a.mailbox.push({ "key": "move", "params": [A.right] }));
-                if (Math.random() < obstacleProbability) {
-                    obstacleProbability -= 0.1;
+                if (r.pattern[r.patternIndex] === 1) {
                     r.data.unshift(A.make_actor({ x: 0, y: r.ordinate }, A.Name.Car_R));
                 }
                 else {
                     r.data.unshift(A.make_actor({ x: 0, y: r.ordinate }, A.Name.Empty));
-                    obstacleProbability += 0.1;
                 }
             }
+            r.patternIndex += 1;
             return r;
         });
     }, 200);
@@ -204,27 +200,24 @@ function run() {
             if (getDirection(r.data) === 'left') {
                 r.data = r.data.slice(1);
                 r.data.map((a) => a.mailbox.push({ "key": "move", "params": [A.left] }));
-                if (Math.random() < obstacleProbability) {
-                    obstacleProbability -= 0.1;
+                if (r.pattern[r.patternIndex] === 1) {
                     r.data.push(A.make_actor({ x: l - 1, y: r.ordinate }, A.Name.Log_L));
                 }
                 else {
                     r.data.push(A.make_actor({ x: l - 1, y: r.ordinate }, A.Name.Water_L));
-                    obstacleProbability += 0.1;
                 }
             }
             else if (getDirection(r.data) === 'right') {
                 r.data = r.data.slice(0, -1);
                 r.data.map((a) => a.mailbox.push({ "key": "move", "params": [A.right] }));
-                if (Math.random() < obstacleProbability) {
-                    obstacleProbability -= 0.1;
+                if (r.pattern[r.patternIndex] === 1) {
                     r.data.unshift(A.make_actor({ x: 0, y: r.ordinate }, A.Name.Log_R));
                 }
                 else {
                     r.data.unshift(A.make_actor({ x: 0, y: r.ordinate }, A.Name.Water_R));
-                    obstacleProbability += 0.1;
                 }
             }
+            r.patternIndex += 1;
             return r;
         });
     }, 400);

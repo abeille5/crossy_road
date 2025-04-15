@@ -33,6 +33,8 @@ type Line = {
     ordinate: number;
     type: LineType;
     data: Actor[];
+    pattern: number[];
+    patternIndex: number;
 }
 
 type Actor = {
@@ -150,7 +152,9 @@ function init_line(size_x: number, size_y: number, difficulty: number, is_void: 
     const l: Line = {
         ordinate: size_y,
         type: random_line,
-        data: new Array(size_x).fill(make_actor({ x: 0, y: size_y }, Name.Empty))
+        data: new Array(size_x).fill(make_actor({ x: 0, y: size_y }, Name.Empty)),
+        pattern: new Array(size_x).fill(0),
+        patternIndex: 0
     };
     if (is_start || is_void === 0) {
         l.data = l.data.map((_, i) => make_actor({ x: i, y: size_y }, Name.Empty));
@@ -158,14 +162,16 @@ function init_line(size_x: number, size_y: number, difficulty: number, is_void: 
     }
 
     switch (l.type) {
-        case 1:
+        case LineType.Nature:
             l.data = generatePatternedLine(size_x, Name.Tree, obstacleProbability, l.ordinate);
             break;
-        case 2:
+        case LineType.Road:
             l.data = generatePatternedLine(size_x, Math.random() > 0.5 ? Name.Car_L : Name.Car_R, obstacleProbability, l.ordinate);
+            l.pattern = generateObstaclePattern(size_x, obstacleProbability);
             break;
-        case 3:
-            l.data = generatePatternedLine(size_x, Math.random() > 0.5 ? Name.Log_L : Name.Log_R, obstacleProbability, l.ordinate);
+        case LineType.River:
+            l.data = generatePatternedLine(size_x, Math.random() > 0.5 ? Name.Log_L : Name.Log_R, obstacleProbability + 0.2, l.ordinate);
+            l.pattern = generateObstaclePattern(size_x, obstacleProbability);
             break;
         default:
             console.log("Inexistant type of line or start line that shouldn't be here");
@@ -174,17 +180,24 @@ function init_line(size_x: number, size_y: number, difficulty: number, is_void: 
     return l;
 };
 
-function generatePatternedLine(size_x: number, obstacleType: Name, probability: number, y: number): Array<any> {
-    let j = 0;
-    return [...Array(size_x)].map((_, i, arr) => {
-        if (j !== 0) {
-            j--;
-            return make_actor({ x: i, y }, obstacleType);
-        }
+function generateObstaclePattern(size_x: number, probability: number): number[] {
+    function aux(remaining: number): number[] {
+        if (remaining <= 0) return [];
 
         if (Math.random() < probability) {
-            const groupSize = Math.min(Math.floor(Math.random() * 3) + 1, size_x - i);
-            j = groupSize;
+            const groupSize = Math.min(Math.floor(Math.random() * 4) + 2, remaining);
+            return Array(groupSize).fill(1).concat(aux(remaining - groupSize));
+        } else {
+            return [0].concat(aux(remaining - 1));
+        }
+    }
+    return aux(size_x);
+};
+
+function generatePatternedLine(size_x: number, obstacleType: Name, probability: number, y: number): Array<any> {
+    const linePattern = generateObstaclePattern(size_x, probability);
+    return [...Array(size_x)].map((_, i) => {
+        if (linePattern[i] === 1) { // si obstacle
             return make_actor({ x: i, y }, obstacleType);
         }
         else if (obstacleType === Name.Log_L) {
