@@ -100,10 +100,12 @@ function run() {
     let lines: A.Line[] = new Array(nb_line).fill(null).map((_, i: number) => A.init_line(line_length, i, 0, i % 2, [] as any));
     const tickInterval = setInterval(() => {
         lines = lines.map((l: A.Line) => tickLine(l));
-        poulet = poulet.actions.tick(poulet);
-	if (checkCollision()){
-	    gameOver();}
-    }, 500);
+	if (poulet.location.y < mapHeight-2){
+	    poulet.mailbox.push({ "key": "move", "params": [A.down] });
+	    poulet = poulet.update(poulet);}
+	else
+	    gameOver();
+    }, 1000);
 
     /*
     term.on('key', (name: any) => {
@@ -141,7 +143,7 @@ function run() {
 
 
     function drawLine(l: A.Line): A.Line {
-        l.data = l.data.map((a: A.Actor) => drawActor(a, a.location.x, nb_line - l.ordinate));
+        l.data = l.data.map((a: A.Actor) => drawActor(a, a.location.x, nb_line - l.ordinate + 1));
         return l;
     }
 
@@ -149,9 +151,11 @@ function run() {
         lines = lines.map((l: A.Line) => drawLine(l));
         poulet = drawActor(poulet, poulet.location.x, poulet.location.y);
         screenBuffer.draw({ delta: true });
+	if (checkCollision()){
+	    gameOver();}	
     }, 100);
 
-    const pouletInterval = setInterval(() => { poulet = drawActor(poulet, poulet.location.x, poulet.location.y); }, 10);
+    const pouletInterval = setInterval(() => {/*poulet = drawActor(poulet, poulet.location.x, poulet.location.y);*/ }, 10);
 
     function getDirection(actors: A.Actor[]): 'left' | 'right' | null {
         for (const actor of actors) {
