@@ -46,7 +46,7 @@ function run() {
         const topBorder = Array.from({ length: mapWidth })
             .map((_, x) => ({
                 x: frameX + x,
-                y: frameY,
+                y: frameY+1,
                 attr: { bgColor: 'white', color: 'white' }
             }));
 
@@ -141,7 +141,7 @@ function run() {
 
 
     function drawLine(l: A.Line): A.Line {
-        l.data = l.data.map((a: A.Actor) => drawActor(a, a.location.x, nb_line - l.ordinate));
+        l.data = l.data.map((a: A.Actor) => drawActor(a, a.location.x, nb_line - l.ordinate+1));
         return l;
     }
 
@@ -196,6 +196,14 @@ function run() {
     const logInterval = setInterval(() => {
         const rivers = lines.filter((l) => l.type === 3);
         rivers.map((r) => {
+            r.data.forEach((a) => {
+                const realY_log = nb_line - r.ordinate + 1;
+                if (a.location.x === poulet.location.x && realY_log === poulet.location.y && a.name === A.Name.Log_R)
+                    poulet.mailbox.push({ "key": "move", "params": [A.right]});
+                else if (a.location.x === poulet.location.x && realY_log === poulet.location.y && a.name === A.Name.Log_L)
+                    poulet.mailbox.push({ "key": "move", "params": [A.left] });
+                
+            });
             const l = r.data.length;
             if (getDirection(r.data) === 'left') {
                 r.data = r.data.slice(1);
@@ -287,7 +295,7 @@ function run() {
             term.grabInput(false);
             process.exit(0);
         }
-        if (name === 'UP' && poulet.location.y > 1) poulet.mailbox.push({ "key": "move", "params": [A.up] });
+        if (name === 'UP' && poulet.location.y > 2) poulet.mailbox.push({ "key": "move", "params": [A.up] });
         else if (name === 'DOWN' && poulet.location.y < nb_line) poulet.mailbox.push({ "key": "move", "params": [A.down] });
         else if (name === 'LEFT' && poulet.location.x > 0) poulet.mailbox.push({ "key": "move", "params": [A.left] });
         else if (name === 'RIGHT' && poulet.location.x < line_length - 2) poulet.mailbox.push({ "key": "move", "params": [A.right] });
