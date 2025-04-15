@@ -268,13 +268,14 @@ function run() {
 
     term.on('key', (name: string) => {
         if (name === 'q' || name === 'CTRL_C') {
+            term.styleReset(); // Réinitialise les styles
+            term.clear();
+            term("\x1B[?25h");
             clearInterval(tickInterval);
             clearInterval(updateInterval);
             clearInterval(carInterval);
             clearInterval(pouletInterval);
             term.grabInput(false);
-            term.clear();
-            term("\x1B[?25h");
             process.exit(0);
         }
         if (name === 'UP' && poulet.location.y > 1) poulet.mailbox.push({ "key": "move", "params": [A.up] });
