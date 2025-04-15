@@ -188,7 +188,7 @@ function generateObstaclePattern(size_x: number, probability: number): number[] 
             const groupSize = Math.min(Math.floor(Math.random() * 4) + 2, remaining);
             return Array(groupSize).fill(1).concat(aux(remaining - groupSize));
         } else {
-            return [0].concat(aux(remaining - 1));
+            return [0, 0].concat(aux(remaining - 1));
         }
     }
     return aux(size_x);
