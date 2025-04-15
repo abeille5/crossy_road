@@ -223,26 +223,43 @@ function run() {
     }, 400);
 
     function isCollision(a: A.Actor): boolean {
-        if (a.location.x === poulet.location.x && a.location.y === poulet.location.y) {
-            term.moveTo(5, 6);
-            console.log(`Collision ! (${a.name})`);
-            if (a.name === A.Name.Log_R || a.name === A.Name.Log_L)
-                return false;
-            else if (a.name === A.Name.Car_R || a.name === A.Name.Car_L)
-                return true;
-            else if (a.name === A.Name.Water_R || a.name === A.Name.Water_L)
-                return true;
-            else return false;
+        // Trouver la ligne contenant l'acteur
+        const actorLine = lines.find(line =>
+            line.data.includes(a)
+        );
+
+        if (!actorLine) return false;
+
+        // Calculer la coordonnée Y réelle (même transformation que pour l'affichage)
+        const realY = nb_line - actorLine.ordinate + 1;
+
+        // Vérifie si les positions correspondent (avec coordonnée Y transformée)
+        if (a.location.x !== poulet.location.x || realY !== poulet.location.y) {
+            return false;
         }
-        return false;
+
+        const logCollision = (actorName: A.Name) => {
+            term.moveTo(5, 6);
+            term.white.bgRed("COLLISION");
+            console.log(`Collision ! (${A.Name[actorName]})`);
+        };
+
+        logCollision(a.name);
+
+        const safeActors = [A.Name.Log_R, A.Name.Log_L];
+        const dangerousActors = [
+            A.Name.Car_R, A.Name.Car_L,
+            A.Name.Water_R, A.Name.Water_L,
+            A.Name.Tree
+        ];
+
+        return dangerousActors.includes(a.name);
     }
 
     function checkCollision(): boolean {
-        let flag = false;
-        lines.forEach((l: A.Line) => {
-            l.data.forEach((a: A.Actor) => { if (isCollision(a)) flag = true; });
-        });
-        return flag;
+        return lines.some(line =>
+            line.data.some(actor => isCollision(actor))
+        );
     }
 
     function gameOver() {
