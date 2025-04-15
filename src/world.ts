@@ -92,8 +92,6 @@ function run() {
     }
 
 
-    // Animation : étoile aléatoire toutes les secondes
-
     let lines: A.Line[] = new Array(nb_line).fill(null).map((_, i: number) => A.init_line(line_length, i, 0, i % 2, [] as any));
     const tickInterval = setInterval(() => {
         lines = lines.map((l: A.Line) => tickLine(l));
@@ -147,7 +145,7 @@ function run() {
 
     const updateInterval = setInterval(() => {
         lines = lines.map((l: A.Line) => drawLine(l));
-        poulet = drawActor(poulet, poulet.location.x, poulet.location.y);
+        poulet = drawActor(poulet, poulet.location.x, nb_line - poulet.location.y);
         screenBuffer.draw({ delta: true });
     }, 10);
 
