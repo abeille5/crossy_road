@@ -141,7 +141,7 @@ function run() {
 
 
     function drawLine(l: A.Line): A.Line {
-        l.data = l.data.map((a: A.Actor) => drawActor(a, a.location.x, nb_line - l.ordinate + 1));
+        l.data = l.data.map((a: A.Actor) => drawActor(a, a.location.x, nb_line - l.ordinate));
         return l;
     }
 
@@ -228,7 +228,6 @@ function run() {
     }, 400);
 
     function isCollision(a: A.Actor): boolean {
-        // Trouver la ligne contenant l'acteur
         const actorLine = lines.find(line =>
             line.data.includes(a)
         );
@@ -236,7 +235,7 @@ function run() {
         if (!actorLine) return false;
 
         // Calculer la coordonnée Y réelle (même transformation que pour l'affichage)
-        const realY = nb_line - actorLine.ordinate + 1;
+        const realY = nb_line - actorLine.ordinate;
 
         // Vérifie si les positions correspondent (avec coordonnée Y transformée)
         if (a.location.x !== poulet.location.x || realY !== poulet.location.y) {
@@ -245,7 +244,6 @@ function run() {
 
         const logCollision = (actorName: A.Name) => {
             term.moveTo(5, 6);
-            term.white.bgRed("COLLISION");
             console.log(`Collision ! (${A.Name[actorName]})`);
         };
 
