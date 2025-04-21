@@ -96,7 +96,7 @@ function run() {
     const tickInterval = setInterval(() => {
         lines = lines.map((l: A.Line) => tickLine(l));
         if (poulet.location.y < mapHeight - 2) {
-            poulet.mailbox.push({ "key": "move", "params": [A.down] });
+            poulet.mailbox.push({ "key": "move", "params": [A.up] });
             poulet = poulet.update(poulet);
         }
         else
@@ -284,7 +284,7 @@ function run() {
 
     term.on('key', (name: string) => {
         if (name === 'q' || name === 'CTRL_C') {
-            term.styleReset(); // Réinitialise les styles
+            term.styleReset();
             term.clear();
             term("\x1B[?25h");
             clearInterval(tickInterval);
@@ -294,8 +294,8 @@ function run() {
             term.grabInput(false);
             process.exit(0);
         }
-        if (name === 'UP' && poulet.location.y > 2) poulet.mailbox.push({ "key": "move", "params": [A.up] });
-        else if (name === 'DOWN' && poulet.location.y < nb_line) poulet.mailbox.push({ "key": "move", "params": [A.down] });
+        if (name === 'UP' && poulet.location.y > 2) poulet.mailbox.push({ "key": "move", "params": [A.down] });
+        else if (name === 'DOWN' && poulet.location.y < nb_line) poulet.mailbox.push({ "key": "move", "params": [A.up] });
         else if (name === 'LEFT' && poulet.location.x > 0) poulet.mailbox.push({ "key": "move", "params": [A.left] });
         else if (name === 'RIGHT' && poulet.location.x < line_length - 2) poulet.mailbox.push({ "key": "move", "params": [A.right] });
 
