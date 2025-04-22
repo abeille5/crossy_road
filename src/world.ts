@@ -189,7 +189,6 @@ function run() {
             return r;
         });
     }, 200);
-
     const logInterval = setInterval(() => {
         const rivers = lines.filter((l) => l.type === 3);
         rivers.map((r) => {
@@ -267,11 +266,13 @@ function run() {
         );
     }
 
-    const colision = setInterval(() => { {
-        if (checkCollision()) {
-            gameOver();
+    const colision = setInterval(() => {
+        {
+            if (checkCollision()) {
+                gameOver();
+            }
         }
-    }},1);
+    }, 1);
 
     function gameOver() {
         term("\x1B[?25h");
