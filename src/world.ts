@@ -4,6 +4,7 @@
 import terminalKit from 'terminal-kit';
 
 import * as A from './actor.js';
+import { getTokenSourceMapRange } from 'typescript';
 
 const term = terminalKit.terminal;
 
@@ -13,7 +14,8 @@ function run() {
     term.hideCursor();
     term.fullscreen(true);
     term.clear();
-    
+    term.bgColor('black').clear();
+
 
     const screenBuffer = new terminalKit.ScreenBuffer({
         dst: term,
@@ -129,6 +131,7 @@ function run() {
         else if ([A.Name.Log_R, A.Name.Log_L].includes(a.name)) attr.bgColor = 94 as any;
         else if ([A.Name.Car_R, A.Name.Car_L].includes(a.name)) attr.bgColor = 'grey';
         else if (a.name === A.Name.Chicken) char = '🐔';
+        else if (a.name === A.Name.Projectile) char='🔥';
 
         screenBuffer.put({ x: screenX, y: screenY, attr }, char);
         return a.update(a);
@@ -143,6 +146,9 @@ function run() {
     const updateInterval = setInterval(() => {
         lines = lines.map((l: A.Line) => drawLine(l));
         poulet = drawActor(poulet, poulet.location.x, poulet.location.y);
+        arrayProj.forEach((projectile) => {
+            drawActor(projectile, projectile.location.x, projectile.location.y);
+        });
         screenBuffer.draw({ delta: true });
         screenBuffer.put({ x: frameY + mapHeight, y: mapWidth / 3, attr: { color: "white", bgcolor: "black" } }, "SCORE : " + score);
         screenBuffer.put({ x: frameY + mapHeight + 15, y: mapWidth / 3, attr: { color: "white", bgcolor: "black" } }, "Level : " + A.difficulty);
@@ -223,7 +229,7 @@ function run() {
         });
     }, 400);
 
-    function isCollision(a: A.Actor): boolean {
+    function isCollision(a: A.Actor, b:A.Actor): boolean {
         // Trouver la ligne contenant l'acteur
         const actorLine = lines.find(line =>
             line.data.includes(a)
@@ -235,7 +241,7 @@ function run() {
         const realY = nb_line - actorLine.ordinate + 1;
 
         // Vérifie si les positions correspondent (avec coordonnée Y transformée)
-        if (a.location.x !== poulet.location.x || realY !== poulet.location.y) {
+        if (a.location.x !== b.location.x || realY !== b.location.y) {
             return false;
         }
 
@@ -252,7 +258,7 @@ function run() {
 
     function checkCollision(): boolean {
         return lines.some(line =>
-            line.data.some(actor => isCollision(actor))
+            line.data.some(actor => isCollision(actor,poulet))
         );
     }
 
@@ -264,8 +270,55 @@ function run() {
         }
     }, 1);
 
-    let arrayProj:A.Actor[] = new Array;
 
+
+    let arrayProj:A.Actor[] = new Array;
+    const intervalProj = setInterval(() => {
+        arrayProj = arrayProj.map((proj) => {
+            proj.mailbox.push({ "key": "move", "params": [A.up]})
+            return proj.update(proj);
+        });
+
+        arrayProj = arrayProj.filter((proj) => proj.location.y > 1);
+    }, 50);
+
+    
+
+    const colisionProj = setInterval(() => {
+        arrayProj = arrayProj.filter((proj) => {
+    
+            const actorLine = lines.find(line =>
+                line.data.some(actor => {
+                    return (
+                        actor.name && actor.name !== A.Name.Chicken && // Exclure le poulet
+                        Math.abs(actor.location.x - proj.location.x) <= 2 &&
+                        nb_line - line.ordinate + 1 === proj.location.y
+                    );
+                })
+            );
+    
+            if (actorLine) {
+                const actorIndex = actorLine.data.findIndex(actor =>
+                    actor.name !== A.Name.Chicken && 
+                    actor.name !== A.Name.Log_L &&
+                    actor.name !== A.Name.Log_R &&
+                    Math.abs(actor.location.x - proj.location.x) <= 2 &&
+                    nb_line - actorLine.ordinate + 1 === proj.location.y
+                );
+    
+                if (actorIndex !== -1) {
+                    actorLine.data.splice(actorIndex, 1);
+                    return false;
+                }
+            }
+    
+            return true;
+        });
+    }, 10);
+    
+
+
+    
 
     function gameOver() {
         term("\x1B[?25h");
@@ -276,6 +329,8 @@ function run() {
         clearInterval(logInterval);
         clearInterval(colision);
         term.grabInput(false);
+        term.bgColor('black').clear();
+
 
         term.clear();
         screenBuffer.clear();
@@ -341,26 +396,12 @@ function run() {
             term.grabInput(false);
             process.exit(0);
         }
-<<<<<<< HEAD
-        if (name  === 'SPACE')
+        if (name === 'e')
         {
-            arrayProj.push(A.make_actor(poulet.location,A.Name.Projectile));
-            console.log("lpr,geaonpkq");
+            const locationProj:A.Position = {x:poulet.location.x,y:poulet.location.y-1};
+            arrayProj.push(A.make_actor(locationProj,A.Name.Projectile));
         }
-        if (name === 'UP' && poulet.location.y > 2)
-            {
-                poulet.mailbox.push({ "key": "move", "params": [A.up] });
-                nb_ligne++;
-            }
-        else if (name === 'DOWN' && poulet.location.y < nb_line)
-        {
-            if (nb_ligne > 0)
-            {
-                nb_ligne--;
-            }
-            poulet.mailbox.push({ "key": "move", "params": [A.down] });
-        }
-=======
+        
         if (name === 'UP' && poulet.location.y > 2) {
             poulet.mailbox.push({ "key": "move", "params": [A.up] });
             setTimeout(() => {
@@ -381,7 +422,6 @@ function run() {
             }
         }
         else if (name === 'DOWN' && poulet.location.y < nb_line) poulet.mailbox.push({ "key": "move", "params": [A.down] });
->>>>>>> refs/remotes/origin/master
         else if (name === 'LEFT' && poulet.location.x > 0) poulet.mailbox.push({ "key": "move", "params": [A.left] });
         else if (name === 'RIGHT' && poulet.location.x < line_length - 2) poulet.mailbox.push({ "key": "move", "params": [A.right] });
 
