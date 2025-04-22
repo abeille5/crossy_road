@@ -134,7 +134,7 @@ describe('Actor game test suite', () => {
     });
 
     test('Init line should create a valid line structure', () => {
-        const line = A.init_line(60, 5, 0, 1, false);
+        const line = A.init_line(60, 5, false, 30);
 
         expect(line.ordinate).toBe(5);
         expect(line.data.length).toBe(60);
@@ -146,9 +146,9 @@ describe('Actor game test suite', () => {
     });
 
     test('Init line should preserve the ordinate value', () => {
-        const line1 = A.init_line(10, 1, 0, 1, false);
-        const line2 = A.init_line(10, 5, 0, 1, false);
-        const line3 = A.init_line(10, 10, 0, 1, false);
+        const line1 = A.init_line(10, 1, false, 30);
+        const line2 = A.init_line(10, 5, false, 30);
+        const line3 = A.init_line(10, 10, false, 30);
 
         expect(line1.ordinate).toBe(1);
         expect(line2.ordinate).toBe(5);
@@ -156,9 +156,9 @@ describe('Actor game test suite', () => {
     });
 
     test('Init line should handle different sizes', () => {
-        const line1 = A.init_line(5, 1, 0, 1, false);
-        const line2 = A.init_line(15, 1, 0, 1, false);
-        const line3 = A.init_line(20, 1, 0, 1, false);
+        const line1 = A.init_line(5, 1, false, 30);
+        const line2 = A.init_line(15, 1, false, 30);
+        const line3 = A.init_line(20, 1, false, 30);
 
         expect(line1.data.length).toBe(5);
         expect(line2.data.length).toBe(15);

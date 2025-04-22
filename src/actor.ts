@@ -146,20 +146,36 @@ function position_add(current_position: Position, dx: Position): Position {
 
 
 let river_direction = 0;
-function init_line(size_x: number, size_y: number, difficulty: number, is_void: number, is_start: boolean): Line {
+let nb_generated_line = 0;
+let difficulty = 0;
+const level_size = 10;
+function init_line(size_x: number, size_y: number, is_start: boolean, nb_line: number): Line {
+    nb_generated_line += 1;
+    let is_void = 1;
+    if (nb_generated_line > nb_line && nb_generated_line % level_size === 0) {
+        difficulty += 1;
+    }
+    if (difficulty < 5) {
+        if (nb_generated_line % 2 === 0) {
+            is_void = 0;
+        }
+    }
+    else {
+        is_void = 1;
+    }
 
     let random_line: number = Math.random();
-    if (random_line < 0.4) {
+    if (random_line <= Math.max(0, 0.7 - difficulty * 0.03)) {
         random_line = 1;
     }
-    else if (random_line > 0.4 && random_line < 0.8) {
+    else if (random_line > Math.max(0, 0.7 - difficulty * 0.03) && random_line < Math.max(0.6, 0.9 - difficulty * 0.01)) {
         random_line = 2;
     }
     else {
         random_line = 3;
     }
 
-    const obstacleProbability = Math.min(0.15 + difficulty * 0.05, 0.8);  // De 15% à 80%
+    const obstacleProbability = Math.min(difficulty * 0.03, 0.8);  // De 0% à 80%
 
     const l: Line = {
         ordinate: size_y,
@@ -182,7 +198,7 @@ function init_line(size_x: number, size_y: number, difficulty: number, is_void: 
             break;
         case LineType.River:
             river_direction = river_direction + 1;
-            l.data = generatePatternedLine(size_x, (river_direction % 2 === 0) ? Name.Log_L : Name.Log_R, obstacleProbability + 0.2, l.ordinate);
+            l.data = generatePatternedLine(size_x, (river_direction % 2 === 0) ? Name.Water_L : Name.Water_R, obstacleProbability, l.ordinate);
             l.pattern = generateObstaclePattern(size_x, obstacleProbability);
             break;
         default:
@@ -212,11 +228,11 @@ function generatePatternedLine(size_x: number, obstacleType: Name, probability: 
         if (linePattern[i] === 1) { // si obstacle
             return make_actor({ x: i, y }, obstacleType);
         }
-        else if (obstacleType === Name.Log_L) {
-            return make_actor({ x: i, y }, Name.Water_L);
+        else if (obstacleType === Name.Water_L) {
+            return make_actor({ x: i, y }, Name.Log_L);
         }
-        else if (obstacleType === Name.Log_R) {
-            return make_actor({ x: i, y }, Name.Water_R);
+        else if (obstacleType === Name.Water_R) {
+            return make_actor({ x: i, y }, Name.Log_R);
         }
         return make_actor({ x: i, y }, Name.Empty);
     });
