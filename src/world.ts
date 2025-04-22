@@ -345,6 +345,7 @@ function run() {
             }, 20);
             if (poulet.location.y < nb_line / 2) {
                 lines = lines.map((l: A.Line) => tickLine(l));
+                progression++;
                 if (poulet.location.y < mapHeight - 2) {
                     poulet.mailbox.push({ "key": "move", "params": [A.down] });
                     poulet = poulet.update(poulet);
