@@ -96,7 +96,7 @@ function run() {
 
     // Animation : étoile aléatoire toutes les secondes
 
-    let lines: A.Line[] = new Array(nb_line).fill(null).map((_, i: number) => A.init_line(line_length, i, true, nb_line));
+    let lines: A.Line[] = new Array(nb_line).fill(null).map((_, i: number) => A.init_line(line_length, i, i < 3 * nb_line / 4, nb_line));
     const tickInterval = setInterval(() => {
         lines = lines.map((l: A.Line) => tickLine(l));
         progression++;

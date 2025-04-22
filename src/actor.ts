@@ -147,12 +147,12 @@ function position_add(current_position: Position, dx: Position): Position {
 
 let river_direction = 0;
 let nb_generated_line = 0;
-let difficulty = 0;
+let difficulty = 1;
 const level_size = 20;
 function init_line(size_x: number, size_y: number, is_start: boolean, nb_line: number): Line {
     if (is_start && nb_generated_line > nb_line) {
         nb_generated_line = 0;
-        difficulty = 0;
+        difficulty = 1;
     }
     nb_generated_line += 1;
     let is_void = 1;
