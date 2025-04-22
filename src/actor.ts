@@ -144,6 +144,8 @@ function position_add(current_position: Position, dx: Position): Position {
     return pos;
 }
 
+
+let river_direction = 0;
 function init_line(size_x: number, size_y: number, difficulty: number, is_void: number, is_start: boolean): Line {
 
     let random_line: number = Math.random();
@@ -170,7 +172,6 @@ function init_line(size_x: number, size_y: number, difficulty: number, is_void: 
         l.data = l.data.map((_, i) => make_actor({ x: i, y: size_y }, Name.Empty));
         return l;
     }
-
     switch (l.type) {
         case LineType.Nature:
             l.data = generatePatternedLine(size_x, Name.Tree, obstacleProbability, l.ordinate);
@@ -180,7 +181,8 @@ function init_line(size_x: number, size_y: number, difficulty: number, is_void: 
             l.pattern = generateObstaclePattern(size_x, obstacleProbability);
             break;
         case LineType.River:
-            l.data = generatePatternedLine(size_x, Math.random() > 0.5 ? Name.Log_L : Name.Log_R, obstacleProbability + 0.2, l.ordinate);
+            river_direction = river_direction + 1;
+            l.data = generatePatternedLine(size_x, (river_direction % 2 === 0) ? Name.Log_L : Name.Log_R, obstacleProbability + 0.2, l.ordinate);
             l.pattern = generateObstaclePattern(size_x, obstacleProbability);
             break;
         default:
