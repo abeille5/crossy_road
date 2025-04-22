@@ -151,6 +151,10 @@ let nb_generated_line = 0;
 let difficulty = 0;
 const level_size = 10;
 function init_line(size_x: number, size_y: number, is_start: boolean, nb_line: number): Line {
+    if (is_start && nb_generated_line > nb_line) {
+        nb_generated_line = 0;
+        difficulty = 0;
+    }
     nb_generated_line += 1;
     let is_void = 1;
     if (nb_generated_line > nb_line && nb_generated_line % level_size === 0) {
