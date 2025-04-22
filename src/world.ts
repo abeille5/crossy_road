@@ -41,7 +41,8 @@ function run() {
     const frameY = titleY + 2;
     const line_length: number = mapWidth - 2;
     const nb_line: number = mapHeight - 2;
-    let nb_ligne = 0;
+    let score = 0;
+    let progression = 0;
 
     function drawFrame() {
         // Generate positions for all borders
@@ -99,6 +100,7 @@ function run() {
     let lines: A.Line[] = new Array(nb_line).fill(null).map((_, i: number) => A.init_line(line_length, i, true, nb_line));
     const tickInterval = setInterval(() => {
         lines = lines.map((l: A.Line) => tickLine(l));
+        progression++;
         if (poulet.location.y < mapHeight - 2) {
             poulet.mailbox.push({ "key": "move", "params": [A.down] });
             poulet = poulet.update(poulet);
@@ -106,8 +108,6 @@ function run() {
         else
             gameOver();
     }, 1000);
-
-
 
     // Remplacer la ligne de posInit par
     const posInit: A.Position = {
@@ -261,7 +261,7 @@ function run() {
                 gameOver();
             }
         }
-        screenBuffer.put({ x: frameY + mapHeight, y: mapWidth / 3, attr: { color: "white", bgcolor: "black" } }, "SCORE : " + nb_ligne);
+        screenBuffer.put({ x: frameY + mapHeight, y: mapWidth / 3, attr: { color: "white", bgcolor: "black" } }, "SCORE : " + score);
     }, 1);
 
     function gameOver() {
@@ -312,6 +312,12 @@ function run() {
         });
     }
 
+    let maxPouletWorldY = getPouletWorldY();
+
+    function getPouletWorldY() {
+        return progression + (nb_line - poulet.location.y);
+    }
+
     term.on('key', (name: string) => {
         if (name === 'q' || name === 'CTRL_C') {
             term.styleReset();
@@ -330,7 +336,13 @@ function run() {
         }
         if (name === 'UP' && poulet.location.y > 2) {
             poulet.mailbox.push({ "key": "move", "params": [A.up] });
-            nb_ligne++;
+            setTimeout(() => {
+                const worldY = getPouletWorldY();
+                if (worldY > maxPouletWorldY) {
+                    score += worldY - maxPouletWorldY;
+                    maxPouletWorldY = worldY;
+                }
+            }, 20);
         }
         else if (name === 'DOWN' && poulet.location.y < nb_line) poulet.mailbox.push({ "key": "move", "params": [A.down] });
         else if (name === 'LEFT' && poulet.location.x > 0) poulet.mailbox.push({ "key": "move", "params": [A.left] });
