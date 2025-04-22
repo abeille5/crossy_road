@@ -13,13 +13,13 @@ function run() {
     term.hideCursor();
     term.fullscreen(true);
     term.clear();
+    
 
     const screenBuffer = new terminalKit.ScreenBuffer({
         dst: term,
         width: term.width,
         height: term.height
     });
-
 
     const screenWidth = term.width;
     let screenHeight = term.height;
@@ -264,6 +264,9 @@ function run() {
         screenBuffer.put({x:frameY+mapHeight,y:mapWidth/3,attr:{color:"white",bgcolor:"black"}},"SCORE : "+nb_ligne);
     }, 1);
 
+    let arrayProj:A.Actor[] = new Array;
+
+
     function gameOver() {
         term("\x1B[?25h");
         clearInterval(tickInterval);
@@ -300,8 +303,12 @@ function run() {
                 term.clear();
                 term.moveTo(1, 1);
                 screenBuffer.clear();
+                screenBuffer.draw();
+                term.removeAllListeners('key');
                 run();
             } else if (name === 'n' || name === 'q' || name === 'CTRL_C') {
+                screenBuffer.clear();
+                screenBuffer.draw();
                 term.grabInput(false);
                 term.styleReset(); 
                 term.clear();
@@ -328,12 +335,24 @@ function run() {
             term.grabInput(false);
             process.exit(0);
         }
+        if (name  === 'SPACE')
+        {
+            arrayProj.push(A.make_actor(poulet.location,A.Name.Projectile));
+            console.log("lpr,geaonpkq");
+        }
         if (name === 'UP' && poulet.location.y > 2)
             {
                 poulet.mailbox.push({ "key": "move", "params": [A.up] });
                 nb_ligne++;
             }
-        else if (name === 'DOWN' && poulet.location.y < nb_line) poulet.mailbox.push({ "key": "move", "params": [A.down] });
+        else if (name === 'DOWN' && poulet.location.y < nb_line)
+        {
+            if (nb_ligne > 0)
+            {
+                nb_ligne--;
+            }
+            poulet.mailbox.push({ "key": "move", "params": [A.down] });
+        }
         else if (name === 'LEFT' && poulet.location.x > 0) poulet.mailbox.push({ "key": "move", "params": [A.left] });
         else if (name === 'RIGHT' && poulet.location.x < line_length - 2) poulet.mailbox.push({ "key": "move", "params": [A.right] });
 

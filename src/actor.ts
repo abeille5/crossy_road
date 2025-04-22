@@ -58,6 +58,7 @@ enum Name {
     Log_L,
     Car_R,
     Car_L,
+    Projectile
 };
 
 enum LineType {
