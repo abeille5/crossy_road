@@ -275,7 +275,7 @@ function run() {
     let arrayProj:A.Actor[] = new Array;
     const intervalProj = setInterval(() => {
         arrayProj = arrayProj.map((proj) => {
-            proj.mailbox.push({ "key": "move", "params": [A.up]})
+            proj.mailbox.push({ "key": "move", "params": [A.up]});
             return proj.update(proj);
         });
 
