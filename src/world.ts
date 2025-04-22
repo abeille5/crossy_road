@@ -20,7 +20,7 @@ function run() {
     term.hideCursor();
     term.fullscreen(true);
     term.clear();
-
+    
     const screenBuffer = new terminalKit.ScreenBuffer({
         dst: term,
         width: term.width,
@@ -48,7 +48,8 @@ function run() {
     const frameY = titleY + 2;
     const line_length: number = mapWidth - 2;
     const nb_line: number = mapHeight - 2;
-    let nb_ligne = 0;
+    let score = 0;
+    let progression = 0;
 
     function drawFrame() {
         const topBorder = Array.from({ length: mapWidth })
@@ -108,12 +109,9 @@ function run() {
     function update_world(world:World) : World {
 	const new_world = make_world(world.score, world.lines.map((l: A.Line) => drawLine(l)), drawActor(world.poulet, world.poulet.location.x, world.poulet.location.y));
 	screenBuffer.draw({ delta: true });
-	term.moveTo(5, 10);
-	console.log(`Score = ${w.score}`);
 	return new_world;
     }
 
-    
     term.grabInput(true);
     let count_void = 0;
     
@@ -127,25 +125,36 @@ function run() {
         return l;
     }
 
+    function get_current_world(): World{
+	return world_buffer[world_buffer_size - 1];
+    }
 
-    // Animation : étoile aléatoire toutes les secondes
+    function go_back_in_time(){
+	world_buffer[world_buffer_size - 1] = world_buffer[0];
+    }
+    
+    const world_buffer_size:number = 10;
 
     const lines: A.Line[] = new Array(nb_line).fill(null).map((_, i: number) => A.init_line(line_length, i, true, nb_line));
+
     const posInit: A.Position = {
         x: Math.floor(line_length / 2), // Utiliser line_length au lieu de mapWidth
         y: Math.floor(nb_line / 2)      // Utiliser nb_line au lieu de mapHeight
     };
     const poulet: A.Actor = A.make_actor(posInit, A.Name.Chicken);
 
-    let w = make_world(0, lines, poulet);
-    
+    let world_buffer: World[] = new Array(world_buffer_size).fill(make_world(0, lines, poulet));
+    world_buffer[world_buffer_size - 1] = make_world(0, lines, poulet);
+
     const tickInterval = setInterval(() => {
-        w = tick_world(w);
+	const new_world = tick_world(get_current_world());
+	world_buffer.shift();
+	world_buffer[world_buffer_size - 1] = new_world;
     }, 1000);
 
     const updateInterval = setInterval(() => {
-        w = update_world(w);
-    }, 10);
+	world_buffer[world_buffer_size - 1] = update_world(get_current_world());
+    }, 30);
 
     
     function drawActor(a: A.Actor, x: number, y: number): A.Actor {
@@ -173,7 +182,6 @@ function run() {
         return l;
     }
 
-    
     function getDirection(actors: A.Actor[]): 'left' | 'right' | null {
         for (const actor of actors) {
             if (actor.name === A.Name.Car_R || actor.name === A.Name.Log_R || actor.name === A.Name.Water_R) return 'right';
@@ -183,7 +191,7 @@ function run() {
     }
 
     const carInterval = setInterval(() => {
-        const roads = w.lines.filter((l) => l.type === A.LineType.Road);
+        const roads = get_current_world().lines.filter((l) => l.type === A.LineType.Road);
         roads.map((r) => {
             const l = r.data.length;
             if (getDirection(r.data) === 'left') {
@@ -210,15 +218,16 @@ function run() {
             return r;
         });
     }, 200);
+    
     const logInterval = setInterval(() => {
-        const rivers = w.lines.filter((l) => l.type === 3);
+        const rivers = get_current_world().lines.filter((l) => l.type === 3);
         rivers.map((r) => {
             r.data.forEach((a) => {
                 const realY_log = nb_line - r.ordinate + 1;
-                if (a.location.x === w.poulet.location.x && realY_log === w.poulet.location.y && a.name === A.Name.Log_R)
-                    w.poulet.mailbox.push({ "key": "move", "params": [A.right] });
-                else if (a.location.x === w.poulet.location.x && realY_log === w.poulet.location.y && a.name === A.Name.Log_L)
-                    w.poulet.mailbox.push({ "key": "move", "params": [A.left] });
+                if (a.location.x === get_current_world().poulet.location.x && realY_log === get_current_world().poulet.location.y && a.name === A.Name.Log_R)
+                    get_current_world().poulet.mailbox.push({ "key": "move", "params": [A.right] });
+                else if (a.location.x === get_current_world().poulet.location.x && realY_log === get_current_world().poulet.location.y && a.name === A.Name.Log_L)
+                    get_current_world().poulet.mailbox.push({ "key": "move", "params": [A.left] });
 
             });
             const l = r.data.length;
@@ -249,7 +258,7 @@ function run() {
 
     function isCollision(a: A.Actor): boolean {
         // Trouver la ligne contenant l'acteur
-        const actorLine = w.lines.find(line =>
+        const actorLine = get_current_world().lines.find((line:A.Line) =>
             line.data.includes(a)
         );
 
@@ -259,7 +268,7 @@ function run() {
         const realY = nb_line - actorLine.ordinate + 1;
 
         // Vérifie si les positions correspondent (avec coordonnée Y transformée)
-        if (a.location.x !== w.poulet.location.x || realY !== w.poulet.location.y) {
+        if (a.location.x !== get_current_world().poulet.location.x || realY !== get_current_world().poulet.location.y) {
             return false;
         }
 
@@ -274,19 +283,19 @@ function run() {
         return dangerousActors.includes(a.name);
     }
 
-    function checkCollision(world:World): boolean {
-        return world.lines.some((line:A.Line) =>
+    function checkCollision(): boolean {
+        return get_current_world().lines.some((line:A.Line) =>
             line.data.some((actor:A.Actor) => isCollision(actor))
         );
     }
 
     const colision = setInterval(() => {
 	{
-            if (checkCollision(w)) {
+            if (checkCollision()) {
                 gameOver();
             }
 	}
-	screenBuffer.put({ x: frameY + mapHeight, y: mapWidth / 3, attr: {color: "white", bgcolor: "black" }},"SCORE : " +nb_ligne);
+	screenBuffer.put({ x: frameY + mapHeight, y: mapWidth / 3, attr: {color: "white", bgcolor: "black" }},"SCORE : " + get_current_world().score);
 	}, 50);
 
     function gameOver() {
@@ -336,6 +345,12 @@ function run() {
         });
     }
 
+    let maxPouletWorldY = getPouletWorldY();
+
+    function getPouletWorldY() {
+        return progression + (nb_line - get_current_world().poulet.location.y);
+    }
+
     term.on('key', (name: string) => {
         if (name === 'q' || name === 'CTRL_C') {
             term.styleReset();
@@ -351,23 +366,36 @@ function run() {
             term.grabInput(false);
             process.exit(0);
         }
-        if (name === 'UP' && w.poulet.location.y > 2) {
-            w.poulet.mailbox.push({ "key": "move", "params": [A.up] });
-            nb_ligne++;
+        if (name === 'UP' && get_current_world().poulet.location.y > 2) {
+	    const current_world = get_current_world();
+	    const poulet = current_world.poulet;
+            poulet.mailbox.push({ "key": "move", "params": [A.up] });
+            setTimeout(() => {
+                const worldY = getPouletWorldY();
+                if (worldY > maxPouletWorldY) {
+                    current_world.score += worldY - maxPouletWorldY;
+                    maxPouletWorldY = worldY;
+                }
+            }, 20);
             if (poulet.location.y < nb_line / 2) {
-                lines = lines.map((l: A.Line) => tickLine(l));
+                progression++;
                 if (poulet.location.y < mapHeight - 2) {
                     poulet.mailbox.push({ "key": "move", "params": [A.down] });
-                    poulet = poulet.update(poulet);
                 }
                 else
                     gameOver();
             }
+	    const new_world = make_world(current_world.score, get_current_world().lines.map((l: A.Line) => tickLine(l)), poulet.update(get_current_world().poulet));
+	    world_buffer.shift();
+	    world_buffer[world_buffer_size - 1] = new_world;
         }
-        else if (name === 'DOWN' && w.poulet.location.y < nb_line) w.poulet.mailbox.push({ "key": "move", "params": [A.down] });
-        else if (name === 'LEFT' && w.poulet.location.x > 0) w.poulet.mailbox.push({ "key": "move", "params": [A.left] });
-        else if (name === 'RIGHT' && w.poulet.location.x < line_length - 2) w.poulet.mailbox.push({ "key": "move", "params": [A.right] });
+        else if (name === 'DOWN' && get_current_world().poulet.location.y < nb_line) get_current_world().poulet.mailbox.push({ "key": "move", "params": [A.down] });
+        else if (name === 'LEFT' && get_current_world().poulet.location.x > 0) get_current_world().poulet.mailbox.push({ "key": "move", "params": [A.left] });
+        else if (name === 'RIGHT' && get_current_world().poulet.location.x < line_length - 2) get_current_world().poulet.mailbox.push({ "key": "move", "params": [A.right] });
+	else if (name === 'r'){
+	    screenBuffer.put({ x: titleX, y: titleY - 1, attr: { color: "white", bgcolor: "black", bold: true } }, "Back in time ! ");
+	    go_back_in_time();
+	}
     });
 }
-
 run();
