@@ -268,6 +268,8 @@ function run() {
         clearInterval(pouletInterval);
         clearInterval(carInterval);
         clearInterval(updateInterval);
+        clearInterval(logInterval);
+        clearInterval(colision);
         term.grabInput(false);
     
         term.clear();
@@ -316,6 +318,10 @@ function run() {
             clearInterval(updateInterval);
             clearInterval(carInterval);
             clearInterval(pouletInterval);
+            clearInterval(logInterval);
+            clearInterval(colision);
+
+
             term.grabInput(false);
             process.exit(0);
         }
