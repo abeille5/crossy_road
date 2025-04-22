@@ -41,7 +41,8 @@ function run() {
     const frameY = titleY + 2;
     const line_length: number = mapWidth - 2;
     const nb_line: number = mapHeight - 2;
-    let nb_ligne = 0;
+    let score = 0;
+    let progression = 0;
 
     function drawFrame() {
         // Generate positions for all borders
@@ -88,7 +89,6 @@ function run() {
             return A.init_line(line_length, nb_line - 1, false, nb_line);
         }
         l.data.map((a: A.Actor) => a.mailbox.push({ "key": "move", "params": [A.down] }));
-        l.data.map((a: A.Actor) => a.actions.tick(a));
         l.ordinate -= 1;
         return l;
     }
@@ -99,6 +99,7 @@ function run() {
     let lines: A.Line[] = new Array(nb_line).fill(null).map((_, i: number) => A.init_line(line_length, i, true, nb_line));
     const tickInterval = setInterval(() => {
         lines = lines.map((l: A.Line) => tickLine(l));
+        progression++;
         if (poulet.location.y < mapHeight - 2) {
             poulet.mailbox.push({ "key": "move", "params": [A.down] });
             poulet = poulet.update(poulet);
@@ -106,8 +107,6 @@ function run() {
         else
             gameOver();
     }, 1000);
-
-
 
     // Remplacer la ligne de posInit par
     const posInit: A.Position = {
@@ -145,6 +144,8 @@ function run() {
         lines = lines.map((l: A.Line) => drawLine(l));
         poulet = drawActor(poulet, poulet.location.x, poulet.location.y);
         screenBuffer.draw({ delta: true });
+        screenBuffer.put({ x: frameY + mapHeight, y: mapWidth / 3, attr: { color: "white", bgcolor: "black" } }, "SCORE : " + score);
+        screenBuffer.put({ x: frameY + mapHeight + 15, y: mapWidth / 3, attr: { color: "white", bgcolor: "black" } }, "Level : " + A.difficulty);
     }, 10);
 
     const pouletInterval = setInterval(() => {/*poulet = drawActor(poulet, poulet.location.x, poulet.location.y);*/ }, 10);
@@ -261,7 +262,6 @@ function run() {
                 gameOver();
             }
         }
-        screenBuffer.put({ x: frameY + mapHeight, y: mapWidth / 3, attr: { color: "white", bgcolor: "black" } }, "SCORE : " + nb_ligne);
     }, 1);
 
     let arrayProj:A.Actor[] = new Array;
@@ -319,6 +319,12 @@ function run() {
         });
     }
 
+    let maxPouletWorldY = getPouletWorldY();
+
+    function getPouletWorldY() {
+        return progression + (nb_line - poulet.location.y);
+    }
+
     term.on('key', (name: string) => {
         if (name === 'q' || name === 'CTRL_C') {
             term.styleReset();
@@ -357,7 +363,22 @@ function run() {
 =======
         if (name === 'UP' && poulet.location.y > 2) {
             poulet.mailbox.push({ "key": "move", "params": [A.up] });
-            nb_ligne++;
+            setTimeout(() => {
+                const worldY = getPouletWorldY();
+                if (worldY > maxPouletWorldY) {
+                    score += worldY - maxPouletWorldY;
+                    maxPouletWorldY = worldY;
+                }
+            }, 20);
+            if (poulet.location.y < nb_line / 2) {
+                lines = lines.map((l: A.Line) => tickLine(l));
+                if (poulet.location.y < mapHeight - 2) {
+                    poulet.mailbox.push({ "key": "move", "params": [A.down] });
+                    poulet = poulet.update(poulet);
+                }
+                else
+                    gameOver();
+            }
         }
         else if (name === 'DOWN' && poulet.location.y < nb_line) poulet.mailbox.push({ "key": "move", "params": [A.down] });
 >>>>>>> refs/remotes/origin/master

@@ -149,7 +149,7 @@ function position_add(current_position: Position, dx: Position): Position {
 let river_direction = 0;
 let nb_generated_line = 0;
 let difficulty = 0;
-const level_size = 10;
+const level_size = 20;
 function init_line(size_x: number, size_y: number, is_start: boolean, nb_line: number): Line {
     if (is_start && nb_generated_line > nb_line) {
         nb_generated_line = 0;
@@ -244,5 +244,5 @@ function generatePatternedLine(size_x: number, obstacleType: Name, probability: 
 }
 
 export {
-    right, left, up, down, Position, Message, Actor, Line, Name, LineType, make_actor, position_add, init_line
+    right, left, up, down, Position, Message, Actor, Line, Name, LineType, make_actor, position_add, init_line, difficulty
 };
