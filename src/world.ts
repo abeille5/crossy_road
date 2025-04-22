@@ -33,7 +33,7 @@ function run() {
 
     const titleX = Math.floor((screenWidth - title.length) / 2);
     const titleY = 6;
-    screenBuffer.put({x:titleX,y:titleY,attr:{color:"white",bgcolor:"black",bold:true}},title);
+    screenBuffer.put({ x: titleX, y: titleY, attr: { color: "white", bgcolor: "black", bold: true } }, title);
 
     const mapWidth = Math.floor(screenWidth / 1.5);
     const mapHeight = Math.floor(screenHeight / 1.5);
@@ -107,7 +107,7 @@ function run() {
             gameOver();
     }, 1000);
 
-   
+
 
     // Remplacer la ligne de posInit par
     const posInit: A.Position = {
@@ -261,7 +261,7 @@ function run() {
                 gameOver();
             }
         }
-        screenBuffer.put({x:frameY+mapHeight,y:mapWidth/3,attr:{color:"white",bgcolor:"black"}},"SCORE : "+nb_ligne);
+        screenBuffer.put({ x: frameY + mapHeight, y: mapWidth / 3, attr: { color: "white", bgcolor: "black" } }, "SCORE : " + nb_ligne);
     }, 1);
 
     function gameOver() {
@@ -273,24 +273,24 @@ function run() {
         clearInterval(logInterval);
         clearInterval(colision);
         term.grabInput(false);
-    
+
         term.clear();
         screenBuffer.clear();
-    
+
         const gameOverX = Math.floor(term.width / 2) - 5;
         const gameOverY = Math.floor(term.height / 2);
-        screenBuffer.put({ x: gameOverX, y: gameOverY,attr:{ color: 'white', bgColor: 'black'}}, "💥 GAME OVER 💥\n");
-    
+        screenBuffer.put({ x: gameOverX, y: gameOverY, attr: { color: 'white', bgColor: 'black' } }, "💥 GAME OVER 💥\n");
+
         const questionX = Math.floor(term.width / 2) - 10;
         const questionY = gameOverY + 2;
-        screenBuffer.put({ x: questionX, y: questionY,attr:{ color: 'white', bgColor: 'black'}}, "Voulez-vous continuer ?");
-    
+        screenBuffer.put({ x: questionX, y: questionY, attr: { color: 'white', bgColor: 'black' } }, "Voulez-vous continuer ?");
+
         const buttonX = Math.floor(term.width / 2) - 6;
         const buttonY = questionY + 2;
 
-        screenBuffer.put({ x: buttonX, y: buttonY,attr:{ color: 'green', bgColor: 'black'}}, "OUI (y)");
-        
-        screenBuffer.put({ x: buttonX+10, y: buttonY,attr:{ color: 'red', bgColor: 'black'}}, "NON (n)");
+        screenBuffer.put({ x: buttonX, y: buttonY, attr: { color: 'green', bgColor: 'black' } }, "OUI (y)");
+
+        screenBuffer.put({ x: buttonX + 10, y: buttonY, attr: { color: 'red', bgColor: 'black' } }, "NON (n)");
         screenBuffer.draw();
 
         term.grabInput(true);
@@ -303,11 +303,11 @@ function run() {
                 run();
             } else if (name === 'n' || name === 'q' || name === 'CTRL_C') {
                 term.grabInput(false);
-                term.styleReset(); 
+                term.styleReset();
                 term.clear();
                 term.moveTo(1, 1);
                 term("\x1B[?25h");
-                process.exit(0); 
+                process.exit(0);
             }
         });
     }
@@ -328,11 +328,10 @@ function run() {
             term.grabInput(false);
             process.exit(0);
         }
-        if (name === 'UP' && poulet.location.y > 2)
-            {
-                poulet.mailbox.push({ "key": "move", "params": [A.up] });
-                nb_ligne++;
-            }
+        if (name === 'UP' && poulet.location.y > 2) {
+            poulet.mailbox.push({ "key": "move", "params": [A.up] });
+            nb_ligne++;
+        }
         else if (name === 'DOWN' && poulet.location.y < nb_line) poulet.mailbox.push({ "key": "move", "params": [A.down] });
         else if (name === 'LEFT' && poulet.location.x > 0) poulet.mailbox.push({ "key": "move", "params": [A.left] });
         else if (name === 'RIGHT' && poulet.location.x < line_length - 2) poulet.mailbox.push({ "key": "move", "params": [A.right] });
