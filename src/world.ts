@@ -10,6 +10,7 @@ const term = terminalKit.terminal;
 const title = "CROSSY ROAD";
 
 function run() {
+    term.hideCursor();
     term.fullscreen(true);
     term.clear();
 
@@ -260,6 +261,7 @@ function run() {
                 gameOver();
             }
         }
+        screenBuffer.put({x:frameY+mapHeight,y:mapWidth/3,attr:{color:"white",bgcolor:"black"}},"SCORE : "+nb_ligne);
     }, 1);
 
     function gameOver() {
@@ -297,6 +299,7 @@ function run() {
                 term.grabInput(true);
                 term.clear();
                 term.moveTo(1, 1);
+                screenBuffer.clear();
                 run();
             } else if (name === 'n' || name === 'q' || name === 'CTRL_C') {
                 term.grabInput(false);
