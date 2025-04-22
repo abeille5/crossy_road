@@ -144,7 +144,7 @@ function run() {
         lines = lines.map((l: A.Line) => drawLine(l));
         poulet = drawActor(poulet, poulet.location.x, poulet.location.y);
         screenBuffer.draw({ delta: true });
-        screenBuffer.put({ x: frameY + mapHeight, y: mapWidth / 3, attr: { color: "white", bgcolor: "black" } }, "SCORE : " + nb_ligne);
+        screenBuffer.put({ x: frameY + mapHeight, y: mapWidth / 3, attr: { color: "white", bgcolor: "black" } }, "SCORE : " + score);
         screenBuffer.put({ x: frameY + mapHeight + 15, y: mapWidth / 3, attr: { color: "white", bgcolor: "black" } }, "Level : " + A.difficulty);
     }, 10);
 
