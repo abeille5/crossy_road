@@ -88,7 +88,6 @@ function run() {
             return A.init_line(line_length, nb_line - 1, false, nb_line);
         }
         l.data.map((a: A.Actor) => a.mailbox.push({ "key": "move", "params": [A.down] }));
-        l.data.map((a: A.Actor) => a.actions.tick(a));
         l.ordinate -= 1;
         return l;
     }
@@ -331,6 +330,15 @@ function run() {
         if (name === 'UP' && poulet.location.y > 2) {
             poulet.mailbox.push({ "key": "move", "params": [A.up] });
             nb_ligne++;
+            if (poulet.location.y < nb_line / 2) {
+                lines = lines.map((l: A.Line) => tickLine(l));
+                if (poulet.location.y < mapHeight - 2) {
+                    poulet.mailbox.push({ "key": "move", "params": [A.down] });
+                    poulet = poulet.update(poulet);
+                }
+                else
+                    gameOver();
+            }
         }
         else if (name === 'DOWN' && poulet.location.y < nb_line) poulet.mailbox.push({ "key": "move", "params": [A.down] });
         else if (name === 'LEFT' && poulet.location.x > 0) poulet.mailbox.push({ "key": "move", "params": [A.left] });
