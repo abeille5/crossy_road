@@ -110,14 +110,14 @@ function run() {
     }
 
     function update_world(world:World) : World {
-	const new_world = make_world(world.score, world.lines.map((l: A.Line) => drawLine(l)), drawActor(world.poulet, world.poulet.location.x, world.poulet.location.y), world.arrayProj);
+	const new_world = make_world(world.score, world.lines.map((l: A.Line) => drawLine(l)), drawActor(world.poulet, world.poulet.location.x, world.poulet.location.y), world.arrayProj.map((p:A.Actor) => drawActor(p, p.location.x, p.location.y)));
 	screenBuffer.draw({ delta: true });
 	return new_world;
     }
 
     term.grabInput(true);
     let count_void = 0;
-    
+
     function tickLine(l: A.Line): A.Line {
         if (l.ordinate < 0) {
             count_void++;
@@ -135,7 +135,7 @@ function run() {
     function go_back_in_time(){
 	world_buffer[world_buffer_size - 1] = world_buffer[0];
     }
-    
+
     const world_buffer_size:number = 10;
 
     const lines: A.Line[] = new Array(nb_line).fill(null).map((_, i: number) => A.init_line(line_length, i, true, nb_line));
