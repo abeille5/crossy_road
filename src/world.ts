@@ -11,6 +11,14 @@ const term = terminalKit.terminal;
 
 const title = "CROSSY ROAD";
 
+const FRAME_RATE = 1000 / 60;
+const UPDATE_RATE = 50;
+const TICK_RATE = 1000;
+const COLLIDE_CHECK_RATE = 20;
+const CAR_RATE = 200;
+const LOG_RATE = 400;
+
+
 type World = {
     score: number;
     lines: A.Line[];
@@ -27,7 +35,7 @@ function run() {
 
 
     const screenBuffer = new terminalKit.ScreenBuffer({
-        dst: term,
+       dst: term,
         width: term.width,
         height: term.height
     });
@@ -53,6 +61,7 @@ function run() {
     const line_length: number = mapWidth - 2;
     const nb_line: number = mapHeight - 2;
     let progression = 0;
+    let stop = false;
 
     function drawFrame() {
         const topBorder = Array.from({ length: mapWidth })
@@ -107,12 +116,14 @@ function run() {
 	else {
             gameOver();
 	}
-	return make_world(world.score + 1, world.lines.map((l: A.Line) => tickLine(l)), world.poulet.update(world.poulet), world.arrayProj);
+	return make_world(world.score + 1000, world.lines.map((l: A.Line) => tickLine(l)), world.poulet.update(world.poulet), world.arrayProj);
     }
 
     function update_world(world:World) : World {
-	const new_world = make_world(world.score, world.lines.map((l: A.Line) => drawLine(l)), drawActor(world.poulet, world.poulet.location.x, world.poulet.location.y), world.arrayProj.map((p:A.Actor) => drawActor(p, p.location.x, p.location.y)));
+	const new_world = make_world(world.score + 20, world.lines.map((l: A.Line) => drawLine(l)), drawActor(world.poulet, world.poulet.location.x, world.poulet.location.y), world.arrayProj.map((p:A.Actor) => drawActor(p, p.location.x, p.location.y)));
 	screenBuffer.draw({ delta: true });
+	term.moveTo(5, 6);
+	console.log(get_current_world().score);
 	return new_world;
     }
 
@@ -134,7 +145,10 @@ function run() {
     }
 
     function go_back_in_time(){
-	world_buffer.push(world_buffer[0]);
+	stop = true;
+	world_buffer[world_buffer_size - 1] = world_buffer[0];
+	world_buffer[world_buffer_size - 1] = update_world(world_buffer[world_buffer_size - 1]);
+	stop = false;
     }
 
     const world_buffer_size:number = 10;
@@ -148,28 +162,59 @@ function run() {
     const poulet: A.Actor = A.make_actor(posInit, A.Name.Chicken);
 
     const arrayProj:A.Actor[] = new Array;
-    
-    let  world_buffer: World[] = new Array(world_buffer_size).fill(make_world(0, lines, poulet, arrayProj));
+
+    const  world_buffer: World[] = new Array(world_buffer_size).fill(make_world(0, lines, poulet, arrayProj));
     world_buffer[world_buffer_size - 1] = make_world(0, lines, poulet, arrayProj);
 
-    const intervalProj = setInterval(() => {
-        world_buffer[world_buffer_size - 1] = make_world(get_current_world().score, get_current_world().lines, get_current_world().poulet, get_current_world().arrayProj.map((proj:A.Actor) => {
-            proj.mailbox.push({ "key": "move", "params": [A.up]});
-            return proj.update(proj);
-        }).filter((proj:A.Actor) => proj.location.y > 1));
-    }, 50);
+    let accTick = 0;
+    let accUpdate = 0;
+    let accCollide = 0;
+    let accCar = 0;
+    let accLog = 0;
 
-    const tickInterval = setInterval(() => {
-	const new_world = tick_world(get_current_world());
-	world_buffer.shift();
-	world_buffer[world_buffer_size - 1] = new_world;
-    }, 1000);
+    const mainInterval = setInterval(() => {
+	stop = true;
+	const current_world = get_current_world();
+	if (accTick > TICK_RATE){
+	    accTick = 0;
+	    const new_world = tick_world(current_world);
+	    world_buffer.shift();
+	    world_buffer[world_buffer_size - 1] = new_world;
+	    
+	}
+	if (accUpdate > UPDATE_RATE){
+	    const update_current_world = get_current_world();
+	    accUpdate = 0;
+	    world_buffer[world_buffer_size - 1] = update_world(make_world(update_current_world.score, update_current_world.lines, update_current_world.poulet, update_current_world.arrayProj.map((proj:A.Actor) => {
+		proj.mailbox.push({ "key": "move", "params": [A.up]});
+		return proj.update(proj);
+            }).filter((proj:A.Actor) => proj.location.y > 1)));
+	}
+	if (accCollide > COLLIDE_CHECK_RATE){
+	    const collide_world = get_current_world();
+	    accCollide = 0;
+	    if (checkCollision()) {
+                gameOver();
+            }
+	    world_buffer[world_buffer_size - 1] = collisionProj(collide_world);
+	}
+	if (accLog > LOG_RATE){
+	    accLog = 0;
+	    log_move(get_current_world());
+	}
+	if (accCar > CAR_RATE){
+	    accCar = 0;
+	    car_move(get_current_world());
+	}
+	screenBuffer.put({ x: frameY + mapHeight, y: mapWidth / 3, attr: {color: "white", bgcolor: "black" }},"SCORE : " + get_current_world().score);
+	stop = false;
+	accTick += FRAME_RATE;
+	accUpdate += FRAME_RATE;
+	accCollide += FRAME_RATE;
+	accCar += FRAME_RATE;
+	accLog += FRAME_RATE;
+    }, FRAME_RATE);
 
-    const updateInterval = setInterval(() => {
-	world_buffer[world_buffer_size-1] = update_world(get_current_world());
-    }, 30);
-
-    
     function drawActor(a: A.Actor, x: number, y: number): A.Actor {
         if (y > nb_line) return a.update(a);
 
@@ -196,7 +241,6 @@ function run() {
         return l;
     }
 
-
     function getDirection(actors: A.Actor[]): 'left' | 'right' | null {
         for (const actor of actors) {
             if (actor.name === A.Name.Car_R || actor.name === A.Name.Log_R || actor.name === A.Name.Water_R) return 'right';
@@ -205,8 +249,8 @@ function run() {
         return null; // aucune voiture trouvée
     }
 
-    const carInterval = setInterval(() => {
-        const roads = get_current_world().lines.filter((l) => l.type === A.LineType.Road);
+    function car_move(current_world:World){
+	const roads = current_world.lines.filter((l) => l.type === A.LineType.Road);
         roads.map((r) => {
             const l = r.data.length;
             if (getDirection(r.data) === 'left') {
@@ -232,17 +276,17 @@ function run() {
             r.patternIndex += 1;
             return r;
         });
-    }, 200);
-    
-    const logInterval = setInterval(() => {
-        const rivers = get_current_world().lines.filter((l) => l.type === 3);
+    }
+
+    function log_move(current_world:World){
+	const rivers = current_world.lines.filter((l) => l.type === 3);
         rivers.map((r) => {
             r.data.forEach((a) => {
                 const realY_log = nb_line - r.ordinate + 1;
-                if (a.location.x === get_current_world().poulet.location.x && realY_log === get_current_world().poulet.location.y && a.name === A.Name.Log_R)
-                    get_current_world().poulet.mailbox.push({ "key": "move", "params": [A.right] });
-                else if (a.location.x === get_current_world().poulet.location.x && realY_log === get_current_world().poulet.location.y && a.name === A.Name.Log_L)
-                    get_current_world().poulet.mailbox.push({ "key": "move", "params": [A.left] });
+                if (a.location.x === current_world.poulet.location.x && realY_log === current_world.poulet.location.y && a.name === A.Name.Log_R)
+                    current_world.poulet.mailbox.push({ "key": "move", "params": [A.right] });
+                else if (a.location.x === current_world.poulet.location.x && realY_log === current_world.poulet.location.y && a.name === A.Name.Log_L)
+                    current_world.poulet.mailbox.push({ "key": "move", "params": [A.left] });
 
             });
             
@@ -270,7 +314,7 @@ function run() {
             r.patternIndex += 1;
             return r;
         });
-    }, 400);
+    }
 
     function isCollision(a: A.Actor, b:A.Actor): boolean {
         // Trouver la ligne contenant l'acteur
@@ -305,72 +349,41 @@ function run() {
         );
     }
 
-    const colision = setInterval(() => {
-	{
-            if (checkCollision()) {
-                gameOver();
-            }
-	}
-	screenBuffer.put({ x: frameY + mapHeight, y: mapWidth / 3, attr: {color: "white", bgcolor: "black" }},"SCORE : " + get_current_world().score);
-	}, 50);
-
-    let nbProj = 10;
-    const nbProjAugm = setInterval(() => {
-        if (nbProj < 10)
-            nbProj++;
-        screenBuffer.put({ x: (frameY + mapHeight)*3, y: mapWidth / 3, attr: { color: "white", bgcolor: "black"} }, "IL VOUS RESTE "+nbProj+" PROJECTILS.");
-    },1000);
-    const colisionProj = setInterval(() => {
-        world_buffer[world_buffer_size - 1] = make_world(
-            get_current_world().score, 
-            get_current_world().lines, 
-            get_current_world().poulet, 
-            get_current_world().arrayProj.filter((proj: A.Actor) => {
-                const ignoredActors = [
-                    A.Name.Chicken,
-                    A.Name.Log_L,
-                    A.Name.Log_R,
-                    A.Name.Water_L,
-                    A.Name.Water_R
-                ];
-                const actorLine = get_current_world().lines.find((line: A.Line) =>
-                    line.data.some(actor => {
-                        return (
-                            actor.name && 
-                            !ignoredActors.includes(actor.name) && 
-                            Math.abs(actor.location.x - proj.location.x) <= 2 && 
+    function collisionProj(current_world:World):World{
+	return make_world(current_world.score, current_world.lines, current_world.poulet, current_world.arrayProj.filter((proj:A.Actor) => {
+	    
+            const actorLine = current_world.lines.find((line:A.Line) =>
+                line.data.some(actor => {
+                    return (
+                        actor.name && actor.name !== A.Name.Chicken && // Exclure le poulet
+                            Math.abs(actor.location.x - proj.location.x) <= 2 &&
                             nb_line - line.ordinate + 1 === proj.location.y
-                        );
-                    })
-                );
-    
-                if (actorLine) {
-                    const actorIndex = actorLine.data.findIndex(actor =>
-                        actor.name &&
-                        !ignoredActors.includes(actor.name) &&
-                        Math.abs(actor.location.x - proj.location.x) <= 2 &&
-                        nb_line - actorLine.ordinate + 1 === proj.location.y
                     );
-    
-                    if (actorIndex !== -1) {
-                        actorLine.data = actorLine.data.filter((_, index) => index !== actorIndex);
-                        actorLine.data[actorIndex].send({ key: "die", params: [] });
-                        return false;
-                    }
+                })
+            );
+	    
+            if (actorLine) {
+                const actorIndex = actorLine.data.findIndex(actor =>
+                    actor.name !== A.Name.Chicken && 
+			actor.name !== A.Name.Log_L &&
+			actor.name !== A.Name.Log_R &&
+			Math.abs(actor.location.x - proj.location.x) <= 2 &&
+			nb_line - actorLine.ordinate + 1 === proj.location.y
+                );
+		
+                if (actorIndex !== -1) {
+                    actorLine.data.splice(actorIndex, 1);
+                    return false;
                 }
-    
-                return true;
-            })
-        );
-    }, 10);
+            }
+	    
+            return true;
+	}));
+    }
 
     function gameOver() {
         term("\x1B[?25h");
-        clearInterval(tickInterval);
-        clearInterval(carInterval);
-        clearInterval(updateInterval);
-        clearInterval(logInterval);
-        clearInterval(colision);
+        clearInterval(mainInterval);
         term.grabInput(false);
         term.bgColor('black').clear();
 
@@ -417,10 +430,10 @@ function run() {
         });
     }
 
-    let maxPouletWorldY = getPouletWorldY();
+    let maxPouletWorldY = getPouletWorldY(get_current_world());
 
-    function getPouletWorldY() {
-        return progression + (nb_line - get_current_world().poulet.location.y);
+    function getPouletWorldY(current_world:World):number {
+        return progression + (nb_line - current_world.poulet.location.y);
     }
 
     term.on('key', (name: string) => {
@@ -428,13 +441,7 @@ function run() {
             term.styleReset();
             term.clear();
             term("\x1B[?25h");
-            clearInterval(tickInterval);
-            clearInterval(updateInterval);
-            clearInterval(carInterval);
-            clearInterval(logInterval);
-            clearInterval(colision);
-
-
+            clearInterval(mainInterval);
             term.grabInput(false);
             process.exit(0);
         }
@@ -451,10 +458,9 @@ function run() {
                 
             }
         }
-        
         else if (name === 'UP' && poulet.location.y > 2) {
-            const current_world = get_current_world();
-            
+	    stop = true;
+            const current_world = get_current_world();            
             // Créer un nouveau poulet avec une mailbox mise à jour
             const updatedPoulet = {
                 ...current_world.poulet,
@@ -497,6 +503,7 @@ function run() {
             if (finalPoulet.location.y < nb_line / 2 && finalPoulet.location.y >= mapHeight - 2) {
                 gameOver();
             }
+	    stop = false;
         }
         else if (name === 'DOWN' && get_current_world().poulet.location.y < nb_line) {
             const current_world = get_current_world();
