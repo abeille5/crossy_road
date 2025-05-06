@@ -1,0 +1,119 @@
+\documentclass[a4paper,12pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{graphicx}
+\usepackage{amsmath, amssymb}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+\title{\textbf{Acting Shooting Star : Notre version de Crossy Road basé sur le modèle des acteurs}}
+\author{Enzo Picarel, Raphaël Bely, Arno Donias, Thibault Abeille\\ 
+Encadrants : Vincent Alba, David Renault \\ ENSEIRB-MATMECA – 2025}
+\date{\today}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{backcolor}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+  backgroundcolor=\color{backcolor},
+  commentstyle=\color{gray},
+  keywordstyle=\color{blue},
+  numberstyle=\tiny\color{codegray},
+  stringstyle=\color{orange},
+  basicstyle=\ttfamily\footnotesize,
+  breaklines=true,
+  captionpos=b,
+  keepspaces=true,
+  numbers=left,
+  numbersep=5pt,
+  showspaces=false,
+  showstringspaces=false,
+  showtabs=false,
+  tabsize=2
+}
+
+\lstset{style=mystyle}
+
+\newpage
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+\newpage
+
+\section{Introduction}
+
+Dans le cadre de notre projet de programmation, nous avons choisi de recréer une version personnalisée du jeu \textit{Crossy Road}, un jeu mobile populaire de notre enfance. Ce choix s’est imposé naturellement : d’une part pour son aspect ludique et familier, et d’autre part parce que ses mécaniques simples et répétitives se prêtaient bien à une première implémentation de projet en JavaScript (ou ici, plus précisément en TypeScript).
+
+L’objectif principal du projet était de concevoir un moteur de jeu basé sur le \textbf{modèle des acteurs}, dans lequel chaque élément du jeu (joueur, voitures, rivières, etc.) est représenté par un acteur autonome. Chaque acteur devait pouvoir recevoir des messages, réagir en fonction de son état, et potentiellement émettre de nouveaux messages à d’autres acteurs. Une attention particulière a été portée à la \textbf{pureté fonctionnelle} de l’implémentation, en évitant les effets de bord et en respectant les principes de la programmation fonctionnelle autant que possible.
+
+Le projet s’inscrivait dans un cadre pédagogique défini, avec des contraintes précises : utilisation de \texttt{TypeScript}, affichage dans le \textit{terminal} via le \textit{terminal-kit}, validation du code avec \texttt{ESLint}, tests unitaires avec \texttt{Jest}, et développement collaboratif via un dépôt \texttt{git}. Le code devait également respecter une structure imposée du dépôt.
+
+Parmi les axes de développement retenus, on peut citer la gestion des acteurs et de leurs interactions, la génération dynamique du monde de jeu avec une difficulté croissante, ainsi que des fonctionnalités plus avancées comme le \textbf{retour dans le temps}. Enfin, ce projet s’insérait dans une démarche académique plus large, en lien avec un enseignement sur \textbf{la programmation fonctionnelle, TypeScript et l’analyse statique de code}.
+
+
+\section{Modèle des acteurs et principes de conception}
+\begin{itemize}
+  \item Rappel du modèle des acteurs
+  \item Justification de l'approche transactionnelle
+  \item Fonctionnement du runtime : messages, tick, mise à jour
+  \item Intérêts pour la programmation concurrente et déterministe
+\end{itemize}
+
+\section{Architecture du jeu}
+\begin{itemize}
+  \item Types d'acteurs : joueur, voitures, bûches, rivières, arbres
+  \item Gestion de la position et boîte aux lettres
+  \item Génération procédurale des lignes et des obstacles
+  \item Évolution de la difficulté
+  \item Gestion des collisions
+  \item Création dynamique d'acteurs
+\end{itemize}
+
+\section{Implémentation technique}
+\begin{itemize}
+  \item Organisation des fichiers et dépendances
+  \item Utilisation de \texttt{TypeScript}, \texttt{terminal-kit}, \texttt{Jest}, \texttt{ESLint}
+  \item Extraits de code clefs (\texttt{make\_actor}, runtime, génération de niveaux)
+\end{itemize}
+
+\section{Affichage et interactions}
+\begin{itemize}
+  \item Affichage ASCII dans le terminal
+  \item Contraintes liées à \texttt{terminal-kit}
+  \item Possibilités d'interactions (touches clavier, etc.)
+\end{itemize}
+
+\section{Difficultés rencontrées et solutions apportées}
+\begin{itemize}
+  \item Collisions sans effets de bord
+  \item Identification des acteurs et passage de tick
+  \item Débogage et visualisation du comportement
+\end{itemize}
+
+\section{Évaluation}
+\begin{itemize}
+  \item Fonctionnalité et stabilité
+  \item Performances en terminal
+  \item Extensibilité du moteur de jeu
+\end{itemize}
+
+\section{Conclusion et perspectives}
+Résumé des apports du projet, limites actuelles, et pistes d'amélioration (graphismes, IA, multijoueur, temps réel).
+
+\section*{Références}
+\begin{itemize}
+  \item Documentation de \texttt{terminal-kit}: \url{https://github.com/cronvel/terminal-kit}
+  \item Tutoriel sur le modèle des acteurs
+  \item Documentation ESLint / Jest / TypeScript
+\end{itemize}
+
+\end{document}

@@ -5,3 +5,7 @@ package-lock.json
 *.js
 *#*
 *example*
+*.aux
+*.log
+*.out
+*.toc
