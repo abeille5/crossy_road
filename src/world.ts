@@ -133,7 +133,7 @@ function run() {
     }
 
     function go_back_in_time(){
-	world_buffer[world_buffer_size - 1] = world_buffer[0];
+	world_buffer.push(world_buffer[0]);
     }
 
     const world_buffer_size:number = 10;
