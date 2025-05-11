@@ -85,25 +85,68 @@ Bien que ce modèle ait offert une approche intuitive et modulaire pour gérer l
 
 \section{Architecture du jeu}
 
-L'architecture du jeu repose sur la modélisation de toutes les entités visibles sous forme d'acteurs. On distingue plusieurs types d'acteurs :
+La description du jeu repose sur la modélisation de tout ce que l'on voit par des acteurs. On en distingue plusieurs types :
 \begin{itemize}
-  \item \textbf{Chicken} : l’acteur principal contrôlé par le joueur ;
-  \item \textbf{Tree}, \textbf{Water\_L}, \textbf{Water\_R}, \textbf{Log\_L}, \textbf{Log\_R}, \textbf{Car\_L}, \textbf{Car\_R} : éléments dynamiques ou statiques constituant les obstacles ;
-  \item \textbf{Projectile} : acteur créé par le joueur pour détruire certains obstacles ;
-  \item \textbf{Empty} : utilisé pour représenter une cellule vide dans le monde.
+  \item[$\bullet$] \textbf{Chicken} : l’acteur principal contrôlé par le joueur ;
+  \item[$\bullet$] \textbf{Tree}, \textbf{Water\_L}, \textbf{Water\_R}, \textbf{Log\_L}, \textbf{Log\_R}, \textbf{Car\_L}, \textbf{Car\_R} : éléments dynamiques ou statiques constituant les obstacles ;
+  \item[$\bullet$] \textbf{Projectile} : acteur créé par le joueur pour détruire certains obstacles ;
+  \item[$\bullet$] \textbf{Empty} : utilisé pour représenter une cellule vide dans le monde.
 \end{itemize}
 
-Tous les acteurs partagent un ensemble de fonctions communes, comme \texttt{tick}, \texttt{move} ou \texttt{update}. Une fonction \texttt{collide} était initialement prévue mais n'est finalement pas utilisée. La détection des collisions se fait par simple comparaison des positions avec l’acteur principal. Si un acteur occupe la même case que le joueur, la partie est terminée.
+\vspace{1em}
 
-L’identité d’un acteur est déterminée à sa création par la fonction \texttt{make\_actor}, à partir d’un \texttt{nom} et d’une \texttt{position}. Ces éléments sont suffisants pour distinguer les comportements spécifiques.
+Ces acteurs partagent des fonctions communes car ils les utilisent tous et réagissent aux messages grâce à elles. Ces fonctions sont : 
+\begin{itemize}
+	\item[$\bullet$] \texttt{move} qui permet à l'acteur de modifier sa position ;
+	\item[$\bullet$] \texttt{tick} qui permet de déclencher l'action de mouvement pendant le déroulement du jeu ;
+	\item[$\bullet$] \texttt{collide} qui permet de réagir (dans notre cas d'arrêter la partie) en cas de collision avec un objet ennemi.
+\end{itemize}
 
-Le monde est représenté comme une structure contenant un tableau de lignes (\texttt{Line[]}), chacune de ces lignes étant composée d’acteurs. La progression du jeu se fait par le défilement automatique de ces lignes, simulant l’avancement du joueur. Ce système permet de maintenir une tension continue : si le joueur avance rapidement, le monde suit son rythme ; s’il reste en bas de l’écran, le défilement automatique reprend.
+\vspace{1em}
 
-Les lignes sont générées dynamiquement via la fonction \texttt{tick\_line}, à chaque avancée du monde. Elles sont construites à partir de motifs d’obstacles (2 à 4 cases consécutives), ce qui permet de représenter visuellement des camions, rangées d’arbres ou bûches flottantes. La probabilité d’apparition des obstacles augmente progressivement, suivant une logique de difficulté croissante. Les motifs sont choisis et combinés aléatoirement, ce qui rend peu probable la répétition exacte de deux lignes.
+Notre monde de jeu est quant à lui représenté par une table de lignes (\texttt{TypeLine}). Ces lignes comportent autant d'acteurs que la largeur du monde, mais aussi :
+\begin{itemize}
+  \item[$\bullet$] le type de ligne : une rivière, une route ou la nature ;
+  \item[$\bullet$] un tableau \texttt{data} comportant les acteurs de la ligne ;
+  \item[$\bullet$] un tableau \texttt{pattern} et une variable \texttt{patternIndex} que nous détaillerons par la suite.
+\end{itemize}
 
-Aucun système ne garantit qu’un chemin praticable existe toujours, mais la rareté des impasses et la possibilité pour le joueur de tirer des projectiles destructeurs offrent un équilibre entre hasard et jouabilité. Les projectiles, comme tous les autres éléments mobiles, sont des acteurs à part entière. Le déplacement dans le monde se fait par recréation successive d’acteurs dans de nouvelles positions, selon une logique purement fonctionnelle.
+\vspace{1em}
 
-Enfin, toutes les collisions avec des obstacles sont létales : la gestion des règles est donc simple mais rigoureuse, renforçant l’aspect arcade et punitif du jeu.
+La progression du jeu se fait par un défilement automatique des lignes, mais le comportement du joueur influe sur ce défilement de deux manières différentes :
+\begin{itemize}
+  \item[$\bullet$] si le joueur est à l'aise avec la difficulté actuelle du niveau, il ira plus vite que le défilement. Ainsi, il risque de sortir du jeu. Pour éviter cela, le rythme de défilement suit la cadence du joueur, l'empêchant d'aller plus haut que le milieu de l'écran ;
+  \item[$\bullet$] dans le cas contraire, le joueur est sous pression et doit rattraper son retard. Dans ce cas-là, on garde la vitesse de défilement automatique.
+\end{itemize}
+
+\vspace{1em}
+
+Cela permet de maintenir une tension permanente sur le joueur.
+
+\vspace{1em}
+
+Les lignes du jeu apparaissent à l'aide de la fonction \texttt{tick\_line}, suivant les principes ci-dessus. Elles sont construites aléatoirement à l'aide de motifs d'acteurs. On choisit d'abord aléatoirement le type de ligne. Puis, on choisit, selon une probabilité \texttt{obstacleProbability}, si l'on place un motif d'acteurs. Ces motifs sont composés de 2 à 4 acteurs de même type. Cela permet de modéliser plus fidèlement les obstacles comme des voitures, camions, ou rangées d'arbres. Seuls les acteurs ennemis sont générés par motif ; les autres, comme les bûches ou "rien", permettent de compléter les lignes. Cette génération aléatoire par choix et combinaison rend très peu probable la répétition exacte de deux lignes.
+
+\vspace{1em}
+
+Afin de modéliser des niveaux de difficulté différents, nous avons joué sur plusieurs paramètres :
+\begin{itemize}
+  \item[$\bullet$] la probabilité d'apparition des obstacles, rendant le terrain plus dense en acteurs à "esquiver" ;
+  \item[$\bullet$] l'espace entre chaque ligne : dans les premiers niveaux, le joueur dispose d'une ligne sur deux "vide", ce qui lui permet d'être à l'abri d'une collision ;
+  \item[$\bullet$] enfin, la répartition des probabilités pour les types de lignes change au cours du temps, pour tendre vers de plus en plus de lignes "dynamiques", telles que les routes ou les rivières.
+\end{itemize}
+
+\vspace{1em}
+
+Nous n'avons pas implémenté de système garantissant qu'un chemin praticable existe toujours. Premièrement, cette garantie n'est pas nécessaire, car le joueur a la capacité de tirer des projectiles permettant de détruire les obstacles. Ainsi, il peut facilement se tirer d'une impasse. Deuxièmement, ces impasses arrivent relativement rarement grâce à la génération aléatoire de lignes.
+
+\vspace{1em}
+
+Le déplacement des acteurs dans le monde, régi par les fonctions \texttt{tick} et \texttt{move}, se fait par recréation successive d'acteurs dans de nouvelles positions, ce qui permet une implémentation purement fonctionnelle. Les projectiles ou boules de feu sont, comme tous les autres éléments du jeu, des acteurs à part entière.
+
+\vspace{1em}
+
+Pour terminer ces explications du jeu, les collisions sont létales instantanément, ce qui permet de renforcer l'aspect punitif du jeu et de maintenir le joueur concentré.
 
 \section{Implémentation technique}
 
