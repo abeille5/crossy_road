@@ -9,3 +9,7 @@ package-lock.json
 *.log
 *.out
 *.toc
+*.fdb_latexmk
+*.fls
+*.synctex.gz
+*.pdf

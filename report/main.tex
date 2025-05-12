@@ -39,8 +39,6 @@ Encadrants : Vincent Alba, David Renault \\ ENSEIRB-MATMECA – 2025}
 
 \lstset{style=mystyle}
 
-\newpage
-
 \begin{document}
 
 \maketitle
@@ -51,38 +49,149 @@ Encadrants : Vincent Alba, David Renault \\ ENSEIRB-MATMECA – 2025}
 
 \section{Introduction}
 
-Dans le cadre de notre projet de programmation, nous avons choisi de recréer une version personnalisée du jeu \textit{Crossy Road}, un jeu mobile populaire de notre enfance. Ce choix s’est imposé naturellement : d’une part pour son aspect ludique et familier, et d’autre part parce que ses mécaniques simples et répétitives se prêtaient bien à une première implémentation de projet en JavaScript (ou ici, plus précisément en TypeScript).
+Dans le cadre de notre projet de programmation en JavaScript, nous avons fait le choix de créer notre propre version du jeu Crossy Road. C'est un jeu mobile populaire auquel on a joué durant notre enfance. Ce fut un choix naturel. En effet, son aspect ludique et familier permet une certaine simplicité d'implémentation qui permet de satisfaire les exigences pour un premier projet dans ce langage. Nous verrons par la suite, que, grâce à notre imagination, nous n'avons pas été restreints par la simplicité du jeu.\\
 
-L’objectif principal du projet était de concevoir un moteur de jeu basé sur le \textbf{modèle des acteurs}, dans lequel chaque élément du jeu (joueur, voitures, rivières, etc.) est représenté par un acteur autonome. Chaque acteur devait pouvoir recevoir des messages, réagir en fonction de son état, et potentiellement émettre de nouveaux messages à d’autres acteurs. Une attention particulière a été portée à la \textbf{pureté fonctionnelle} de l’implémentation, en évitant les effets de bord et en respectant les principes de la programmation fonctionnelle autant que possible.
+Le projet est axé principalement sur la conception d'un moteur de jeu basé sur un modèle fonctionnant par interaction des objets définis en tant qu'"acteur". Ces acteurs (qui vont du poulet à la bûche en passant par les voitures) sont indépendants les uns des autres. Chaque acteur devait être capable de recevoir des informations sous forme de messages, puis de traiter ces messages et enfin de réagir en fonction. Pendant l'implémentation, nous avons fait particulièrement attention à avoir un code avec une pureté fonctionnelle maximale, en évitant les effets de bord et en respectant les principes de la programmation fonctionnelle autant que possible.\\
 
-Le projet s’inscrivait dans un cadre pédagogique défini, avec des contraintes précises : utilisation de \texttt{TypeScript}, affichage dans le \textit{terminal} via le \textit{terminal-kit}, validation du code avec \texttt{ESLint}, tests unitaires avec \texttt{Jest}, et développement collaboratif via un dépôt \texttt{git}. Le code devait également respecter une structure imposée du dépôt.
+Le projet était cadré par des contraintes définies en relation avec le cours de programmation fonctionnelle et d'utilisation de \textit{Typescript}. Les exigences étaient les suivantes :
+\begin{itemize}
+	\item affichage dans le terminal même à l'aide de \textit{terminal-kit}
+	\item code validé grâce à l'utilisation d'\textit{ESLint}
+	\item tests unitaires avec \textit{Jest}
+	\item développement collaboratif avec un dépôt git
+	\item code structuré selon les consignes 
+\end{itemize}
 
-Parmi les axes de développement retenus, on peut citer la gestion des acteurs et de leurs interactions, la génération dynamique du monde de jeu avec une difficulté croissante, ainsi que des fonctionnalités plus avancées comme le \textbf{retour dans le temps}. Enfin, ce projet s’insérait dans une démarche académique plus large, en lien avec un enseignement sur \textbf{la programmation fonctionnelle, TypeScript et l’analyse statique de code}.
-
+Durant ce rapport nous aborderons plusieurs thèmes principaux du développement comme la conception des acteurs, l'architecture du jeu, son implémentation, ainsi qu'un retour sur expérience contenant les difficultés rencontrées et nos apprentissages durant le projet.
 
 \section{Modèle des acteurs et principes de conception}
+
+L'architecture complète du jeu est basée entièrement sur un modèle comportant des acteurs. Ces acteurs font office de \textbf{structures abstraites de données}. En effet, leur implémentation est cachée derrière le type \textbf{Actor} défini dans le fichier \textit{actor.ts} et généré à l'aide de la fonction \textit{make\_actor}. Les acteurs doivent posséder :
 \begin{itemize}
-  \item Rappel du modèle des acteurs
-  \item Justification de l'approche transactionnelle
-  \item Fonctionnement du runtime : messages, tick, mise à jour
-  \item Intérêts pour la programmation concurrente et déterministe
+  \item une \textbf{mailbox} afin de recevoir des messages ou instructions ;
+  \item une fonction centrale \textit{update} qui lit les messages et renvoie une nouvelle version de l'acteur après avoir effectué les changements propres aux instructions lues ;
+  \item plusieurs fonctions génériques comme \textit{move, collide ou tick} communes à tous les acteurs de notre jeu ;
 \end{itemize}
+
+Les messages échangés par les acteurs sont typés par une structure composé d'un champ \texttt{type} (chaîne de caractères) et un champ \texttt{params} (tableau d'arguments). Ces messages permettent la transmission des différentes actions à effectuer, faisant réagir les acteurs de manière \textbf{autonome} et \textbf{indépendante} durant le déroulement du jeu.\\
+
+Le modèle repose sur la mise à jour successive et répétée des acteurs: quand l'un d'eux reçoit un \textbf{"tick"}, il ne modifie pas vraiment sont propre état, à la place, il crée une nouvelle version de lui-même en fonction des messages/instructions reçues.\\
+
+Le fonctionnement du jeu est dirigé par un \textbf{runtime} comportant plusieurs boucles d'exécution indépendantes (\texttt{setinterval}) en fonction des acteurs, telles que \texttt{intervalProj, tickInterval ou carInterval}. Ce sont elles qui déclenchent des tick à fréquences différentes selon l'acteur impacté. \\
+
+Le monde contenant tout les acteurs est également sauvegarder régulièrement. Les versions du mondes sont enregistrées dans une file qui permet alors le \textbf{retour en arrière}. Le monde actuel correspond au dernièr élément de la file, ainsi afin de revenir en arrière, il faut replacer cet élément par un élément placé précédemment dans la file, ce qui permet de revenir dans un état antérieur du jeu. \\
+
+Bien que ce modèle ait offert une approche intuitive et modulaire pour gérer les interactions entre les entités du jeu, il a également introduit une certaine \textbf{rigidité}. La recréation fréquente d’acteurs, imposée par la pureté fonctionnelle, a parfois généré des bugs graphiques et une complexité de gestion accrue. Néanmoins, cette architecture s’est révélée pertinente pour développer des comportements réactifs, évitant la prolifération de structures conditionnelles complexes. \\
 
 \section{Architecture du jeu}
+
+La description du jeu repose sur la modélisation de tout ce que l'on voit par des acteurs. On en distingue plusieurs types :
 \begin{itemize}
-  \item Types d'acteurs : joueur, voitures, bûches, rivières, arbres
-  \item Gestion de la position et boîte aux lettres
-  \item Génération procédurale des lignes et des obstacles
-  \item Évolution de la difficulté
-  \item Gestion des collisions
-  \item Création dynamique d'acteurs
+  \item[$\bullet$] \textbf{Chicken} : l’acteur principal contrôlé par le joueur ;
+  \item[$\bullet$] \textbf{Tree}, \textbf{Water\_L}, \textbf{Water\_R}, \textbf{Log\_L}, \textbf{Log\_R}, \textbf{Car\_L}, \textbf{Car\_R} : éléments dynamiques ou statiques constituant les obstacles ;
+  \item[$\bullet$] \textbf{Projectile} : acteur créé par le joueur pour détruire certains obstacles ;
+  \item[$\bullet$] \textbf{Empty} : utilisé pour représenter une cellule vide dans le monde.
 \end{itemize}
 
-\section{Implémentation technique}
+\vspace{1em}
+
+Ces acteurs partagent des fonctions communes car ils les utilisent tous et réagissent aux messages grâce à elles. Ces fonctions sont : 
 \begin{itemize}
-  \item Organisation des fichiers et dépendances
-  \item Utilisation de \texttt{TypeScript}, \texttt{terminal-kit}, \texttt{Jest}, \texttt{ESLint}
-  \item Extraits de code clefs (\texttt{make\_actor}, runtime, génération de niveaux)
+	\item[$\bullet$] \texttt{move} qui permet à l'acteur de modifier sa position ;
+	\item[$\bullet$] \texttt{tick} qui permet de déclencher l'action de mouvement pendant le déroulement du jeu ;
+	\item[$\bullet$] \texttt{collide} qui permet de réagir (dans notre cas d'arrêter la partie) en cas de collision avec un objet ennemi.
+\end{itemize}
+
+\vspace{1em}
+
+Notre monde de jeu est quant à lui représenté par une table de lignes (\texttt{TypeLine}). Ces lignes comportent autant d'acteurs que la largeur du monde, mais aussi :
+\begin{itemize}
+  \item[$\bullet$] le type de ligne : une rivière, une route ou la nature ;
+  \item[$\bullet$] un tableau \texttt{data} comportant les acteurs de la ligne ;
+  \item[$\bullet$] un tableau \texttt{pattern} et une variable \texttt{patternIndex} que nous détaillerons par la suite.
+\end{itemize}
+
+\vspace{1em}
+
+La progression du jeu se fait par un défilement automatique des lignes, mais le comportement du joueur influe sur ce défilement de deux manières différentes :
+\begin{itemize}
+  \item[$\bullet$] si le joueur est à l'aise avec la difficulté actuelle du niveau, il ira plus vite que le défilement. Ainsi, il risque de sortir du jeu. Pour éviter cela, le rythme de défilement suit la cadence du joueur, l'empêchant d'aller plus haut que le milieu de l'écran ;
+  \item[$\bullet$] dans le cas contraire, le joueur est sous pression et doit rattraper son retard. Dans ce cas-là, on garde la vitesse de défilement automatique.
+\end{itemize}
+
+\vspace{1em}
+
+Cela permet de maintenir une tension permanente sur le joueur.
+
+\vspace{1em}
+
+Les lignes du jeu apparaissent à l'aide de la fonction \texttt{tick\_line}, suivant les principes ci-dessus. Elles sont construites aléatoirement à l'aide de motifs d'acteurs. On choisit d'abord aléatoirement le type de ligne. Puis, on choisit, selon une probabilité \texttt{obstacleProbability}, si l'on place un motif d'acteurs. Ces motifs sont composés de 2 à 4 acteurs de même type. Cela permet de modéliser plus fidèlement les obstacles comme des voitures, camions, ou rangées d'arbres. Seuls les acteurs ennemis sont générés par motif ; les autres, comme les bûches ou "rien", permettent de compléter les lignes. Cette génération aléatoire par choix et combinaison rend très peu probable la répétition exacte de deux lignes.
+  
+\vspace{1em}
+
+Afin de modéliser des niveaux de difficulté différents, nous avons joué sur plusieurs paramètres :
+\begin{itemize}
+  \item[$\bullet$] la probabilité d'apparition des obstacles, rendant le terrain plus dense en acteurs à "esquiver" ;
+  \item[$\bullet$] l'espace entre chaque ligne : dans les premiers niveaux, le joueur dispose d'une ligne sur deux "vide", ce qui lui permet d'être à l'abri d'une collision ;
+  \item[$\bullet$] enfin, la répartition des probabilités pour les types de lignes change au cours du temps, pour tendre vers de plus en plus de lignes "dynamiques", telles que les routes ou les rivières.
+\end{itemize}
+
+\vspace{1em}
+
+Nous n'avons pas implémenté de système garantissant qu'un chemin praticable existe toujours. Premièrement, cette garantie n'est pas nécessaire, car le joueur a la capacité de tirer des projectiles permettant de détruire les obstacles. Ainsi, il peut facilement se tirer d'une impasse. Deuxièmement, ces impasses arrivent relativement rarement grâce à la génération aléatoire de lignes.
+
+\vspace{1em}
+
+Le déplacement des acteurs dans le monde, régi par les fonctions \texttt{tick} et \texttt{move}, se fait par recréation successive d'acteurs dans de nouvelles positions, ce qui permet une implémentation purement fonctionnelle. Les projectiles ou boules de feu sont, comme tous les autres éléments du jeu, des acteurs à part entière.
+
+\vspace{1em}
+
+Pour terminer ces explications du jeu, les collisions sont létales instantanément, ce qui permet de renforcer l'aspect punitif du jeu et de maintenir le joueur concentré.
+
+\section{Implémentation technique}
+
+Le projet est organisé selon une structure claire et modulaire. Le répertoire principal contient les fichiers de configuration nécessaires pour l’utilisation de \texttt{ESLint}, \texttt{Jest}, ainsi qu’un \texttt{Makefile} destiné à automatiser les différentes tâches de compilation, d’exécution et de tests.
+
+\subsection*{Organisation des fichiers}
+
+\begin{itemize}
+  \item \textbf{src/} : contient les fichiers source principaux :
+  \begin{itemize}
+    \item \texttt{actor.ts} : implémente les fonctions de création et de gestion des acteurs ;
+    \item \texttt{world.ts} : contient la logique de simulation du monde, les ticks, le moteur du jeu et l’affichage terminal.
+  \end{itemize}
+  \item \textbf{test/} : contient les tests unitaires, notamment \texttt{actor.test.ts} qui vérifie le bon fonctionnement des fonctions définies dans \texttt{actor.ts}.
+  \item \textbf{dist/} : contient les fichiers JavaScript générés automatiquement à la compilation.
+\end{itemize}
+
+\subsection*{Technologies et outils utilisés}
+
+Le développement repose sur plusieurs outils modernes :
+\begin{itemize}
+  \item \texttt{TypeScript} pour garantir un typage statique des données ;
+  \item \texttt{ESLint} pour assurer une qualité de code homogène (indentation, style, bonne utilisation des structures) ;
+  \item \texttt{Jest} pour l’écriture et l’exécution des tests unitaires ;
+  \item \texttt{terminal-kit} pour l’affichage dynamique dans le terminal.
+\end{itemize}
+
+La configuration TypeScript (\texttt{tsconfig.json}) et le \texttt{Makefile} étaient fournis dans le sujet. Le Makefile propose notamment une commande \texttt{make run} qui compile le projet avec \texttt{tsc} puis exécute le jeu via Node.js :
+
+\begin{lstlisting}[language=bash]
+npx tsc
+node dist/src/world.js
+\end{lstlisting}
+
+Le fichier principal d’exécution est \texttt{world.ts}, qui gère l’ensemble de la boucle de jeu.
+
+Le jeu est entièrement jouable depuis un terminal, sans interface graphique additionnelle. L’affichage s’adapte dynamiquement à la taille de l’écran du terminal, ce qui permet une bonne ergonomie malgré l’usage de caractères ASCII.
+
+\subsection*{Éléments clés du code}
+
+Trois éléments de l’implémentation méritent une attention particulière :
+\begin{itemize}
+  \item \textbf{Le système de tick} : chaque type d’acteur est mis à jour à une fréquence spécifique via des fonctions \texttt{setInterval}. Cela permet de différencier la cadence de déplacement des voitures, bûches, projectiles, etc.
+  \item \textbf{La génération d’acteurs} : la fonction \texttt{make\_actor} crée des entités selon leur type, leur position et leur comportement à partir de modèles réutilisables.
+  \item \textbf{La génération de lignes} : des motifs prédéfinis (pattern) permettent de générer dynamiquement des obstacles selon une probabilité qui augmente avec la progression du joueur. Cela assure un équilibre entre imprévisibilité et jouabilité.
 \end{itemize}
 
 \section{Affichage et interactions}
