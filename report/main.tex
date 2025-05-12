@@ -126,7 +126,7 @@ Cela permet de maintenir une tension permanente sur le joueur.
 \vspace{1em}
 
 Les lignes du jeu apparaissent à l'aide de la fonction \texttt{tick\_line}, suivant les principes ci-dessus. Elles sont construites aléatoirement à l'aide de motifs d'acteurs. On choisit d'abord aléatoirement le type de ligne. Puis, on choisit, selon une probabilité \texttt{obstacleProbability}, si l'on place un motif d'acteurs. Ces motifs sont composés de 2 à 4 acteurs de même type. Cela permet de modéliser plus fidèlement les obstacles comme des voitures, camions, ou rangées d'arbres. Seuls les acteurs ennemis sont générés par motif ; les autres, comme les bûches ou "rien", permettent de compléter les lignes. Cette génération aléatoire par choix et combinaison rend très peu probable la répétition exacte de deux lignes.
-
+  
 \vspace{1em}
 
 Afin de modéliser des niveaux de difficulté différents, nous avons joué sur plusieurs paramètres :
