@@ -176,38 +176,37 @@ function run() {
 	stop = true;
 	const current_world = get_current_world();
 	if (accTick > TICK_RATE){
-	    accTick = 0;
-	    if (nbProj < 10)
-		nbProj++;
+            accTick = 0;
+            if (nbProj < 10)
+                nbProj++;
             screenBuffer.put({ x: (frameY + mapHeight)*3, y: mapWidth / 3, attr: { color: "white", bgcolor: "black"} }, "IL VOUS RESTE "+nbProj+" PROJECTILS.");
-	    const new_world = tick_world(current_world);
-	    world_buffer.shift();
-	    world_buffer[world_buffer_size - 1] = new_world;
-	    
+            const new_world = tick_world(current_world);
+            world_buffer.shift();
+            world_buffer[world_buffer_size - 1] = new_world;    
 	}
 	if (accUpdate > UPDATE_RATE){
-	    const update_current_world = get_current_world();
-	    accUpdate = 0;
-	    world_buffer[world_buffer_size - 1] = update_world(make_world(update_current_world.score, update_current_world.lines, update_current_world.poulet, update_current_world.arrayProj.map((proj:A.Actor) => {
-		proj.mailbox.push({ "key": "move", "params": [A.up]});
-		return proj.update(proj);
+            const update_current_world = get_current_world();
+            accUpdate = 0;
+            world_buffer[world_buffer_size - 1] = update_world(make_world(update_current_world.score, update_current_world.lines, update_current_world.poulet, update_current_world.arrayProj.map((proj:A.Actor) => {
+            proj.mailbox.push({ "key": "move", "params": [A.up]});
+                return proj.update(proj);
             }).filter((proj:A.Actor) => proj.location.y > 1)));
 	}
 	if (accCollide > COLLIDE_CHECK_RATE){
-	    const collide_world = get_current_world();
-	    accCollide = 0;
-	    if (checkCollision()) {
+            const collide_world = get_current_world();
+            accCollide = 0;
+            if (checkCollision()) {
                 gameOver();
             }
-	    world_buffer[world_buffer_size - 1] = collisionProj(collide_world);
+            world_buffer[world_buffer_size - 1] = collisionProj(collide_world);
 	}
 	if (accLog > LOG_RATE){
-	    accLog = 0;
-	    log_move(get_current_world());
+            accLog = 0;
+            log_move(get_current_world());
 	}
 	if (accCar > CAR_RATE){
-	    accCar = 0;
-	    car_move(get_current_world());
+            accCar = 0;
+            car_move(get_current_world());
 	}
 	screenBuffer.put({ x: frameY + mapHeight, y: mapWidth / 3, attr: {color: "white", bgcolor: "black" }},"SCORE : " + get_current_world().score);
 	stop = false;
@@ -354,7 +353,6 @@ function run() {
 
     function collisionProj(current_world:World):World{
 	return make_world(current_world.score, current_world.lines, current_world.poulet, current_world.arrayProj.filter((proj:A.Actor) => {
-	    
             const actorLine = current_world.lines.find((line:A.Line) =>
                 line.data.some(actor => {
                     return (
@@ -364,7 +362,6 @@ function run() {
                     );
                 })
             );
-	    
             if (actorLine) {
                 const actorIndex = actorLine.data.findIndex(actor =>
                     actor.name !== A.Name.Chicken && 
@@ -379,7 +376,6 @@ function run() {
                     return false;
                 }
             }
-	    
             return true;
 	}));
     }
@@ -462,7 +458,7 @@ function run() {
             }
         }
         else if (name === 'UP' && poulet.location.y > 2) {
-	    stop = true;
+            stop = true;
             const current_world = get_current_world();            
             // Créer un nouveau poulet avec une mailbox mise à jour
             const updatedPoulet = {
@@ -506,7 +502,7 @@ function run() {
             if (finalPoulet.location.y < nb_line / 2 && finalPoulet.location.y >= mapHeight - 2) {
                 gameOver();
             }
-	    stop = false;
+            stop = false;
         }
         else if (name === 'DOWN' && get_current_world().poulet.location.y < nb_line) {
             const current_world = get_current_world();
@@ -580,7 +576,7 @@ function run() {
         }
         else if (name === 'r'){
             screenBuffer.put({ x: titleX, y: titleY - 1, attr: { color: "white", bgcolor: "black", bold: true } }, "Back in time ! ");
-	    if (!stop)
+            if (!stop)
 		go_back_in_time();
 	}
     });
