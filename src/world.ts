@@ -122,8 +122,6 @@ function run() {
     function update_world(world:World) : World {
 	const new_world = make_world(world.score + 20, world.lines.map((l: A.Line) => drawLine(l)), drawActor(world.poulet, world.poulet.location.x, world.poulet.location.y), world.arrayProj.map((p:A.Actor) => drawActor(p, p.location.x, p.location.y)));
 	screenBuffer.draw({ delta: true });
-	term.moveTo(5, 6);
-	console.log(get_current_world().score);
 	return new_world;
     }
 
@@ -163,9 +161,11 @@ function run() {
 
     const arrayProj:A.Actor[] = new Array;
 
-    const  world_buffer: World[] = new Array(world_buffer_size).fill(make_world(0, lines, poulet, arrayProj));
+    let  world_buffer: World[] = new Array(world_buffer_size).fill(make_world(0, lines, poulet, arrayProj));
     world_buffer[world_buffer_size - 1] = make_world(0, lines, poulet, arrayProj);
 
+    let nbProj = 10;
+        
     let accTick = 0;
     let accUpdate = 0;
     let accCollide = 0;
@@ -177,6 +177,9 @@ function run() {
 	const current_world = get_current_world();
 	if (accTick > TICK_RATE){
 	    accTick = 0;
+	    if (nbProj < 10)
+		nbProj++;
+            screenBuffer.put({ x: (frameY + mapHeight)*3, y: mapWidth / 3, attr: { color: "white", bgcolor: "black"} }, "IL VOUS RESTE "+nbProj+" PROJECTILS.");
 	    const new_world = tick_world(current_world);
 	    world_buffer.shift();
 	    world_buffer[world_buffer_size - 1] = new_world;
@@ -468,7 +471,7 @@ function run() {
             };
         
             // Calculer le nouveau score et la progression
-            const worldY = getPouletWorldY();
+            const worldY = getPouletWorldY(current_world);
             const scoreIncrement = worldY > maxPouletWorldY ? worldY - maxPouletWorldY : 0;
             const newMaxPouletWorldY = Math.max(maxPouletWorldY, worldY);
             const newProgression = updatedPoulet.location.y < nb_line / 2 ? progression + 1 : progression;
@@ -484,7 +487,7 @@ function run() {
             // Créer le nouveau monde
             const new_world = make_world(
                 current_world.score + scoreIncrement,
-                get_current_world().lines.map((l: A.Line) => tickLine(l)),
+                updatedPoulet.location.y < nb_line / 2 && updatedPoulet.location.y < mapHeight - 2 ? current_world.lines.map((l: A.Line) => tickLine(l)) : current_world.lines,
                 finalPoulet.update(finalPoulet),
                 current_world.arrayProj
             );
@@ -577,7 +580,8 @@ function run() {
         }
         else if (name === 'r'){
             screenBuffer.put({ x: titleX, y: titleY - 1, attr: { color: "white", bgcolor: "black", bold: true } }, "Back in time ! ");
-            go_back_in_time();
+	    if (!stop)
+		go_back_in_time();
 	}
     });
 }
