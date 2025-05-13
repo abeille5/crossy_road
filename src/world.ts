@@ -35,7 +35,7 @@ function run() {
 
 
     const screenBuffer = new terminalKit.ScreenBuffer({
-       dst: term,
+        dst: term,
         width: term.width,
         height: term.height
     });
@@ -65,32 +65,32 @@ function run() {
 
     function drawFrame() {
         const topBorder = Array.from({ length: mapWidth })
-              .map((_, x) => ({
-                  x: frameX + x,
-                  y: frameY + 1,
-                  attr: { bgColor: 'white', color: 'white' }
-              }));
+            .map((_, x) => ({
+                x: frameX + x,
+                y: frameY + 1,
+                attr: { bgColor: 'white', color: 'white' }
+            }));
 
         const bottomBorder = Array.from({ length: mapWidth })
-              .map((_, x) => ({
-                  x: frameX + x,
-                  y: frameY + mapHeight - 1,
-                  attr: { bgColor: 'white', color: 'white' }
-              }));
+            .map((_, x) => ({
+                x: frameX + x,
+                y: frameY + mapHeight - 1,
+                attr: { bgColor: 'white', color: 'white' }
+            }));
 
         const sideBorders = Array.from({ length: mapHeight - 2 })
-              .flatMap((_, y) => [
-                  {
-                      x: frameX,
-                      y: frameY + y + 1,
-                      attr: { bgColor: 'white', color: 'white' }
-                  },
-                  {
-                      x: frameX + mapWidth - 1,
-                      y: frameY + y + 1,
-                      attr: { bgColor: 'white', color: 'white' }
-                  }
-              ]);
+            .flatMap((_, y) => [
+                {
+                    x: frameX,
+                    y: frameY + y + 1,
+                    attr: { bgColor: 'white', color: 'white' }
+                },
+                {
+                    x: frameX + mapWidth - 1,
+                    y: frameY + y + 1,
+                    attr: { bgColor: 'white', color: 'white' }
+                }
+            ]);
 
         [...topBorder, ...bottomBorder, ...sideBorders]
             .forEach(position => screenBuffer.put(position, ' '));
@@ -98,31 +98,31 @@ function run() {
 
     drawFrame();
 
-    function make_world(score:number, actors:A.Line[], poulet:A.Actor, arrayProj:A.Actor[]) : World {
-	const world: World = {
+    function make_world(score: number, actors: A.Line[], poulet: A.Actor, arrayProj: A.Actor[]): World {
+        const world: World = {
             score: score,
             lines: actors,
             poulet: poulet,
             level: 1,
             arrayProj: arrayProj,
-	};
-	return world;
+        };
+        return world;
     }
 
-    function tick_world(world:World) : World {
-	if (world.poulet.location.y < mapHeight - 2){
+    function tick_world(world: World): World {
+        if (world.poulet.location.y < mapHeight - 2) {
             world.poulet.mailbox.push({ "key": "move", "params": [A.down] });
-	}
-	else {
+        }
+        else {
             gameOver();
-	}
-	return make_world(world.score + 1000, world.lines.map((l: A.Line) => tickLine(l)), world.poulet.update(world.poulet), world.arrayProj);
+        }
+        return make_world(world.score, world.lines.map((l: A.Line) => tickLine(l)), world.poulet.update(world.poulet), world.arrayProj);
     }
 
-    function update_world(world:World) : World {
-	const new_world = make_world(world.score + 20, world.lines.map((l: A.Line) => drawLine(l)), drawActor(world.poulet, world.poulet.location.x, world.poulet.location.y), world.arrayProj.map((p:A.Actor) => drawActor(p, p.location.x, p.location.y)));
-	screenBuffer.draw({ delta: true });
-	return new_world;
+    function update_world(world: World): World {
+        const new_world = make_world(world.score, world.lines.map((l: A.Line) => drawLine(l)), drawActor(world.poulet, world.poulet.location.x, world.poulet.location.y), world.arrayProj.map((p: A.Actor) => drawActor(p, p.location.x, p.location.y)));
+        screenBuffer.draw({ delta: true });
+        return new_world;
     }
 
     term.grabInput(true);
@@ -138,18 +138,18 @@ function run() {
         return l;
     }
 
-    function get_current_world(): World{
-	return world_buffer[world_buffer_size - 1];
+    function get_current_world(): World {
+        return world_buffer[world_buffer_size - 1];
     }
 
-    function go_back_in_time(){
-	stop = true;
-	world_buffer[world_buffer_size - 1] = world_buffer[0];
-	world_buffer[world_buffer_size - 1] = update_world(world_buffer[world_buffer_size - 1]);
-	stop = false;
+    function go_back_in_time() {
+        stop = true;
+        world_buffer[world_buffer_size - 1] = world_buffer[0];
+        world_buffer[world_buffer_size - 1] = update_world(world_buffer[world_buffer_size - 1]);
+        stop = false;
     }
 
-    const world_buffer_size:number = 10;
+    const world_buffer_size: number = 10;
 
     const lines: A.Line[] = new Array(nb_line).fill(null).map((_, i: number) => A.init_line(line_length, i, true, nb_line));
 
@@ -159,13 +159,13 @@ function run() {
     };
     const poulet: A.Actor = A.make_actor(posInit, A.Name.Chicken);
 
-    const arrayProj:A.Actor[] = new Array;
+    const arrayProj: A.Actor[] = new Array;
 
-    let  world_buffer: World[] = new Array(world_buffer_size).fill(make_world(0, lines, poulet, arrayProj));
+    let world_buffer: World[] = new Array(world_buffer_size).fill(make_world(0, lines, poulet, arrayProj));
     world_buffer[world_buffer_size - 1] = make_world(0, lines, poulet, arrayProj);
 
     let nbProj = 10;
-        
+
     let accTick = 0;
     let accUpdate = 0;
     let accCollide = 0;
@@ -173,48 +173,48 @@ function run() {
     let accLog = 0;
 
     const mainInterval = setInterval(() => {
-	stop = true;
-	const current_world = get_current_world();
-	if (accTick > TICK_RATE){
+        stop = true;
+        const current_world = get_current_world();
+        if (accTick > TICK_RATE) {
             accTick = 0;
             if (nbProj < 10)
                 nbProj++;
-            screenBuffer.put({ x: (frameY + mapHeight)*3, y: mapWidth / 3, attr: { color: "white", bgcolor: "black"} }, "IL VOUS RESTE "+nbProj+" PROJECTILS.");
+            screenBuffer.put({ x: (frameY + mapHeight) * 3, y: mapWidth / 3, attr: { color: "white", bgcolor: "black" } }, "IL VOUS RESTE " + nbProj + " PROJECTILS.");
             const new_world = tick_world(current_world);
             world_buffer.shift();
-            world_buffer[world_buffer_size - 1] = new_world;    
-	}
-	if (accUpdate > UPDATE_RATE){
+            world_buffer[world_buffer_size - 1] = new_world;
+        }
+        if (accUpdate > UPDATE_RATE) {
             const update_current_world = get_current_world();
             accUpdate = 0;
-            world_buffer[world_buffer_size - 1] = update_world(make_world(update_current_world.score, update_current_world.lines, update_current_world.poulet, update_current_world.arrayProj.map((proj:A.Actor) => {
-            proj.mailbox.push({ "key": "move", "params": [A.up]});
+            world_buffer[world_buffer_size - 1] = update_world(make_world(update_current_world.score, update_current_world.lines, update_current_world.poulet, update_current_world.arrayProj.map((proj: A.Actor) => {
+                proj.mailbox.push({ "key": "move", "params": [A.up] });
                 return proj.update(proj);
-            }).filter((proj:A.Actor) => proj.location.y > 1)));
-	}
-	if (accCollide > COLLIDE_CHECK_RATE){
+            }).filter((proj: A.Actor) => proj.location.y > 1)));
+        }
+        if (accCollide > COLLIDE_CHECK_RATE) {
             const collide_world = get_current_world();
             accCollide = 0;
             if (checkCollision()) {
                 gameOver();
             }
             world_buffer[world_buffer_size - 1] = collisionProj(collide_world);
-	}
-	if (accLog > LOG_RATE){
+        }
+        if (accLog > LOG_RATE) {
             accLog = 0;
             log_move(get_current_world());
-	}
-	if (accCar > CAR_RATE){
+        }
+        if (accCar > CAR_RATE) {
             accCar = 0;
             car_move(get_current_world());
-	}
-	screenBuffer.put({ x: frameY + mapHeight, y: mapWidth / 3, attr: {color: "white", bgcolor: "black" }},"SCORE : " + get_current_world().score);
-	stop = false;
-	accTick += FRAME_RATE;
-	accUpdate += FRAME_RATE;
-	accCollide += FRAME_RATE;
-	accCar += FRAME_RATE;
-	accLog += FRAME_RATE;
+        }
+        screenBuffer.put({ x: frameY + mapHeight, y: mapWidth / 3, attr: { color: "white", bgcolor: "black" } }, "SCORE : " + get_current_world().score);
+        stop = false;
+        accTick += FRAME_RATE;
+        accUpdate += FRAME_RATE;
+        accCollide += FRAME_RATE;
+        accCar += FRAME_RATE;
+        accLog += FRAME_RATE;
     }, FRAME_RATE);
 
     function drawActor(a: A.Actor, x: number, y: number): A.Actor {
@@ -231,7 +231,7 @@ function run() {
         else if ([A.Name.Log_R, A.Name.Log_L].includes(a.name)) attr.bgColor = 94 as any;
         else if ([A.Name.Car_R, A.Name.Car_L].includes(a.name)) attr.bgColor = 'grey';
         else if (a.name === A.Name.Chicken) char = '🐔';
-        else if (a.name === A.Name.Projectile) char='🔥';
+        else if (a.name === A.Name.Projectile) char = '🔥';
 
         screenBuffer.put({ x: screenX, y: screenY, attr }, char);
         return a.update(a);
@@ -251,8 +251,8 @@ function run() {
         return null; // aucune voiture trouvée
     }
 
-    function car_move(current_world:World){
-	const roads = current_world.lines.filter((l) => l.type === A.LineType.Road);
+    function car_move(current_world: World) {
+        const roads = current_world.lines.filter((l) => l.type === A.LineType.Road);
         roads.map((r) => {
             const l = r.data.length;
             if (getDirection(r.data) === 'left') {
@@ -280,8 +280,8 @@ function run() {
         });
     }
 
-    function log_move(current_world:World){
-	const rivers = current_world.lines.filter((l) => l.type === 3);
+    function log_move(current_world: World) {
+        const rivers = current_world.lines.filter((l) => l.type === 3);
         rivers.map((r) => {
             r.data.forEach((a) => {
                 const realY_log = nb_line - r.ordinate + 1;
@@ -291,7 +291,7 @@ function run() {
                     current_world.poulet.mailbox.push({ "key": "move", "params": [A.left] });
 
             });
-            
+
             const l = r.data.length;
             if (getDirection(r.data) === 'left') {
                 r.data = r.data.slice(1);
@@ -318,9 +318,9 @@ function run() {
         });
     }
 
-    function isCollision(a: A.Actor, b:A.Actor): boolean {
+    function isCollision(a: A.Actor, b: A.Actor): boolean {
         // Trouver la ligne contenant l'acteur
-        const actorLine = get_current_world().lines.find((line:A.Line) =>
+        const actorLine = get_current_world().lines.find((line: A.Line) =>
             line.data.includes(a)
         );
 
@@ -346,38 +346,38 @@ function run() {
     }
 
     function checkCollision(): boolean {
-        return get_current_world().lines.some((line:A.Line) =>
-            line.data.some((actor:A.Actor) => isCollision(actor, get_current_world().poulet))
+        return get_current_world().lines.some((line: A.Line) =>
+            line.data.some((actor: A.Actor) => isCollision(actor, get_current_world().poulet))
         );
     }
 
-    function collisionProj(current_world:World):World{
-	return make_world(current_world.score, current_world.lines, current_world.poulet, current_world.arrayProj.filter((proj:A.Actor) => {
-            const actorLine = current_world.lines.find((line:A.Line) =>
+    function collisionProj(current_world: World): World {
+        return make_world(current_world.score, current_world.lines, current_world.poulet, current_world.arrayProj.filter((proj: A.Actor) => {
+            const actorLine = current_world.lines.find((line: A.Line) =>
                 line.data.some(actor => {
                     return (
                         actor.name && actor.name !== A.Name.Chicken && // Exclure le poulet
-                            Math.abs(actor.location.x - proj.location.x) <= 2 &&
-                            nb_line - line.ordinate + 1 === proj.location.y
+                        Math.abs(actor.location.x - proj.location.x) <= 2 &&
+                        nb_line - line.ordinate + 1 === proj.location.y
                     );
                 })
             );
             if (actorLine) {
                 const actorIndex = actorLine.data.findIndex(actor =>
-                    actor.name !== A.Name.Chicken && 
-			actor.name !== A.Name.Log_L &&
-			actor.name !== A.Name.Log_R &&
-			Math.abs(actor.location.x - proj.location.x) <= 2 &&
-			nb_line - actorLine.ordinate + 1 === proj.location.y
+                    actor.name !== A.Name.Chicken &&
+                    actor.name !== A.Name.Log_L &&
+                    actor.name !== A.Name.Log_R &&
+                    Math.abs(actor.location.x - proj.location.x) <= 2 &&
+                    nb_line - actorLine.ordinate + 1 === proj.location.y
                 );
-		
+
                 if (actorIndex !== -1) {
                     actorLine.data.splice(actorIndex, 1);
                     return false;
                 }
             }
             return true;
-	}));
+        }));
     }
 
     function gameOver() {
@@ -431,7 +431,7 @@ function run() {
 
     let maxPouletWorldY = getPouletWorldY(get_current_world());
 
-    function getPouletWorldY(current_world:World):number {
+    function getPouletWorldY(current_world: World): number {
         return progression + (nb_line - current_world.poulet.location.y);
     }
 
@@ -446,40 +446,40 @@ function run() {
         }
         if (name === 'e') {
             if (nbProj > 0) {
-                const locationProj:A.Position = {x:get_current_world().poulet.location.x,y:get_current_world().poulet.location.y-1};
-                get_current_world().arrayProj.push(A.make_actor(locationProj,A.Name.Projectile));
+                const locationProj: A.Position = { x: get_current_world().poulet.location.x, y: get_current_world().poulet.location.y - 1 };
+                get_current_world().arrayProj.push(A.make_actor(locationProj, A.Name.Projectile));
                 nbProj--;
-                screenBuffer.put({ x: (frameY + mapHeight)*3, y: mapWidth / 3, attr: { color: "white", bgcolor: "black"} }, "IL VOUS RESTE "+nbProj+" PROJECTILS.");
+                screenBuffer.put({ x: (frameY + mapHeight) * 3, y: mapWidth / 3, attr: { color: "white", bgcolor: "black" } }, "IL VOUS RESTE " + nbProj + " PROJECTILS.");
                 screenBuffer.draw();
             }
             else {
-                screenBuffer.put({ x: (frameY + mapHeight)*3, y: mapWidth / 3, attr: { color: "red", bgcolor: "black"} }, "      I NEED MORE BULLET.       ");
-                
+                screenBuffer.put({ x: (frameY + mapHeight) * 3, y: mapWidth / 3, attr: { color: "red", bgcolor: "black" } }, "      I NEED MORE BULLET.       ");
+
             }
         }
         else if (name === 'UP' && poulet.location.y > 2) {
             stop = true;
-            const current_world = get_current_world();            
+            const current_world = get_current_world();
             // Créer un nouveau poulet avec une mailbox mise à jour
             const updatedPoulet = {
                 ...current_world.poulet,
                 mailbox: [...current_world.poulet.mailbox, { "key": "move", "params": [A.up] }]
             };
-        
+
             // Calculer le nouveau score et la progression
             const worldY = getPouletWorldY(current_world);
             const scoreIncrement = worldY > maxPouletWorldY ? worldY - maxPouletWorldY : 0;
             const newMaxPouletWorldY = Math.max(maxPouletWorldY, worldY);
             const newProgression = updatedPoulet.location.y < nb_line / 2 ? progression + 1 : progression;
-        
+
             // Ajouter le mouvement vers le bas si nécessaire
-            const finalPoulet = updatedPoulet.location.y < nb_line / 2 && updatedPoulet.location.y < mapHeight - 2 
+            const finalPoulet = updatedPoulet.location.y < nb_line / 2 && updatedPoulet.location.y < mapHeight - 2
                 ? {
                     ...updatedPoulet,
                     mailbox: [...updatedPoulet.mailbox, { "key": "move", "params": [A.down] }]
-                  }
+                }
                 : updatedPoulet;
-        
+
             // Créer le nouveau monde
             const new_world = make_world(
                 current_world.score + scoreIncrement,
@@ -487,18 +487,18 @@ function run() {
                 finalPoulet.update(finalPoulet),
                 current_world.arrayProj
             );
-        
+
             // Mettre à jour le buffer de manière immutable dans la file en supprimant le premier
             const newBuffer = [
                 ...world_buffer.slice(1),
                 new_world
             ];
             world_buffer = newBuffer;
-            
+
             // Mettre à jour les variables globales de manière explicite
             maxPouletWorldY = newMaxPouletWorldY;
             progression = newProgression;
-        
+
             if (finalPoulet.location.y < nb_line / 2 && finalPoulet.location.y >= mapHeight - 2) {
                 gameOver();
             }
@@ -506,13 +506,13 @@ function run() {
         }
         else if (name === 'DOWN' && get_current_world().poulet.location.y < nb_line) {
             const current_world = get_current_world();
-            
+
             // Créer un nouveau poulet avec une mailbox mise à jour
             const updatedPoulet = {
                 ...current_world.poulet,
                 mailbox: [...current_world.poulet.mailbox, { "key": "move", "params": [A.down] }]
             };
-        
+
             // Créer le nouveau monde
             const new_world = make_world(
                 current_world.score,
@@ -520,7 +520,7 @@ function run() {
                 updatedPoulet.update(updatedPoulet),
                 current_world.arrayProj
             );
-        
+
             // Mettre à jour le buffer de manière immutable
             world_buffer = [
                 ...world_buffer.slice(1),
@@ -528,15 +528,15 @@ function run() {
             ];
         }
         else if (name === 'LEFT' && get_current_world().poulet.location.x > 0) {
-        
+
             const current_world = get_current_world();
-            
+
             // Créer un nouveau poulet avec une mailbox mise à jour
             const updatedPoulet = {
                 ...current_world.poulet,
                 mailbox: [...current_world.poulet.mailbox, { "key": "move", "params": [A.left] }]
             };
-        
+
             // Créer le nouveau monde
             const new_world = make_world(
                 current_world.score,
@@ -544,7 +544,7 @@ function run() {
                 updatedPoulet.update(updatedPoulet),
                 current_world.arrayProj
             );
-        
+
             // Mettre à jour le buffer de manière immutable
             world_buffer = [
                 ...world_buffer.slice(1),
@@ -553,13 +553,13 @@ function run() {
         }
         else if (name === 'RIGHT' && get_current_world().poulet.location.x < line_length - 2) {
             const current_world = get_current_world();
-            
+
             // Créer un nouveau poulet avec une mailbox mise à jour
             const updatedPoulet = {
                 ...current_world.poulet,
                 mailbox: [...current_world.poulet.mailbox, { "key": "move", "params": [A.right] }]
             };
-        
+
             // Créer le nouveau monde
             const new_world = make_world(
                 current_world.score,
@@ -567,18 +567,18 @@ function run() {
                 updatedPoulet.update(updatedPoulet),
                 current_world.arrayProj
             );
-        
+
             // Mettre à jour le buffer de manière immutable
             world_buffer = [
                 ...world_buffer.slice(1),
                 new_world
             ];
         }
-        else if (name === 'r'){
+        else if (name === 'r') {
             screenBuffer.put({ x: titleX, y: titleY - 1, attr: { color: "white", bgcolor: "black", bold: true } }, "Back in time ! ");
             if (!stop)
-		go_back_in_time();
-	}
+                go_back_in_time();
+        }
     });
 }
 run();
