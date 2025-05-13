@@ -244,7 +244,30 @@ Notre affichage graphique fait apparaitre chaque acteurs sur un plateau encadré
 \subsection*{Affichage désynchronisé avec le jeu}
 
 \subsection*{Problème de synchronisation dans la boucle de jeu}
+Dans une version précédente du projet, la boucle de jeu était représentée par de multiples sous-boucles qui modifiaient les données à des fréquences différentes. Certaines modifications pouvant prendre plus de temps que d'autres, le version du monde actuel n'était pas partagée entre toutes les boucles. La désynchronisation du monde actuel provoquait alors des problèmes de fiabilité des intéractions, notament pour le traitement des messages des acteurs.\\
+La solution trouvée a été de regrouper toutes les boucles en une seule. Comme exposé précédemment, la gestion des différentes fréquances passe par des accumulateurs qui sont réinitialisés à un rythme spécifique.
+\begin{figure}[h]
+  \centering
+  \begin{tabular}{|c|c|c|}
+    \hline
+    Objectif & Nom de l'accumulateur &  Fréquence (ms) \\
+    \hline
+    Défilement du jeu & \textit{accTick} & 1000 \\
+    \hline
+    Mise à jour des acteurs & \textit{accUpdate} & 50 \\
+    \hline
+    Vérification des collisions & \textit{accCollide} & 20 \\
+    \hline
+    Déplacement des voitures & \textit{accCar} & 200 \\
+    \hline
+    Déplacement des bûches & \textit{accLog} & 400 \\
+    \hline
+    \end{tabular}
+  \caption{Tableau des accumulateurs}
+  \label{fig:acc_tab}
+\end{figure}
 
+Le figure \ref{fig:acc_tab} montre les différentes fréquences des sous-boucles de jeu. Les accumulateurs associés sont incrémentés de une unité de temps (~17 ms) à chaque boucle de jeu. Lorsqu'ils atteignent la valeur de leur fréquence, ils sont réinitialisés à 0. De cette manière, chaque action ne s'effectue que si son accumulateur associé dépasse la fréquence. Cela est équivalent à effectuer l'action à cette même fréquence. 
 \subsection*{Efficacité des projectiles}
 
 
