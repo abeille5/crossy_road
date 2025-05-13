@@ -7,8 +7,19 @@ import * as A from './actor.js';
 
 const term = terminalKit.terminal;
 
-const title = "CROSSY ROAD";
 
+const titleArt = [
+    "╔═══════════════════════════════════════════════════════════════════════════════════════════╗",
+    "║                                                                                           ║",
+    "║   ██████╗██████╗  ██████╗ ███████╗███████╗██╗   ██╗    ██████╗  ██████╗  █████╗ ██████╗   ║",
+    "║   ██╔═══╝██╔══██╗██╔═══██╗██╔════╝██╔════╝╚██╗ ██╔╝    ██╔══██╗██╔═══██╗██╔══██╗██╔══██╗  ║",
+    "║   ██║    ██████╔╝██║   ██║███████╗███████╗ ╚████╔╝     ██████╔╝██║   ██║███████║██║  ██║  ║",
+    "║   ██║    ██╔══██╗██║   ██║╚════██║╚════██║  ╚██╔╝      ██╔══██╗██║   ██║██╔══██║██║  ██║  ║",
+    "║   ██████╗██║  ██║╚██████╔╝███████║███████║   ██║       ██║  ██║╚██████╔╝██║  ██║██████╔╝  ║",
+    "║   ╚═════╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚══════╝   ╚═╝       ╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝╚═════╝   ║",
+    "║                                                                                           ║",
+    "╚═══════════════════════════════════════════════════════════════════════════════════════════╝"
+];
 const FRAME_RATE = 1000 / 60;
 const UPDATE_RATE = 50;
 const TICK_RATE = 1000;
@@ -48,14 +59,24 @@ function run() {
         process.exit(1);
     }
 
-    const titleX = Math.floor((screenWidth - title.length) / 2);
-    const titleY = 6;
-    screenBuffer.put({ x: titleX, y: titleY, attr: { color: "white", bgcolor: "black", bold: true } }, title);
+    const titleStartX = Math.floor((screenWidth - titleArt[0].length) / 2);
+    const titleStartY = 1;
+    titleArt.forEach((line, index) => {
+        screenBuffer.put({ 
+            x: titleStartX, 
+            y: titleStartY + index, 
+            attr: { 
+                color: "white", 
+                bgcolor: "black",
+                bold: true 
+            }
+        }, line);
+    });
 
     const mapWidth = Math.floor(screenWidth / 1.5);
     const mapHeight = Math.floor(screenHeight / 1.5);
     const frameX = Math.floor((screenWidth - mapWidth) / 2);
-    const frameY = titleY + 2;
+    const frameY = titleStartY + titleArt.length;
     const line_length: number = mapWidth - 2;
     const nb_line: number = mapHeight - 2;
     let progression = 0;
@@ -64,8 +85,8 @@ function run() {
 
     //variable pour la barre de projectile
     const barreTaille = 10;
-    const barreX = (frameY + mapHeight)*3 + 30;
-    const barreY = mapWidth / 3;
+    const barreX = (frameY + mapHeight)*3;
+    const barreY = (mapWidth / 3) + 3;
 
 
     function drawFrame() {
@@ -187,7 +208,7 @@ function run() {
         const ProjectileTXT = nbProj > 1 ? " PROJECTILES." : " PROJECTILE. ";
         screenBuffer.put({ 
             x: (frameY + mapHeight)*3, 
-            y: mapWidth / 3, 
+            y: (mapWidth / 3)+2, 
             attr: { color: "white", bgcolor: "black"}
         }, "IL VOUS RESTE "+nbProj+ProjectileTXT);
         
@@ -235,7 +256,7 @@ function run() {
             accCar = 0;
             car_move(get_current_world());
         }
-        screenBuffer.put({ x: frameY + mapHeight, y: mapWidth / 3, attr: { color: "white", bgcolor: "black" } }, "SCORE : " + score);
+        screenBuffer.put({ x: frameY + mapHeight, y: (mapWidth / 3)+2, attr: { color: "white", bgcolor: "black" } }, "SCORE : " + score);
         stop = false;
         accTick += FRAME_RATE;
         accUpdate += FRAME_RATE;
@@ -504,7 +525,7 @@ function run() {
                 const ProjectileTXT = nbProj > 1 ? " PROJECTILES." : " PROJECTILE. ";
                 screenBuffer.put({ 
                     x: (frameY + mapHeight)*3, 
-                    y: mapWidth / 3, 
+                    y: (mapWidth / 3)+2, 
                     attr: { color: "white", bgcolor: "black"}
                 }, "IL VOUS RESTE "+nbProj+ProjectileTXT);
 
@@ -528,7 +549,7 @@ function run() {
                 screenBuffer.draw();
             }
             else {
-                screenBuffer.put({ x: (frameY + mapHeight) * 3, y: mapWidth / 3, attr: { color: "red", bgcolor: "black" } }, "      I NEED MORE BULLET.       ");
+                screenBuffer.put({ x: (frameY + mapHeight) * 3, y: (mapWidth / 3)+1, attr: { color: "red", bgcolor: "black" } }, "      I NEED MORE BULLET.       ");
 
             }
         }
@@ -659,7 +680,7 @@ function run() {
             ];
         }
         else if (name === 'r') {
-            screenBuffer.put({ x: titleX, y: titleY - 1, attr: { color: "white", bgcolor: "black", bold: true } }, "Back in time ! ");
+            screenBuffer.put({ x: titleStartX, y: titleStartY - 1, attr: { color: "white", bgcolor: "black", bold: true } }, "Back in time ! ");
             if (!stop)
                 go_back_in_time();
         }
