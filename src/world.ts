@@ -17,10 +17,10 @@ const TICK_RATE = 1000;
 const COLLIDE_CHECK_RATE = 20;
 const CAR_RATE = 200;
 const LOG_RATE = 400;
+let score = 0;
 
 
 type World = {
-    score: number;
     lines: A.Line[];
     poulet: A.Actor;
     level: number;
@@ -98,9 +98,8 @@ function run() {
 
     drawFrame();
 
-    function make_world(score: number, actors: A.Line[], poulet: A.Actor, arrayProj: A.Actor[]): World {
+    function make_world(actors: A.Line[], poulet: A.Actor, arrayProj: A.Actor[]): World {
         const world: World = {
-            score: score,
             lines: actors,
             poulet: poulet,
             level: 1,
@@ -110,17 +109,18 @@ function run() {
     }
 
     function tick_world(world: World): World {
+        progression++;
         if (world.poulet.location.y < mapHeight - 2) {
             world.poulet.mailbox.push({ "key": "move", "params": [A.down] });
         }
         else {
             gameOver();
         }
-        return make_world(world.score, world.lines.map((l: A.Line) => tickLine(l)), world.poulet.update(world.poulet), world.arrayProj);
+        return make_world(world.lines.map((l: A.Line) => tickLine(l)), world.poulet.update(world.poulet), world.arrayProj);
     }
 
     function update_world(world: World): World {
-        const new_world = make_world(world.score, world.lines.map((l: A.Line) => drawLine(l)), drawActor(world.poulet, world.poulet.location.x, world.poulet.location.y), world.arrayProj.map((p: A.Actor) => drawActor(p, p.location.x, p.location.y)));
+        const new_world = make_world(world.lines.map((l: A.Line) => drawLine(l)), drawActor(world.poulet, world.poulet.location.x, world.poulet.location.y), world.arrayProj.map((p: A.Actor) => drawActor(p, p.location.x, p.location.y)));
         screenBuffer.draw({ delta: true });
         return new_world;
     }
@@ -161,8 +161,8 @@ function run() {
 
     const arrayProj: A.Actor[] = new Array;
 
-    let world_buffer: World[] = new Array(world_buffer_size).fill(make_world(0, lines, poulet, arrayProj));
-    world_buffer[world_buffer_size - 1] = make_world(0, lines, poulet, arrayProj);
+    let world_buffer: World[] = new Array(world_buffer_size).fill(make_world(lines, poulet, arrayProj));
+    world_buffer[world_buffer_size - 1] = make_world(lines, poulet, arrayProj);
 
     let nbProj = 10;
 
@@ -179,7 +179,7 @@ function run() {
             accTick = 0;
             if (nbProj < 10)
                 nbProj++;
-            screenBuffer.put({ x: (frameY + mapHeight) * 3, y: mapWidth / 3, attr: { color: "white", bgcolor: "black" } }, "IL VOUS RESTE " + nbProj + " PROJECTILS.");
+            screenBuffer.put({ x: (frameY + mapHeight) * 3, y: mapWidth / 3, attr: { color: "white", bgcolor: "black" } }, "IL VOUS RESTE " + nbProj + " PROJECTILES");
             const new_world = tick_world(current_world);
             world_buffer.shift();
             world_buffer[world_buffer_size - 1] = new_world;
@@ -187,7 +187,7 @@ function run() {
         if (accUpdate > UPDATE_RATE) {
             const update_current_world = get_current_world();
             accUpdate = 0;
-            world_buffer[world_buffer_size - 1] = update_world(make_world(update_current_world.score, update_current_world.lines, update_current_world.poulet, update_current_world.arrayProj.map((proj: A.Actor) => {
+            world_buffer[world_buffer_size - 1] = update_world(make_world(update_current_world.lines, update_current_world.poulet, update_current_world.arrayProj.map((proj: A.Actor) => {
                 proj.mailbox.push({ "key": "move", "params": [A.up] });
                 return proj.update(proj);
             }).filter((proj: A.Actor) => proj.location.y > 1)));
@@ -208,7 +208,7 @@ function run() {
             accCar = 0;
             car_move(get_current_world());
         }
-        screenBuffer.put({ x: frameY + mapHeight, y: mapWidth / 3, attr: { color: "white", bgcolor: "black" } }, "SCORE : " + get_current_world().score);
+        screenBuffer.put({ x: frameY + mapHeight, y: mapWidth / 3, attr: { color: "white", bgcolor: "black" } }, "SCORE : " + score);
         stop = false;
         accTick += FRAME_RATE;
         accUpdate += FRAME_RATE;
@@ -352,7 +352,7 @@ function run() {
     }
 
     function collisionProj(current_world: World): World {
-        return make_world(current_world.score, current_world.lines, current_world.poulet, current_world.arrayProj.filter((proj: A.Actor) => {
+        return make_world(current_world.lines, current_world.poulet, current_world.arrayProj.filter((proj: A.Actor) => {
             const actorLine = current_world.lines.find((line: A.Line) =>
                 line.data.some(actor => {
                     return (
@@ -457,46 +457,58 @@ function run() {
 
             }
         }
-        else if (name === 'UP' && poulet.location.y > 2) {
+        else if (name === 'UP' && get_current_world().poulet.location.y > 2) {
             stop = true;
             const current_world = get_current_world();
-            // Créer un nouveau poulet avec une mailbox mise à jour
-            const updatedPoulet = {
+
+            // Appliquer le mouvement vers le haut
+            let updatedPoulet = {
                 ...current_world.poulet,
                 mailbox: [...current_world.poulet.mailbox, { "key": "move", "params": [A.up] }]
             };
 
-            // Calculer le nouveau score et la progression
-            const worldY = getPouletWorldY(current_world);
-            const scoreIncrement = worldY > maxPouletWorldY ? worldY - maxPouletWorldY : 0;
-            const newMaxPouletWorldY = Math.max(maxPouletWorldY, worldY);
-            const newProgression = updatedPoulet.location.y < nb_line / 2 ? progression + 1 : progression;
+            let newProgression = progression;
+            let newLines = current_world.lines;
 
-            // Ajouter le mouvement vers le bas si nécessaire
-            const finalPoulet = updatedPoulet.location.y < nb_line / 2 && updatedPoulet.location.y < mapHeight - 2
-                ? {
-                    ...updatedPoulet,
-                    mailbox: [...updatedPoulet.mailbox, { "key": "move", "params": [A.down] }]
+            // Si on doit avancer les lignes (poulet dans la moitié haute)
+            if (updatedPoulet.location.y < nb_line / 2) {
+                newLines = newLines.map((l: A.Line) => tickLine(l));
+                newProgression++;
+                // Mouvement vers le bas automatique si pas tout en haut
+                if (updatedPoulet.location.y < mapHeight - 2) {
+                    updatedPoulet = {
+                        ...updatedPoulet,
+                        mailbox: [...updatedPoulet.mailbox, { "key": "move", "params": [A.down] }]
+                    };
                 }
-                : updatedPoulet;
+            }
+
+            // Mettre à jour le poulet (après tous les mouvements)
+            const finalPoulet = updatedPoulet.update(updatedPoulet);
+
+            // Calculer le nouveau score et progression APRÈS déplacement
+            const worldY = newProgression + (nb_line - finalPoulet.location.y);
+            let scoreIncrement = 0;
+            if (worldY > maxPouletWorldY) {
+                scoreIncrement = worldY - maxPouletWorldY;
+                maxPouletWorldY = worldY;
+                score += scoreIncrement;
+            }
 
             // Créer le nouveau monde
             const new_world = make_world(
-                current_world.score + scoreIncrement,
-                updatedPoulet.location.y < nb_line / 2 && updatedPoulet.location.y < mapHeight - 2 ? current_world.lines.map((l: A.Line) => tickLine(l)) : current_world.lines,
-                finalPoulet.update(finalPoulet),
+                newLines,
+                finalPoulet,
                 current_world.arrayProj
             );
 
-            // Mettre à jour le buffer de manière immutable dans la file en supprimant le premier
-            const newBuffer = [
+            // Mettre à jour le buffer
+            world_buffer = [
                 ...world_buffer.slice(1),
                 new_world
             ];
-            world_buffer = newBuffer;
 
-            // Mettre à jour les variables globales de manière explicite
-            maxPouletWorldY = newMaxPouletWorldY;
+            // Mettre à jour les variables globales
             progression = newProgression;
 
             if (finalPoulet.location.y < nb_line / 2 && finalPoulet.location.y >= mapHeight - 2) {
@@ -515,7 +527,6 @@ function run() {
 
             // Créer le nouveau monde
             const new_world = make_world(
-                current_world.score,
                 current_world.lines,
                 updatedPoulet.update(updatedPoulet),
                 current_world.arrayProj
@@ -539,7 +550,6 @@ function run() {
 
             // Créer le nouveau monde
             const new_world = make_world(
-                current_world.score,
                 current_world.lines,
                 updatedPoulet.update(updatedPoulet),
                 current_world.arrayProj
@@ -562,7 +572,6 @@ function run() {
 
             // Créer le nouveau monde
             const new_world = make_world(
-                current_world.score,
                 current_world.lines,
                 updatedPoulet.update(updatedPoulet),
                 current_world.arrayProj
