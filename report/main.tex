@@ -97,7 +97,7 @@ Les messages échangés par les acteurs sont typés par une structure composé d
 
 Le modèle repose sur la mise à jour successive et répétée des acteurs: quand l'un d'eux reçoit un \textbf{"tick"}, il ne modifie pas vraiment sont propre état, à la place, il crée une nouvelle version de lui-même en fonction des messages/instructions reçues.\\
 
-Le fonctionnement du jeu est dirigé par un \textbf{runtime} comportant une boucle d'exécution (\texttt{setinterval}). Les actions répétitives des acteurs et les ticks du jeu sont déclenchés par cette boucle à des intervales réguliers, qui peuvent différés selon le type d'acteur concerné.\\
+Le fonctionnement du jeu est dirigé par un \textbf{runtime} comportant une boucle d'exécution (\texttt{setinterval}). Les actions répétitives des acteurs et les ticks du jeu sont déclenchés par cette boucle à des intervales réguliers, qui peuvent différés selon le type d'acteur concerné. L'utilisation de \textit{setinterval} permet de commander la fréquence des actions à effectuer. Une unique boucle de jeu autorise des fréquences différentes en utilisant des accumulateurs qui se réinitialisent au bout d'un certain nombre de période.\\
 
 Le monde contenant tout les acteurs est également sauvegarder régulièrement. Les versions du mondes sont enregistrées dans une file qui permet alors le \textbf{retour en arrière}. Le monde actuel correspond au dernièr élément de la file, ainsi afin de revenir en arrière, il faut replacer cet élément par un élément placé précédemment dans la file, ce qui permet de revenir dans un état antérieur du jeu. \\
 
@@ -162,8 +162,9 @@ Les données du jeu peuvent changer plus fréquemment que les ticks. La mise à 
 La gestion des collisions contient 2 parties distinctes :
 \begin{enumerate}
 \item Collisions avec le poulet : elles sont vérifiées par la fonction \textit{checkCollision} qui, en cas de collision avec un acteur, provoque la mort du poulet, comme dit précédemment.
-  \item Collisions entre une boule de feu et un acteur : lors d'une collision entre une boule de feu et un acteur, le monde actuel est réactualisé pour prendre en compte cette collision. De la même manière que pour le défilement de terrain, le nouveau monde est enfilé dans la file des mondes pour mettre à jour les données. Dans ce nouveau monde, on élimine le boule de feu concernée
-  \end{enumerate}
+  \item Collisions entre une boule de feu et un acteur : lors d'une collision entre une boule de feu et un acteur, le monde actuel est réactualisé pour prendre en compte cette collision. De la même manière que pour le défilement de terrain, le nouveau monde est enfilé dans la file des mondes pour mettre à jour les données. Dans ce nouveau monde, on élimine le boule de feu concernée et l'acteur touché est remplacé par un acteur vide, qui ne sera plus affiché par la suite.
+\end{enumerate}
+Enfin, les bûches et les voitures se déplacent à des vitesses spécifiques. Ces déplacements sont envoyés par message à chaque acteurs par les fonctions \textit{log\_move} et \textit{car\_move}. Ainis, à la prochaine mise à jour des acteurs, ces messages seront traités et appliqués à chaque acteur.
 
 \section{Implémentation technique}
 
