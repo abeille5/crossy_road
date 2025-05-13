@@ -27,4 +27,10 @@ clean:
 	@rm -f *~ src/*~ src/*.js test/*~ html/*~
 	@rm -rf dist/*
 
-.PHONY: all archive build clean eslint parcel test run watch
+rapport:
+	pdflatex report/main.tex
+	pdflatex report/main.tex
+	mv main.* report/
+	evince report/main.pdf&
+
+.PHONY: all archive build clean eslint parcel test run watch rapport

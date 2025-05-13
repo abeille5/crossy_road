@@ -11,7 +11,7 @@
 \usepackage{geometry}
 \geometry{margin=2.5cm}
 
-\title{\textbf{Acting Shooting Star : Notre version de Crossy Road basé sur le modèle des acteurs}}
+\title{\textbf{Acting Shooting Star : Notre version de Crossy Road basé sur le modèle acteurs}}
 \author{Enzo Picarel, Raphaël Bely, Arno Donias, Thibault Abeille\\ 
 Encadrants : Vincent Alba, David Renault \\ ENSEIRB-MATMECA – 2025}
 \date{\today}
@@ -49,17 +49,17 @@ Encadrants : Vincent Alba, David Renault \\ ENSEIRB-MATMECA – 2025}
 
 \section{Introduction}
 
-Dans le cadre de notre projet de programmation en JavaScript, nous avons fait le choix de créer notre propre version du jeu Crossy Road. C'est un jeu mobile populaire auquel on a joué durant notre enfance. Ce fut un choix naturel. En effet, son aspect ludique et familier permet une certaine simplicité d'implémentation qui permet de satisfaire les exigences pour un premier projet dans ce langage. Nous verrons par la suite, que, grâce à notre imagination, nous n'avons pas été restreints par la simplicité du jeu.\\
+Dans le cadre de notre projet de programmation en JavaScript, nous avons fait le choix de créer notre propre version du jeu Crossy Road. C'est un jeu mobile populaire auquel nous avons joué durant notre enfance. Ce fut un choix naturel. En effet, son aspect ludique et familier permet une certaine simplicité d'implémentation qui permet de satisfaire les exigences pour un premier projet dans ce langage. Nous verrons par la suite, que, grâce à notre imagination, nous n'avons pas été restreints par la simplicité du jeu.\\
 
-Le projet est axé principalement sur la conception d'un moteur de jeu basé sur un modèle fonctionnant par interaction des objets définis en tant qu'"acteur". Ces acteurs (qui vont du poulet à la bûche en passant par les voitures) sont indépendants les uns des autres. Chaque acteur devait être capable de recevoir des informations sous forme de messages, puis de traiter ces messages et enfin de réagir en fonction. Pendant l'implémentation, nous avons fait particulièrement attention à avoir un code avec une pureté fonctionnelle maximale, en évitant les effets de bord et en respectant les principes de la programmation fonctionnelle autant que possible.\\
+Le projet est axé principalement sur la conception d'un moteur de jeu basé sur un modèle fonctionnant par interaction des objets définis en tant qu'"acteur". Ces acteurs (qui vont du poulet à la bûche en passant par les voitures) sont indépendants les uns des autres. Chaque acteur doit être capable de recevoir des informations sous forme de messages, puis de traiter ces messages et enfin de réagir en fonction. Pendant l'implémentation, nous avons fait particulièrement attention à avoir un code avec une pureté fonctionnelle maximale, en évitant les effets de bord et en respectant les principes de la programmation fonctionnelle autant que possible.\\
 
-Le projet était cadré par des contraintes définies en relation avec le cours de programmation fonctionnelle et d'utilisation de \textit{Typescript}. Les exigences étaient les suivantes :
+Ce projet est cadré par des contraintes définies en relation avec le cours PG104 (programmation fonctionnelle) et d'utilisation du langage \textit{Typescript}. Les exigences sont les suivantes :
 \begin{itemize}
 	\item affichage dans le terminal même à l'aide de \textit{terminal-kit}
 	\item code validé grâce à l'utilisation d'\textit{ESLint}
 	\item tests unitaires avec \textit{Jest}
 	\item développement collaboratif avec un dépôt git
-	\item code structuré selon les consignes 
+	\item code structuré selon les consignes (dossier: src, test, dist et fichiers de configuration: *.config.*)
 \end{itemize}
 
 Durant ce rapport nous aborderons plusieurs thèmes principaux du développement comme la conception des acteurs, l'architecture du jeu, son implémentation, ainsi qu'un retour sur expérience contenant les difficultés rencontrées et nos apprentissages durant le projet.
