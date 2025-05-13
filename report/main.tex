@@ -93,7 +93,9 @@ L'architecture complète du jeu est basée entièrement sur un modèle comportan
   \item plusieurs fonctions génériques comme \textit{move, collide ou tick} communes à tous les acteurs de notre jeu ;
 \end{itemize}
 
-Les messages échangés par les acteurs sont typés par une structure composé d'un champ \texttt{type} (chaîne de caractères) et un champ \texttt{params} (tableau d'arguments). Ces messages permettent la transmission des différentes actions à effectuer, faisant réagir les acteurs de manière \textbf{autonome} et \textbf{indépendante} durant le déroulement du jeu.\\
+Les messages échangés par les acteurs sont typés par une structure composé d'un champ \texttt{type} (chaîne de caractères) et un champ \texttt{params} (tableau d'arguments). Ces messages permettent la transmission des différentes actions à effectuer, faisant réagir les acteurs de manière \textbf{autonome} et \textbf{indépendante} durant le déroulement du jeu. \\
+
+Ce principe est notamment utilisé pour les déplacements des acteurs. Les déplacements de l'acteur principal est lui engendré par la méthode \textit{Terminal-kit.terminal.grabInput(true)} qui permet la lecture des entrées claviers. Chaque entrée clavier traduit un déplacement via la création d'un nouveau monde introduisant un nouveau poulet ayant reçu un message de déplacement dans sa mailbox.\\ 
 
 Le modèle repose sur la mise à jour successive et répétée des acteurs: quand l'un d'eux reçoit un \textbf{"tick"}, il ne modifie pas vraiment sont propre état, à la place, il crée une nouvelle version de lui-même en fonction des messages/instructions reçues.\\
 
@@ -190,7 +192,7 @@ Afin de modéliser des niveaux de difficulté différents, nous avons joué sur 
 La progression du jeu se fait par un défilement automatique des lignes, mais le comportement du joueur influe sur ce défilement de deux manières différentes :
 \begin{itemize}
   \item[$\bullet$] si le joueur est à l'aise avec la difficulté actuelle du niveau, il ira plus vite que le défilement. Ainsi, il risque de sortir du jeu. Pour éviter cela, le rythme de défilement suit la cadence du joueur, l'empêchant d'aller plus haut que le milieu de l'écran ;
-  \item[$\bullet$] dans le cas contraire, le joueur est sous pression et doit rattraper son retard. Dans ce cas-là, on garde la vitesse de défilement automatique.
+  \item[$\bullet$] dans le cas contraire, le joueur est sous pression et doit rattraper son retard. Dans ce cas-là, la vitesse n'est ni plus ni moins que le défilement automatique.
 \end{itemize}
 
 \vspace{1em}
@@ -202,12 +204,15 @@ Cela permet de maintenir une tension permanente sur le joueur.
 Nous n'avons pas implémenté de système garantissant qu'un chemin praticable existe toujours. Premièrement, cette garantie n'est pas nécessaire, car le joueur a la capacité de tirer des projectiles permettant de détruire les obstacles. Ainsi, il peut facilement se tirer d'une impasse. Deuxièmement, ces impasses arrivent relativement rarement grâce à la génération aléatoire de lignes.
 
 
-\section{Affichage et interactions}
-\begin{itemize}
-  \item Affichage ASCII dans le terminal
-  \item Contraintes liées à \texttt{terminal-kit}
-  \item Possibilités d'interactions (touches clavier, etc.)
-\end{itemize}
+\section{Affichage}
+
+Comme spécifié dans l'introduction, l'une des contraintes est de manipuler la librairie \texttt{Terminal-Kit} afin d'afficher graphiquement le jeu. Cet outil étant pour nous parfaitement nouveau et la documentation peu fourni sur internet, nous avons mit un temps non négligeable avant de réussir à la prendre en main.\\
+
+
+Dans un premier temps nous nous sommes naturellement dirigés vers un affichage utilisant la méthode \textit{Termimal-Kit.terminal.moveTo}. Bien que cette approche initiale ait permis un affichage basique, nous nous sommes rapidement rendu compte que la méthode \textit{Termimal-Kit.terminal.ScreenBuffer.put} était bien plus adaptée à nos besoins car elle utilise une technique de double buffering qui permet d'éviter les scintillements à l'écran et offre un affichage plus fluide. Cette technique consiste à préparer l'affichage complet dans un buffer temporaire avant de l'afficher, ce qui évite les perturbations visuels que nous avions avec la méthode précédente.\\
+
+
+Notre affichage graphique fait apparaitre chaque acteurs sur un plateau encadré de blanc, chaque acteurs à sa propre chartre graphique. Un arbre est logiquement représenté par un carré de couleur vert, une voiture est quant à elle de couleur grise, un rondin de bois marron et l'eau en bleu clair. L'acteur principale, le poulet, est lui définit par un emoji poulet, et les projectiles par des emojis flammes.   
 
 \section{Difficultés rencontrées et solutions apportées}
 
