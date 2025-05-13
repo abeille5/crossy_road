@@ -23,7 +23,6 @@ let score = 0;
 type World = {
     lines: A.Line[];
     poulet: A.Actor;
-    level: number;
     arrayProj: A.Actor[];
 }
 
@@ -102,7 +101,6 @@ function run() {
         const world: World = {
             lines: actors,
             poulet: poulet,
-            level: 1,
             arrayProj: arrayProj,
         };
         return world;
@@ -351,8 +349,19 @@ function run() {
         );
     }
 
+    function set_line_data(l:A.Line, newData:A.Actor[]):A.Line {
+	const newLine:A.Line = {
+            ordinate: l.ordinate,
+            type: l.type,
+            data: newData,
+            pattern: l.pattern,
+            patternIndex: l.patternIndex
+        };
+        return newLine;
+    }
+    
     function collisionProj(current_world: World): World {
-        return make_world(current_world.lines, current_world.poulet, current_world.arrayProj.filter((proj: A.Actor) => {
+	const newProjArray = current_world.arrayProj.filter((proj: A.Actor) => {
             const actorLine = current_world.lines.find((line: A.Line) =>
                 line.data.some(actor => {
                     return (
@@ -363,21 +372,17 @@ function run() {
                 })
             );
             if (actorLine) {
-                const actorIndex = actorLine.data.findIndex(actor =>
-                    actor.name !== A.Name.Chicken &&
+                current_world.lines = current_world.lines.map((l:A.Line) => {return l.ordinate === actorLine.ordinate ? set_line_data(l, actorLine.data.map((actor:A.Actor) => {
+                    return (actor.name !== A.Name.Chicken &&
                     actor.name !== A.Name.Log_L &&
                     actor.name !== A.Name.Log_R &&
+                    actor.name !== A.Name.Empty &&
                     Math.abs(actor.location.x - proj.location.x) <= 2 &&
-                    nb_line - actorLine.ordinate + 1 === proj.location.y
-                );
-
-                if (actorIndex !== -1) {
-                    actorLine.data.splice(actorIndex, 1);
-                    return false;
-                }
+                    nb_line - actorLine.ordinate + 1 === proj.location.y) ? A.make_actor(actor.location, A.Name.Empty) : actor; })) : l;});
             }
             return true;
-        }));
+        });
+        return make_world(current_world.lines, current_world.poulet, newProjArray);
     }
 
     function gameOver() {

@@ -97,7 +97,7 @@ Les messages échangés par les acteurs sont typés par une structure composé d
 
 Le modèle repose sur la mise à jour successive et répétée des acteurs: quand l'un d'eux reçoit un \textbf{"tick"}, il ne modifie pas vraiment sont propre état, à la place, il crée une nouvelle version de lui-même en fonction des messages/instructions reçues.\\
 
-Le fonctionnement du jeu est dirigé par un \textbf{runtime} comportant plusieurs boucles d'exécution indépendantes (\texttt{setinterval}) en fonction des acteurs, telles que \texttt{intervalProj, tickInterval ou carInterval}. Ce sont elles qui déclenchent des tick à fréquences différentes selon l'acteur impacté. \\
+Le fonctionnement du jeu est dirigé par un \textbf{runtime} comportant une boucle d'exécution (\texttt{setinterval}). Les actions répétitives des acteurs et les ticks du jeu sont déclenchés par cette boucle à des intervales réguliers, qui peuvent différés selon le type d'acteur concerné.\\
 
 Le monde contenant tout les acteurs est également sauvegarder régulièrement. Les versions du mondes sont enregistrées dans une file qui permet alors le \textbf{retour en arrière}. Le monde actuel correspond au dernièr élément de la file, ainsi afin de revenir en arrière, il faut replacer cet élément par un élément placé précédemment dans la file, ce qui permet de revenir dans un état antérieur du jeu. \\
 
@@ -141,7 +141,29 @@ Le déplacement des acteurs dans le monde, régi par les fonctions \texttt{tick}
 
 Pour terminer ces explications du jeu, les collisions sont létales instantanément, ce qui permet de renforcer l'aspect punitif du jeu et de maintenir le joueur concentré.
 
-\subsection*{Gestion du jeu}  
+\subsection*{Gestion du jeu}
+
+Pour conserver une gestion pure des données, les mondes dans lesquels les acteurs évoluent sont des structures de données \texttt{World} stockées dans une file.\\
+La structure de donnée \texttt{World} contient certaines données utiles au déroulement du jeu :
+\begin{itemize}
+   \item \texttt{lines} : une file de lignes
+   \item \texttt{poulet} : le personnage principale du jeu, stocké indépendamment des autres acteurs et modifiable en fonction des actions du joueur
+   \item \texttt{arrayProj} : un tableau d'acteur projectile, qui peuvent être créé lorsque le joueur veut cracher une boule de feu
+\end{itemize}
+
+A chaque tick du jeu, plusieurs actions s'effectuent sur les acteurs, les lignes et les mondes. Elles se résument en 3 étapes : \\
+\begin{enumerate}
+\item Le terrain est décalé d'un cran vers le bas, pour faire défiler les éléments du jeu. Cela se manifeste par un défilement des lignes. Pour garantir la pureté du code, la ligne à défiler est remplacée par une ligne vierge, puis enfilée à la manière d'un convoyeur.
+\item Le poulet est déplacé vers le bas également. Ne faisant pas partie des autres acteurs, son déplacement se fait indépendamment.
+\item Le monde actuel est remplacé dans la file par son successeur. Ce monde est généré par la fonction \textit{make\_world} en héritant de la file de ligne, du poulet et des projectiles du monde actuel, auxquels est appliqué le défilement du terrain.
+\end{enumerate}
+
+Les données du jeu peuvent changer plus fréquemment que les ticks. La mise à jour des acteurs doit donc suivre ce rythme à côté de celui des ticks. A la différence du défilement à chaque tick, la mise à jour des acteurs ne provoquent pas de déplacement des lignes. Il s'agit simplement d'un parcours de tous les acteurs du jeu afin d'actiter leur fonction interne \textit{update}. Cette mise à jour concerne principalement le poulet dont les déplacements doivent suivre les commandes du joueur. Le fréquence de la mise à jour influe directement sur la réactivité du jeu et donc sur la précision des mouvements. Elle concerne également le déplacement des boules de feu qui évoluent dans le terrain plus rapidement que le défilement général.\\
+La gestion des collisions contient 2 parties distinctes :
+\begin{enumerate}
+\item Collisions avec le poulet : elles sont vérifiées par la fonction \textit{checkCollision} qui, en cas de collision avec un acteur, provoque la mort du poulet, comme dit précédemment.
+  \item Collisions entre une boule de feu et un acteur : lors d'une collision entre une boule de feu et un acteur, le monde actuel est réactualisé pour prendre en compte cette collision. De la même manière que pour le défilement de terrain, le nouveau monde est enfilé dans la file des mondes pour mettre à jour les données. Dans ce nouveau monde, on élimine le boule de feu concernée
+  \end{enumerate}
 
 \section{Implémentation technique}
 
