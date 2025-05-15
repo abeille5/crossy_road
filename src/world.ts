@@ -482,6 +482,7 @@ function run() {
                 screenBuffer.clear();
                 screenBuffer.draw();
                 term.removeAllListeners('key');
+                score = 0;
                 run();
             } else if (name === 'n' || name === 'q' || name === 'CTRL_C') {
                 screenBuffer.clear();
