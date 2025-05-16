@@ -103,7 +103,7 @@ Le fonctionnement du jeu est dirigé par un \textbf{runtime} comportant une bouc
 
 Le monde contenant tout les acteurs est également sauvegarder régulièrement. Les versions du mondes sont enregistrées dans une file qui permet alors le \textbf{retour en arrière}. Le monde actuel correspond au dernièr élément de la file, ainsi afin de revenir en arrière, il faut replacer cet élément par un élément placé précédemment dans la file, ce qui permet de revenir dans un état antérieur du jeu. \\
 
-Bien que ce modèle ait offert une approche intuitive et modulaire pour gérer les interactions entre les entités du jeu, il a également introduit une certaine \textbf{rigidité}. La recréation fréquente d’acteurs, imposée par la pureté fonctionnelle, a parfois généré des bugs graphiques et une complexité de gestion accrue. Néanmoins, cette architecture s’est révélée pertinente pour développer des comportements réactifs, évitant la prolifération de structures conditionnelles complexes. \\
+Bien que ce modèle ait offert une approche intuitive et modulaire pour gérer les interactions entre les entités du jeu, il a également introduit une certaine \textbf{rigidité}. La recréation fréquente d'acteurs, imposée par la pureté fonctionnelle, a parfois généré des bugs graphiques et une complexité de gestion accrue. Néanmoins, cette architecture s'est révélée pertinente pour développer des comportements réactifs, évitant la prolifération de structures conditionnelles complexes. \\
 
 \section{Architecture du jeu}
 
@@ -111,7 +111,7 @@ Bien que ce modèle ait offert une approche intuitive et modulaire pour gérer l
 
 La description du jeu repose sur la modélisation de tout ce que l'on voit par des acteurs. On en distingue plusieurs types :
 \begin{itemize}
-  \item[$\bullet$] \textbf{Chicken} : l’acteur principal contrôlé par le joueur ;
+  \item[$\bullet$] \textbf{Chicken} : l'acteur principal contrôlé par le joueur ;
   \item[$\bullet$] \textbf{Tree}, \textbf{Water\_L}, \textbf{Water\_R}, \textbf{Log\_L}, \textbf{Log\_R}, \textbf{Car\_L}, \textbf{Car\_R} : éléments dynamiques ou statiques constituant les obstacles ;
   \item[$\bullet$] \textbf{Projectile} : acteur créé par le joueur pour détruire certains obstacles ;
   \item[$\bullet$] \textbf{Empty} : utilisé pour représenter une cellule vide dans le monde.
@@ -178,7 +178,7 @@ Au niveau de l'organisation du projet, nous avons opté pour une structure clair
   \item \textbf{src/} : contient les fichiers source principaux :
   \begin{itemize}
     \item \texttt{actor.ts} : implémente les fonctions de création et de gestion des acteurs ;
-    \item \texttt{world.ts} : contient la logique de simulation du monde, les ticks, le moteur du jeu et l’affichage terminal.
+    \item \texttt{world.ts} : contient la logique de simulation du monde, les ticks, le moteur du jeu et l'affichage terminal.
   \end{itemize}
   \item \textbf{test/} : contient les tests unitaires, notamment \texttt{actor.test.ts} qui vérifie le bon fonctionnement des fonctions définies dans \texttt{actor.ts}.
   \item \textbf{dist/} : contient les fichiers JavaScript générés automatiquement à la compilation.
@@ -193,9 +193,9 @@ Durant notre projet, nous avons pu aborder plus profondément des outils vu en c
 	\item \texttt{Jest} nous a permis d'écrire et d'executer proprement les tests unitaires
 	\item \texttt{terminal-kit} nous a permis d'avoir un affichage propre à l'intérieur même du terminal
 \end{itemize}
-Le fichier principal d’exécution est \texttt{world.ts}, qui gère l’ensemble de la boucle de jeu.
+Le fichier principal d'exécution est \texttt{world.ts}, qui gère l'ensemble de la boucle de jeu.
 
-Le jeu est entièrement jouable depuis un terminal, sans interface graphique additionnelle. L’affichage s’adapte dynamiquement à la taille de l’écran du terminal, ce qui permet une bonne ergonomie malgré l’usage de caractères ASCII.
+Le jeu est entièrement jouable depuis un terminal, sans interface graphique additionnelle. L'affichage s'adapte dynamiquement à la taille de l'écran du terminal, ce qui permet une bonne ergonomie malgré l'usage de caractères ASCII.
 
 \subsection*{Génération aléatoire des lignes de jeu}
 
@@ -286,12 +286,35 @@ On retrouve notaement la file des mondes du jeu qui est modifiée par effet de b
 
 \subsection*{Performances}
 
-Le jeu est capable d'effectuer toutes les modifications du monde sans générer d'erreur de synchronisation jusqu'à une certaine de vitesse de jeu. Le risque en laissant trop peu de temps pour effectuer chaque étape est provoqué un retard dans l'arrivée des informations du monde et donc que certaines fonctions s'éxecutent avec des entrées erronées ou obsoltères. Cela jusitifie les fréquences des différentes boucles de jeu illustrées dans le figure \ref{fig:acc_tab}. Pour le cas des collisions, on ne peut pas véritablement baisser plus la fréquence de la vérification car cette action nécessite de parcourir plusieurs acteurs. Ce traitement prend donc un temps minimum durant lequel aucune autre fonction ne doit engagé un calcul.
+Le jeu est capable d'effectuer toutes les modifications du monde sans générer d'erreur de synchronisation jusqu'à une certaine de vitesse de jeu. 
+e risque en laissant trop peu de temps pour effectuer chaque étape est provoqué un retard dans l'arrivée des informations du monde et donc que certaines 
+fonctions s'éxecutent avec des entrées erronées ou obsoltères. Cela jusitifie les fréquences des différentes boucles de jeu illustrées dans le figure \ref{fig:acc_tab}. 
+Pour le cas des collisions, on ne peut pas véritablement baisser plus la fréquence de la vérification car cette action nécessite de parcourir plusieurs acteurs. 
+Ce traitement prend donc un temps minimum durant lequel aucune autre fonction ne doit engagé un calcul.
 
-\section{Conclusion et perspectives}
+\section{Perspectives d'amélioration}
+
 Résumé des apports du projet, limites actuelles, et pistes d'amélioration (graphismes, IA, multijoueur, temps réel).\\
-La prochaine étape pour améliorer la pureté de ce projet serait de remplacer les acteurs morts par des acteurs vides prédéfinis. Actuellement, les acteurs recevant le message \texttt{die} sont supprimés du jeu. Cet action modifie donc les listes d'acteurs par effets de bord, ce qui ne respectent pas le principe de pureté. Avec cette solution, on éviterait alors de supprimer totalement un acteur mort en cachant simplement son existence.\\
-De plus, le retour en arrière provoque des erreurs de synchronisation des mondes et donc de l'affichage du jeu. On pourra, dans le futur, améliorer cette fonctionnalité en vérifiant que toutes les fonctions ont bien terminé leur éxecetion avant de remplacer le monde actuel par un monde précédent. Tout problème de synchronisation serait alors éliminé.
+La prochaine étape pour améliorer la pureté de ce projet serait de remplacer les acteurs morts par des acteurs vides prédéfinis. 
+Actuellement, les acteurs recevant le message \texttt{die} sont supprimés du jeu. Cet action modifie donc les listes d'acteurs par effets de bord, 
+ce qui ne respectent pas le principe de pureté. Avec cette solution, on éviterait alors de supprimer totalement un acteur mort en cachant simplement son existence.\\
+De plus, le retour en arrière provoque des erreurs de synchronisation des mondes et donc de l'affichage du jeu. On pourra, dans le futur, 
+améliorer cette fonctionnalité en vérifiant que toutes les fonctions ont bien terminé leur éxecetion avant de remplacer le monde actuel par un monde précédent. 
+Tout problème de synchronisation serait alors éliminé.
+
+\section{Conclusion}
+
+La réalisation de ce projet nous a permis de créer un moteur de jeu entièrement fonctionnel, bâti sur le modèle d'acteurs et conçu pour respecter au 
+maximum les principes de la programmation fonctionnelle. Grâce à \textit{terminal-kit} et à son double-buffering, l'affichage reste fluide, 
+et la claire séparation des responsabilités (gestion des acteurs, boucle de ticks, défilement du terrain, détection des collisions) rend le code à la fois lisible et modulaire.
+
+Le runtime global que nous avons développé gère les cycles de jeu, les mises à jour des acteurs et le mécanisme de retour en arrière(bien que non fonctionnel), 
+démontrant ainsi la souplesse du modèle d'acteurs. L'ajout de tests unitaires avec Jest et l'analyse du code avec ESLint ont permis de garantir un code fiable et facile à maintenir, 
+tout en respectant les contraintes de compilation et de packaging du langage.
+
+Ce projet démontre qu'il est tout à fait possible de concevoir, en TypeScript, un jeu de type « Frogger » reposant sur un modèle d'acteurs, 
+tout en conservant une certaine  pureté fonctionnelle.
+
 \section*{Références}
 \begin{itemize}
   \item Documentation de \texttt{terminal-kit}: \url{https://github.com/cronvel/terminal-kit}
