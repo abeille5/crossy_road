@@ -274,17 +274,24 @@ La solution trouvée a été de regrouper toutes les boucles en une seule. Comme
 Le figure \ref{fig:acc_tab} montre les différentes fréquences des sous-boucles de jeu. Les accumulateurs associés sont incrémentés de une unité de temps (~17 ms) à chaque boucle de jeu. Lorsqu'ils atteignent la valeur de leur fréquence, ils sont réinitialisés à 0. De cette manière, chaque action ne s'effectue que si son accumulateur associé dépasse la fréquence. Cela est équivalent à effectuer l'action à cette même fréquence. 
 \subsection*{Efficacité des projectiles}
 
+Les projectiles ayant été implémentés de manière simple dans un premier temps, il y avait des incohérences lors de collision entre un projectile et un acteur (autre que le poulet, les buches et l'eau). Dans cette ancienne version, afin de trouver quel acteur a collisioné le projectile, un parcours sur tous les acteurs est fait en regardant quel acteur possède les mêmes coordonnées x et y que le projectile. Chaque acteur concerné par ces séries de tests se verra être supprimé de manière impure car supprimé du tableau le contenant en commettant des effets de bord. De plus, la vérification de collision n'était pas synchronisée avec les ticks de déplacements, ce qui peut déclencher des bugs et ne pas supprimer correctement les deux acteurs (projectile et cible).\\
+La solution apportée pour traiter ce problème a été de créer une fonction \texttt{collisionProj} qui renvoie un nouveau monde qui est une copie de l'ancien monde en ayant remplacé les acteurs collisionnés et le projectile par des acteurs vides. Le nouveau monde renvoyé remplace l'ancien et l'affichage est rechargé sur ce nouveau monde. Ce changement traite non seulement le problème de synchronisation car la vérification se fait en même temps que les déplacements, mais également le problème d'impureté du code en renvoyant un nouveau monde basé sur l'ancien mais avec des nouveaux acteurs fraîchement créés.
 
 \section{Évaluation}
-\begin{itemize}
-  \item Fonctionnalité et stabilité
-  \item Performances en terminal
-  \item Extensibilité du moteur de jeu
-\end{itemize}
+A la fin du projet, on peut vérifier si les principes de la programmation fonctionnelle sont respectés à toutes les étapes du jeu.
+\subsection*{Pureté}
+Un des enjeux majeurs est de respecter le principe de pureté en programmation. Ce principe proscrit la modification de variables par effet de bord. Les fonctions doivent suivre la définition mathématique et respecter la transparence référentielle.\\
+Dans le code, la plupart des fonctions respectent ces principes. On peut prendre comme exemple la génération d'un nouveau monde à chaque modification ou le stockage des acteurs dans des listes de taille fixe. Cependant, la structure du code apporte certaines limites à ce type de programmation. Il existe dans le code des variables dont la modification ne peut pas être traduite autrement qu'avec un effet de bord. Le stockage d'informations générale du jeu est plus difficelement implémentable de manière pure. Il faut alors pensé ces varibles comme des arguments d'une structure qui représentente tout le jeu.\\
+On retrouve notaement la file des mondes du jeu qui est modifiée par effet de bord au moment du défilement du terrain. De plus, cette file ne peut pas être traitée comme une constance car elle est intégralement recréée dans certains cas particuliers.
+
+\subsection*{Performances}
+
+Le jeu est capable d'effectuer toutes les modifications du monde sans générer d'erreur de synchronisation jusqu'à une certaine de vitesse de jeu. Le risque en laissant trop peu de temps pour effectuer chaque étape est provoqué un retard dans l'arrivée des informations du monde et donc que certaines fonctions s'éxecutent avec des entrées erronées ou obsoltères. Cela jusitifie les fréquences des différentes boucles de jeu illustrées dans le figure \ref{fig:acc_tab}. Pour le cas des collisions, on ne peut pas véritablement baisser plus la fréquence de la vérification car cette action nécessite de parcourir plusieurs acteurs. Ce traitement prend donc un temps minimum durant lequel aucune autre fonction ne doit engagé un calcul.
 
 \section{Conclusion et perspectives}
 Résumé des apports du projet, limites actuelles, et pistes d'amélioration (graphismes, IA, multijoueur, temps réel).\\
-Pour le moment, le retour en arrière provoque des erreurs de synchronisation des mondes et donc de l'affichage du jeu. On pourra, dans le futur, améliorer cette fonctionnalité en vérifiant que toutes les fonctions ont bien terminé leur éxecetion avant de remplacer le monde actuel par un monde précédent. Tout problème de synchronisation serait alors éliminé.
+La prochaine étape pour améliorer la pureté de ce projet serait de remplacer les acteurs morts par des acteurs vides prédéfinis. Actuellement, les acteurs recevant le message \texttt{die} sont supprimés du jeu. Cet action modifie donc les listes d'acteurs par effets de bord, ce qui ne respectent pas le principe de pureté. Avec cette solution, on éviterait alors de supprimer totalement un acteur mort en cachant simplement son existence.\\
+De plus, le retour en arrière provoque des erreurs de synchronisation des mondes et donc de l'affichage du jeu. On pourra, dans le futur, améliorer cette fonctionnalité en vérifiant que toutes les fonctions ont bien terminé leur éxecetion avant de remplacer le monde actuel par un monde précédent. Tout problème de synchronisation serait alors éliminé.
 \section*{Références}
 \begin{itemize}
   \item Documentation de \texttt{terminal-kit}: \url{https://github.com/cronvel/terminal-kit}
