@@ -61,13 +61,13 @@ function run() {
     const titleStartX = Math.floor((screenWidth - titleArt[0].length) / 2);
     const titleStartY = 1;
     titleArt.forEach((line, index) => {
-        screenBuffer.put({ 
-            x: titleStartX, 
-            y: titleStartY + index, 
-            attr: { 
-                color: "white", 
+        screenBuffer.put({
+            x: titleStartX,
+            y: titleStartY + index,
+            attr: {
+                color: "white",
                 bgcolor: "black",
-                bold: true 
+                bold: true
             }
         }, line);
     });
@@ -84,7 +84,7 @@ function run() {
 
     //variable pour la barre de projectile
     const barreTaille = 10;
-    const barreX = (frameY + mapHeight)*3;
+    const barreX = (frameY + mapHeight) * 3;
     const barreY = (mapWidth / 3) + 3;
 
 
@@ -197,35 +197,35 @@ function run() {
     let accLog = 0;
 
     const mainInterval = setInterval(() => {
-	stop = true;
-	const current_world = get_current_world();
-	if (accTick > TICK_RATE) {
-        accTick = 0;
-            
-        // Afficher le texte des projectiles
-        const ProjectileTXT = nbProj > 1 ? " PROJECTILES." : " PROJECTILE. ";
-        screenBuffer.put({ 
-            x: (frameY + mapHeight)*3, 
-            y: (mapWidth / 3)+2, 
-            attr: { color: "white", bgcolor: "black"}
-        }, "IL VOUS RESTE "+nbProj+ProjectileTXT);
-        
-        if (nbProj < 10)
-            nbProj++;
-        
-        // Dessiner la barre de projectiles
-        for (let i = 0; i < barreTaille; i++) {
-            const char = i < nbProj ? "🔥" : ' ';
-            screenBuffer.put({ 
-                x: barreX + (i * 2), 
-                y: barreY, 
-                attr: { 
-                    color: "white",
-                    bgcolor: "black"
-                }
-            }, char);
-        }
-    
+        stop = true;
+        const current_world = get_current_world();
+        if (accTick > TICK_RATE) {
+            accTick = 0;
+
+            // Afficher le texte des projectiles
+            const ProjectileTXT = nbProj > 1 ? " PROJECTILES." : " PROJECTILE. ";
+            screenBuffer.put({
+                x: (frameY + mapHeight) * 3,
+                y: (mapWidth / 3) + 2,
+                attr: { color: "white", bgcolor: "black" }
+            }, "IL VOUS RESTE " + nbProj + ProjectileTXT);
+
+            if (nbProj < 10)
+                nbProj++;
+
+            // Dessiner la barre de projectiles
+            for (let i = 0; i < barreTaille; i++) {
+                const char = i < nbProj ? "🔥" : ' ';
+                screenBuffer.put({
+                    x: barreX + (i * 2),
+                    y: barreY,
+                    attr: {
+                        color: "white",
+                        bgcolor: "black"
+                    }
+                }, char);
+            }
+
             const new_world = tick_world(current_world);
             world_buffer.shift();
             world_buffer[world_buffer_size - 1] = new_world;
@@ -254,7 +254,7 @@ function run() {
             accCar = 0;
             car_move(get_current_world());
         }
-        screenBuffer.put({ x: frameY + mapHeight, y: (mapWidth / 3)+2, attr: { color: "white", bgcolor: "black" } }, "SCORE : " + score);
+        screenBuffer.put({ x: frameY + mapHeight, y: (mapWidth / 3) + 2, attr: { color: "white", bgcolor: "black" } }, "SCORE : " + score);
         stop = false;
         accTick += FRAME_RATE;
         accUpdate += FRAME_RATE;
@@ -400,30 +400,30 @@ function run() {
     function collisionProj(current_world: World): World {
         // Copie des lignes pour éviter la modification directe
         const updatedLines = [...current_world.lines];
-        
+
         // Filtrer les projectiles qui n'ont pas touché de cible
         const remainingProj = current_world.arrayProj.filter((proj: A.Actor) => {
             let hasHit = false;
-            
+
             updatedLines.forEach((line: A.Line) => {
                 const realY = nb_line - line.ordinate + 1;
                 if (realY === proj.location.y) {
                     // Vérifier les 3 positions : gauche, centre et droite
                     for (let xOffset = -1; xOffset <= 1; xOffset++) {
                         const targetX = proj.location.x + xOffset;
-                        
+
                         // Vérifier que la position est dans les limites
                         if (targetX >= 0 && targetX < line.data.length) {
-                            const hitIndex = line.data.findIndex(actor => 
+                            const hitIndex = line.data.findIndex(actor =>
                                 actor.location.x === targetX &&
-                                actor.name !== A.Name.Chicken && 
+                                actor.name !== A.Name.Chicken &&
                                 actor.name !== A.Name.Empty &&
                                 actor.name !== A.Name.Water_L &&
                                 actor.name !== A.Name.Water_R &&
                                 actor.name !== A.Name.Log_L &&
                                 actor.name !== A.Name.Log_R
                             );
-    
+
                             if (hitIndex !== -1) {
                                 // Remplacer l'acteur touché par un espace vide
                                 line.data[hitIndex] = A.make_actor(
@@ -436,17 +436,17 @@ function run() {
                     }
                 }
             });
-    
+
             return !hasHit;
         });
-    
+
         return make_world(
             updatedLines,
             current_world.poulet,
             remainingProj
         );
     }
-    
+
     function gameOver() {
         term("\x1B[?25h");
         clearInterval(mainInterval);
@@ -514,41 +514,41 @@ function run() {
         }
         if (name === 'e') {
             if (nbProj > 0) {
-                const locationProj:A.Position = {
+                const locationProj: A.Position = {
                     x: get_current_world().poulet.location.x,
-                    y: get_current_world().poulet.location.y-1
+                    y: get_current_world().poulet.location.y - 1
                 };
-                
-                
+
+
                 // Afficher le texte mis à jour
                 const ProjectileTXT = nbProj > 1 ? " PROJECTILES." : " PROJECTILE. ";
-                screenBuffer.put({ 
-                    x: (frameY + mapHeight)*3, 
-                    y: (mapWidth / 3)+2, 
-                    attr: { color: "white", bgcolor: "black"}
-                }, "IL VOUS RESTE "+nbProj+ProjectileTXT);
+                screenBuffer.put({
+                    x: (frameY + mapHeight) * 3,
+                    y: (mapWidth / 3) + 2,
+                    attr: { color: "white", bgcolor: "black" }
+                }, "IL VOUS RESTE " + nbProj + ProjectileTXT);
 
                 get_current_world().arrayProj.push(A.make_actor(locationProj, A.Name.Projectile));
                 nbProj--;
-        
-        
+
+
                 // Mettre à jour la barre de projectiles
                 for (let i = 0; i < barreTaille; i++) {
                     const char = i < nbProj ? "🔥" : " ";
-                    screenBuffer.put({ 
-                        x: barreX + (i * 2), 
-                        y: barreY, 
-                        attr: { 
+                    screenBuffer.put({
+                        x: barreX + (i * 2),
+                        y: barreY,
+                        attr: {
                             color: "white",
                             bgcolor: "black"
                         }
                     }, char);
                 }
-                
+
                 screenBuffer.draw();
             }
             else {
-                screenBuffer.put({ x: (frameY + mapHeight) * 3, y: (mapWidth / 3)+1, attr: { color: "red", bgcolor: "black" } }, "      I NEED MORE BULLET.       ");
+                screenBuffer.put({ x: (frameY + mapHeight) * 3, y: (mapWidth / 3) + 1, attr: { color: "red", bgcolor: "black" } }, "      I NEED MORE BULLET.       ");
 
             }
         }
@@ -677,11 +677,6 @@ function run() {
                 ...world_buffer.slice(1),
                 new_world
             ];
-        }
-        else if (name === 'r') {
-            screenBuffer.put({ x: titleStartX, y: titleStartY - 1, attr: { color: "white", bgcolor: "black", bold: true } }, "Back in time ! ");
-            if (!stop)
-                go_back_in_time();
         }
     });
 }
