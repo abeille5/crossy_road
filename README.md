@@ -42,4 +42,6 @@ make test
 - Si vous touchez un obstacle dangereux : **Game Over**.  
   Vous pourrez alors choisir **OUI (y)** pour rejouer ou **NON (n)** pour quitter.  
 
----
+## Auteurs
+
+Enzo Picarel, Raphaël Bely, Arno Donias, Thibault Abeille
