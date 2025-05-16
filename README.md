@@ -2,6 +2,8 @@
 
 Une version terminal de *Crossy Road* basée sur un modèle d’acteurs en TypeScript.
 
+---
+
 ## Sujet du projet
 
 - Page du sujet :  
