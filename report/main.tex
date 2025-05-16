@@ -238,16 +238,19 @@ Dans un premier temps nous nous sommes naturellement dirigés vers un affichage 
 Notre affichage graphique fait apparaitre chaque acteurs sur un plateau encadré de blanc, chaque acteurs à sa propre chartre graphique. Un arbre est logiquement représenté par un carré de couleur vert, une voiture est quant à elle de couleur grise, un rondin de bois marron et l'eau en bleu clair. L'acteur principale, le poulet, est lui définit par un emoji poulet, et les projectiles par des emojis flammes.   
 
 \section{Difficultés rencontrées et solutions apportées}
-Dans ce projet, nous nous sommes heurté à des problèmes liés à la cohérence entre les données du jeu, la synchronisation des actions et l'affichage final du jeu. Pour y remédier, nous avons fait certains choix de structure du jeu.
+Dans ce projet, nous nous sommes heurté à des problèmes liés à la cohérence entre les données du jeu, la synchronisation des actions et l'affichage final du jeu. Pour y remédier, nous avons fait certains choix de structure du jeu qui assurent un contrôle sur l'éxecution de la boucle de jeu. 
 \subsection*{Affichage trop permanent du poulet}
-Comme détaillé précédement, le poulet est un acteur géré indépendemment des autres acteurs. Son affichage suit donc cette logique. Dans un premier temps, il a été décidé de placé cet action affichage dans une boucle de jeu (\texttt{setinterval}) à part, dont la fréquence serait différente. Avec cette proposition, l'affichage du poulet suit fidèlement les commandes du joueur. Cependant, les affichages précédents du poulet ne sont pas remplacés à la même vitesse puisqu'il faut attendre que les autres acteurs réactualisent leur affichage. Le terrain de jeu se retrouve couvert d'affichage de poulet qui ne disparaîssent pas en même temps que le poulet se déplace.\\
+Comme détaillé précédement, le poulet est un acteur géré indépendemment des autres acteurs. Son affichage suit donc cette logique. Dans un premier temps, il a été décidé de placé cet action affichage dans une boucle de jeu (\texttt{setinterval}) à part, dont la fréquence serait différente.\\
+Avec cette proposition, l'affichage du poulet suit fidèlement les commandes du joueur. Cependant, les affichages précédents du poulet ne sont pas remplacés à la même vitesse puisqu'il faut attendre que les autres acteurs réactualisent leur affichage. Le terrain de jeu se retrouve couvert d'affichage de poulet qui ne disparaîssent pas en même temps que le poulet se déplace.\\
 La solution apportée a été de réunir l'affichage du poulet et des autres acteurs dans une même boucle de jeu. L'actualisation du plateau efface donc bien les poulets remanants au bon rythme. Un inconvénient de cette solution est que la totalité des acteurs sont affichés à chaque tour de boucle. Cela limite donc la fréquence de rafraîchissement du terrain, car il faut attendre que l'éxecution soit terminée.
 \subsection*{Affichage désynchronisé avec le jeu}
-
+Le retour en arrière est effectué en enfilant le monde au bout de la file des mondes. C'est un changement brutal du déroulement du jeu qui demande que les données actuelles soient bien mise à jour pour toutes les parties de la boucle de jeu principale. Pour cela, il faut s'assurer qu'aucun processus en cours ne manquera ce changement de monde et viendra par la suite perturbée les données du jeu.\\
+Pour empêcher cela, la variable globale \texttt{stop} agit comme un signal autorisant ou non de lancer un processus. Dans la boucle de jeu, chaque étape bloque toutes les autres en mettant \texttt{stop} à \texttt{true}. Toutes les autres fonctions sont alors bloquées. A la fin de éxecution, elle libère les autres fonctions en changeant la valeur de \texttt{stop} à \texttt{False}.\\
+Au moment du retour dans le temps, la même méthode est appliquée. Cependant, dans le cas où une fonction est appelée avant le retour dans le temps mais n'a pas le temps de terminer son éxecution avant le changement de monde actuel, il y a un problème de synchronisation entre le nouveau monde et le monde utilisé par la fonction. Elle va alors modifier ce monde en partant des informations d'un monde obsolète. A l'affichage, cela se manifeste par une partie du plateau qui ne se met pas à jour et reste fixe.
 \subsection*{Problème de synchronisation dans la boucle de jeu}
 Dans une version précédente du projet, la boucle de jeu était représentée par de multiples sous-boucles qui modifiaient les données à des fréquences différentes. Certaines modifications pouvant prendre plus de temps que d'autres, le version du monde actuel n'était pas partagée entre toutes les boucles. La désynchronisation du monde actuel provoquait alors des problèmes de fiabilité des intéractions, notament pour le traitement des messages des acteurs.\\
 La solution trouvée a été de regrouper toutes les boucles en une seule. Comme exposé précédemment, la gestion des différentes fréquances passe par des accumulateurs qui sont réinitialisés à un rythme spécifique.
-\begin{figure}[h]
+\begin{figure}[!h]
   \centering
   \begin{tabular}{|c|c|c|}
     \hline
@@ -280,13 +283,15 @@ Le figure \ref{fig:acc_tab} montre les différentes fréquences des sous-boucles
 \end{itemize}
 
 \section{Conclusion et perspectives}
-Résumé des apports du projet, limites actuelles, et pistes d'amélioration (graphismes, IA, multijoueur, temps réel).
-
+Résumé des apports du projet, limites actuelles, et pistes d'amélioration (graphismes, IA, multijoueur, temps réel).\\
+Pour le moment, le retour en arrière provoque des erreurs de synchronisation des mondes et donc de l'affichage du jeu. On pourra, dans le futur, améliorer cette fonctionnalité en vérifiant que toutes les fonctions ont bien terminé leur éxecetion avant de remplacer le monde actuel par un monde précédent. Tout problème de synchronisation serait alors éliminé.
 \section*{Références}
 \begin{itemize}
   \item Documentation de \texttt{terminal-kit}: \url{https://github.com/cronvel/terminal-kit}
   \item Tutoriel sur le modèle des acteurs
-  \item Documentation ESLint / Jest / TypeScript
+  \item Documentation de \texttt{ESLint} : \url{https://eslint.org/docs/latest/}
+  \item Documentation de \texttt{Jest} : \url{https://jestjs.io/docs/getting-started}
+    \item Documentation de \texttt{TypeScript} : \url{https://www.typescriptlang.org/docs/}
 \end{itemize}
 
 \end{document}
