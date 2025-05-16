@@ -238,9 +238,10 @@ Dans un premier temps nous nous sommes naturellement dirigés vers un affichage 
 Notre affichage graphique fait apparaitre chaque acteurs sur un plateau encadré de blanc, chaque acteurs à sa propre chartre graphique. Un arbre est logiquement représenté par un carré de couleur vert, une voiture est quant à elle de couleur grise, un rondin de bois marron et l'eau en bleu clair. L'acteur principale, le poulet, est lui définit par un emoji poulet, et les projectiles par des emojis flammes.   
 
 \section{Difficultés rencontrées et solutions apportées}
-
+Dans ce projet, nous nous sommes heurté à des problèmes liés à la cohérence entre les données du jeu, la synchronisation des actions et l'affichage final du jeu. Pour y remédier, nous avons fait certains choix de structure du jeu.
 \subsection*{Affichage trop permanent du poulet}
-
+Comme détaillé précédement, le poulet est un acteur géré indépendemment des autres acteurs. Son affichage suit donc cette logique. Dans un premier temps, il a été décidé de placé cet action affichage dans une boucle de jeu (\texttt{setinterval}) à part, dont la fréquence serait différente. Avec cette proposition, l'affichage du poulet suit fidèlement les commandes du joueur. Cependant, les affichages précédents du poulet ne sont pas remplacés à la même vitesse puisqu'il faut attendre que les autres acteurs réactualisent leur affichage. Le terrain de jeu se retrouve couvert d'affichage de poulet qui ne disparaîssent pas en même temps que le poulet se déplace.\\
+La solution apportée a été de réunir l'affichage du poulet et des autres acteurs dans une même boucle de jeu. L'actualisation du plateau efface donc bien les poulets remanants au bon rythme. Un inconvénient de cette solution est que la totalité des acteurs sont affichés à chaque tour de boucle. Cela limite donc la fréquence de rafraîchissement du terrain, car il faut attendre que l'éxecution soit terminée.
 \subsection*{Affichage désynchronisé avec le jeu}
 
 \subsection*{Problème de synchronisation dans la boucle de jeu}
