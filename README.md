@@ -17,6 +17,8 @@ make build
 
 ## Exécution
 
+Mettre le terminal en plein écran puis :
+
 ```bash
 make run
 ```
