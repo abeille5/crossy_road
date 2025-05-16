@@ -548,7 +548,7 @@ function run() {
                 screenBuffer.draw();
             }
             else {
-                screenBuffer.put({ x: (frameY + mapHeight) * 3, y: (mapWidth / 3) + 1, attr: { color: "red", bgcolor: "black" } }, "      I NEED MORE BULLET.       ");
+                screenBuffer.put({ x: (frameY + mapHeight) * 3, y: (mapWidth / 3) + 2, attr: { color: "red", bgcolor: "black" } }, "      I NEED MORE BULLET.       ");
 
             }
         }
