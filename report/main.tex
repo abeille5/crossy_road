@@ -11,7 +11,7 @@
 \usepackage{geometry}
 \geometry{margin=2.5cm}
 
-\title{\textbf{Acting Shooting Star : Notre version de Crossy Road basé sur le modèle acteurs}}
+\title{\textbf{Acting Shooting Star : Notre version de Crossy Road basé sur le modèle des acteurs}}
 \author{Enzo Picarel, Raphaël Bely, Arno Donias, Thibault Abeille\\ 
 Encadrants : Vincent Alba, David Renault \\ ENSEIRB-MATMECA – 2025}
 \date{\today}
@@ -51,15 +51,15 @@ Encadrants : Vincent Alba, David Renault \\ ENSEIRB-MATMECA – 2025}
 
 Dans le cadre de notre projet de programmation en JavaScript, nous avons fait le choix de créer notre propre version du jeu Crossy Road. C'est un jeu mobile populaire auquel nous avons joué durant notre enfance. Ce fut un choix naturel. En effet, son aspect ludique et familier permet une certaine simplicité d'implémentation qui permet de satisfaire les exigences pour un premier projet dans ce langage. Nous verrons par la suite, que, grâce à notre imagination, nous n'avons pas été restreints par la simplicité du jeu.\\
 
-Le projet est axé principalement sur la conception d'un moteur de jeu basé sur un modèle fonctionnant par interaction des objets définis en tant qu'"acteur". Ces acteurs (qui vont du poulet à la bûche en passant par les voitures) sont indépendants les uns des autres. Chaque acteur doit être capable de recevoir des informations sous forme de messages, puis de traiter ces messages et enfin de réagir en fonction. Pendant l'implémentation, nous avons fait particulièrement attention à avoir un code avec une pureté fonctionnelle maximale, en évitant les effets de bord et en respectant les principes de la programmation fonctionnelle autant que possible.\\
+Le projet est axé principalement sur la conception d'un moteur de jeu basé sur un modèle fonctionnant par interaction des objets définis en tant qu'"acteur". Ces acteurs (qui vont du poulet à la bûche en passant par les voitures) sont indépendants les uns des autres. Chaque acteur devait être capable de recevoir des informations sous forme de messages, puis de traiter ces messages et enfin de réagir en fonction. Pendant l'implémentation, nous avons fait particulièrement attention à avoir un code avec une pureté fonctionnelle maximale, en évitant les effets de bord et en respectant les principes de la programmation fonctionnelle autant que possible.\\
 
-Ce projet est cadré par des contraintes définies en relation avec le cours PG104 (programmation fonctionnelle) et d'utilisation du langage \textit{Typescript}. Les exigences sont les suivantes :
+Le projet était cadré par des contraintes définies en relation avec le cours de programmation fonctionnelle et d'utilisation de \textit{Typescript}. Les exigences étaient les suivantes :
 \begin{itemize}
 	\item affichage dans le terminal même à l'aide de \textit{terminal-kit}
 	\item code validé grâce à l'utilisation d'\textit{ESLint}
 	\item tests unitaires avec \textit{Jest}
 	\item développement collaboratif avec un dépôt git
-	\item code structuré selon les consignes (dossier: src, test, dist et fichiers de configuration: *.config.*)
+	\item code structuré selon les consignes 
 \end{itemize}
 
 Durant ce rapport nous aborderons plusieurs thèmes principaux du développement comme la conception des acteurs, l'architecture du jeu, son implémentation, ainsi qu'un retour sur expérience contenant les difficultés rencontrées et nos apprentissages durant le projet.
@@ -95,19 +95,17 @@ L'architecture complète du jeu est basée entièrement sur un modèle comportan
 
 Les messages échangés par les acteurs sont typés par une structure composé d'un champ \texttt{type} (chaîne de caractères) et un champ \texttt{params} (tableau d'arguments). Ces messages permettent la transmission des différentes actions à effectuer, faisant réagir les acteurs de manière \textbf{autonome} et \textbf{indépendante} durant le déroulement du jeu. \\
 
-Ce principe est notamment utilisé pour les déplacements des acteurs. Les déplacements de l'acteur principal est lui engendré par la méthode \textit{Terminal-kit.terminal.grabInput(true)} qui permet la lecture des entrées claviers. Chaque entrée clavier traduit un déplacement via la création d'un nouveau monde introduisant un nouveau poulet ayant reçu un message de déplacement dans sa mailbox.\\ 
+Ce principe est notamment utilisé pour les déplacements des acteurs. Le déplacement de l'acteur principal est lui engendré par la méthode \textit{Terminal-kit.terminal.grabInput(true)} qui permet la lecture des entrées claviers. Chaque entrée clavier traduit un déplacement via la création d'un nouveau monde introduisant un nouveau poulet ayant reçu un message de déplacement dans sa mailbox.\\ 
 
 Le modèle repose sur la mise à jour successive et répétée des acteurs: quand l'un d'eux reçoit un \textbf{"tick"}, il ne modifie pas vraiment sont propre état, à la place, il crée une nouvelle version de lui-même en fonction des messages/instructions reçues.\\
 
-Le fonctionnement du jeu est dirigé par un \textbf{runtime} comportant une boucle d'exécution (\texttt{setinterval}). Les actions répétitives des acteurs et les ticks du jeu sont déclenchés par cette boucle à des intervales réguliers, qui peuvent différés selon le type d'acteur concerné. L'utilisation de \textit{setinterval} permet de commander la fréquence des actions à effectuer. Une unique boucle de jeu autorise des fréquences différentes en utilisant des accumulateurs qui se réinitialisent au bout d'un certain nombre de période.\\
+Le fonctionnement du jeu est dirigé par un \textbf{runtime} comportant une boucle d'exécution (\texttt{setinterval}). Les actions répétitives des acteurs et les ticks du jeu sont déclenchées par cette boucle à des intervalles réguliers, qui peuvent différer selon le type d'acteur concerné. L'utilisation de \textit{setinterval} permet de commander la fréquence des actions à effectuer. Une unique boucle de jeu autorise des fréquences différentes en utilisant des accumulateurs qui se réinitialisent au bout d'un certain nombre de période.\\
 
-Le monde contenant tout les acteurs est également sauvegardé régulièrement. Les versions du monde sont enregistrées dans une file qui permet alors le \textbf{retour en arrière}. Le monde actuel correspond au dernièr élément de la file, ainsi afin de revenir en arrière, il faut replacer cet élément par un élément placé précédemment dans la file, ce qui permet de revenir dans un état antérieur du jeu. \\
+Le monde contenant tout les acteurs est également sauvegardé régulièrement. Les versions du monde sont enregistrées dans une file qui permet alors le \textbf{retour en arrière}. Le monde actuel correspond au dernière élément de la file, ainsi afin de revenir en arrière, il faut replacer cet élément par un élément placé précédemment dans la file, ce qui permet de revenir dans un état antérieur du jeu. \\
 
 Bien que ce modèle ait offert une approche intuitive et modulaire pour gérer les interactions entre les entités du jeu, il a également introduit une certaine \textbf{rigidité}. La recréation fréquente d'acteurs, imposée par la pureté fonctionnelle, a parfois généré des bugs graphiques et une complexité de gestion accrue. Néanmoins, cette architecture s'est révélée pertinente pour développer des comportements réactifs, évitant la prolifération de structures conditionnelles complexes. \\
 
 \section{Architecture du jeu}
-
-\subsection*{Gestion des acteurs}
 
 La description du jeu repose sur la modélisation de tout ce que l'on voit par des acteurs. On en distingue plusieurs types :
 \begin{itemize}
@@ -137,13 +135,40 @@ Notre monde de jeu est quant à lui représenté par une table de lignes (\textt
 
 \vspace{1em}
 
-Le déplacement des acteurs dans le monde, régit par les fonctions \texttt{tick} et \texttt{move}, se fait par recréation successive d'acteurs dans de nouvelles positions, ce qui permet une implémentation purement fonctionnelle. Les projectiles ou boules de feu sont, comme tous les autres éléments du jeu, des acteurs à part entière.
+La progression du jeu se fait par un défilement automatique des lignes, mais le comportement du joueur influe sur ce défilement de deux manières différentes :
+\begin{itemize}
+  \item[$\bullet$] si le joueur est à l'aise avec la difficulté actuelle du niveau, il ira plus vite que le défilement. Ainsi, il risque de sortir du jeu. Pour éviter cela, le rythme de défilement suit la cadence du joueur, l'empêchant d'aller plus haut que le milieu de l'écran ;
+  \item[$\bullet$] dans le cas contraire, le joueur est sous pression et doit rattraper son retard. Dans ce cas-là, on garde la vitesse de défilement automatique.
+\end{itemize}
+
+\vspace{1em}
+
+Cela permet de maintenir une tension permanente sur le joueur.
+
+\vspace{1em}
+
+Les lignes du jeu apparaissent à l'aide de la fonction \texttt{tick\_line}, suivant les principes ci-dessus. Elles sont construites aléatoirement à l'aide de motifs d'acteurs. On choisit d'abord aléatoirement le type de ligne. Puis, on choisit, selon une probabilité \texttt{obstacleProbability}, si l'on place un motif d'acteurs. Ces motifs sont composés de 2 à 4 acteurs de même type. Cela permet de modéliser plus fidèlement les obstacles comme des voitures, camions, ou rangées d'arbres. Seuls les acteurs ennemis sont générés par motif ; les autres, comme les bûches ou "rien", permettent de compléter les lignes. Cette génération aléatoire par choix et combinaison rend très peu probable la répétition exacte de deux lignes.
+
+\vspace{1em}
+
+Afin de modéliser des niveaux de difficulté différentes, nous avons joué sur plusieurs paramètres :
+\begin{itemize}
+  \item[$\bullet$] la probabilité d'apparition des obstacles, rendant le terrain plus dense en acteurs à "esquiver" ;
+  \item[$\bullet$] l'espace entre chaque ligne : dans les premiers niveaux, le joueur dispose d'une ligne sur deux "vide", ce qui lui permet d'être à l'abri d'une collision ;
+  \item[$\bullet$] enfin, la répartition des probabilités pour les types de lignes change au cours du temps, pour tendre vers de plus en plus de lignes "dynamiques", telles que les routes ou les rivières.
+\end{itemize}
+
+\vspace{1em}
+
+Nous n'avons pas implémenté de système garantissant qu'un chemin praticable existe toujours. Premièrement, cette garantie n'est pas nécessaire, car le joueur a la capacité de tirer des projectiles permettant de détruire les obstacles. Ainsi, il peut facilement se tirer d'une impasse. Deuxièmement, ces impasses arrivent relativement rarement grâce à la génération aléatoire de lignes.
+
+\vspace{1em}
+
+Le déplacement des acteurs dans le monde, régi par les fonctions \texttt{tick} et \texttt{move}, se fait par recréation successive d'acteurs dans de nouvelles positions, ce qui permet une implémentation purement fonctionnelle. Les projectiles ou boules de feu sont, comme tous les autres éléments du jeu, des acteurs à part entière.
 
 \vspace{1em}
 
 Pour terminer ces explications du jeu, les collisions sont létales instantanément, ce qui permet de renforcer l'aspect punitif du jeu et de maintenir le joueur concentré.
-
-\subsection*{Gestion du jeu}
 
 Pour conserver une gestion pure des données, les mondes dans lesquels les acteurs évoluent sont des structures de données \texttt{World} stockées dans une file.\\
 La structure de donnée \texttt{World} contient certaines données utiles au déroulement du jeu :
@@ -160,17 +185,17 @@ A chaque tick du jeu, plusieurs actions s'effectuent sur les acteurs, les lignes
 \item Le monde actuel est remplacé dans la file par son successeur. Ce monde est généré par la fonction \textit{make\_world} en héritant de la file de ligne, du poulet et des projectiles du monde actuel, auxquels est appliqué le défilement du terrain.
 \end{enumerate}
 
-Les données du jeu peuvent changer plus fréquemment que les ticks. La mise à jour des acteurs doit donc suivre ce rythme à côté de celui des ticks. A la différence du défilement à chaque tick, la mise à jour des acteurs ne provoquent pas de déplacement des lignes. Il s'agit simplement d'un parcours de tous les acteurs du jeu afin d'activer leur fonction interne \textit{update}. Cette mise à jour concerne principalement le poulet dont les déplacements doivent suivre les commandes du joueur. Le fréquence de la mise à jour influe directement sur la réactivité du jeu et donc sur la précision des mouvements. Elle concerne également le déplacement des boules de feu qui évoluent dans le terrain plus rapidement que le défilement général.\\
+Les données du jeu peuvent évoluer à un rythme plus rapide que celui des ticks. Par conséquent, la mise à jour des acteurs doit suivre cette cadence indépendamment du rythme imposé par les ticks. Contrairement au défilement des lignes, déclenché par chaque tick, la mise à jour des acteurs n'entraîne aucun déplacement visuel. Il s'agit uniquement d'un parcours complet de l'ensemble des acteurs pour déclencher leur fonction interne \textit{update}. Cette mise à jour concerne principalement le poulet dont les déplacements doivent suivre les commandes du joueur. La fréquence de la mise à jour influe directement sur la réactivité du jeu et donc sur la précision des mouvements. Elle concerne également le déplacement des boules de feu qui évoluent dans le terrain plus rapidement que le défilement général.\\
 La gestion des collisions contient 2 parties distinctes :
 \begin{enumerate}
 \item Collisions avec le poulet : elles sont vérifiées par la fonction \textit{checkCollision} qui, en cas de collision avec un acteur, provoque la mort du poulet, comme dit précédemment.
-  \item Collisions entre une boule de feu et un acteur : lors d'une collision entre une boule de feu et un acteur, le monde actuel est réactualisé pour prendre en compte cette collision. De la même manière que pour le défilement de terrain, le nouveau monde est enfilé dans la file des mondes pour mettre à jour les données. Dans ce nouveau monde, on élimine le boule de feu concernée et l'acteur touché est remplacé par un acteur vide, qui ne sera plus affiché par la suite.
+  \item Collisions entre une boule de feu et un acteur : Lorsqu'une collision survient entre une boule de feu et un acteur, le monde actuel est mis à jour afin d'intégrer les effets de cette collision. Tout comme lors du défilement du terrain, ce nouveau monde est placé dans la file des mondes pour actualiser les données. Dans cette version actualisée du monde, la boule de feu impliquée est supprimée et l'acteur atteint est remplacé par un acteur vide, qui ne sera désormais plus affiché.
 \end{enumerate}
 Enfin, les bûches et les voitures se déplacent à des vitesses spécifiques. Ces déplacements sont envoyés par message à chaque acteurs par les fonctions \textit{log\_move} et \textit{car\_move}. Ainsi, à la prochaine mise à jour des acteurs, ces messages seront traités et appliqués à chaque acteur.
 
 \section{Implémentation technique}
 
-Au niveau de l'organisation du projet, nous avons opté pour une structure claire et modulaire. Le répertoire principal contient les fichiers de configuration nécéssaires afin d'utiliser \texttt{ESLint, Jest} et un \texttt{Makefile} qui est destiné à faciliter les différentes tâches de compilation, d'exécution et de tests en les automatisants à travers des commandes.
+Le projet est organisé selon une structure claire et modulaire. Le répertoire principal contient les fichiers de configuration nécessaires pour l’utilisation de \texttt{ESLint}, \texttt{Jest}, ainsi qu’un \texttt{Makefile} destiné à automatiser les différentes tâches de compilation, d’exécution et de tests.
 
 \subsection*{Organisation des fichiers}
 
@@ -186,46 +211,37 @@ Au niveau de l'organisation du projet, nous avons opté pour une structure clair
 
 \subsection*{Technologies et outils utilisés}
 
-Durant notre projet, nous avons pu aborder plus profondément des outils vu en cours comme :
+Le développement repose sur plusieurs outils modernes :
 \begin{itemize}
 	\item \texttt{TypeScript} : un langage dérivée de \texttt{Javascript} permettant le typage statique des données
 	\item \texttt{ESLint} nous a permis d'assurer une qualité de code constante et formaté homogènement
 	\item \texttt{Jest} nous a permis d'écrire et d'exécuter proprement les tests unitaires
 	\item \texttt{terminal-kit} nous a permis d'avoir un affichage propre à l'intérieur même du terminal
+  \item \texttt{TypeScript} pour garantir un typage statique des données ;
+  \item \texttt{ESLint} pour assurer une qualité de code homogène (indentation, style, bonne utilisation des structures) ;
+  \item \texttt{Jest} pour l’écriture et l’exécution des tests unitaires ;
+  \item \texttt{terminal-kit} pour l’affichage dynamique dans le terminal.
 \end{itemize}
-Le fichier principal d'exécution est \texttt{world.ts}, qui gère l'ensemble de la boucle de jeu.
+
+La configuration TypeScript (\texttt{tsconfig.json}) et le \texttt{Makefile} étaient fournis dans le sujet. Le Makefile propose notamment une commande \texttt{make run} qui compile le projet avec \texttt{tsc} puis exécute le jeu via Node.js :
+
+\begin{lstlisting}[language=bash]
+npx tsc
+node dist/src/world.js
+\end{lstlisting}
+
+Le fichier principal d’exécution est \texttt{world.ts}, qui gère l’ensemble de la boucle de jeu.
 
 Le jeu est entièrement jouable depuis un terminal, sans interface graphique additionnelle. L'affichage s'adapte dynamiquement à la taille de l'écran du terminal, ce qui permet une bonne ergonomie malgré l'usage de caractères ASCII.
 
-\subsection*{Génération aléatoire des lignes de jeu}
+\subsection*{Éléments clés du code}
 
-Les lignes du jeu apparaissent à l'aide de la fonction \texttt{tick\_line}, suivant les principes ci-dessus. Elles sont construites aléatoirement à l'aide de motifs d'acteurs. On choisit d'abord aléatoirement le type de ligne. Puis, on choisit, selon une probabilité \texttt{obstacleProbability}, si l'on place un motif d'acteurs. Ces motifs sont composés de 2 à 4 acteurs de même type. Cela permet de modéliser plus fidèlement les obstacles comme des voitures, camions, ou rangées d'arbres. Seuls les acteurs ennemis sont générés par motif ; les autres, comme les bûches ou "rien", permettent de compléter les lignes. Cette génération aléatoire par choix et combinaison rend très peu probable la répétition exacte de deux lignes, excepté lors d'un bug d'affichage ou 2 lignes identiques apparaissent successivement toute les \textit{hauteur de l'écran du terminal}. Nous n'avons malheuresement pas été capable de comprendre et corriger ce problème.
-  
-\vspace{1em}
-
-Afin de modéliser des niveaux de difficulté différents, nous avons joué sur plusieurs paramètres :
+Trois éléments de l’implémentation méritent une attention particulière :
 \begin{itemize}
-  \item[$\bullet$] la probabilité d'apparition des obstacles, rendant le terrain plus dense en acteurs à "esquiver" ;
-  \item[$\bullet$] l'espace entre chaque ligne : dans les premiers niveaux, le joueur dispose d'une ligne sur deux "vide", ce qui lui permet d'être à l'abri d'une collision ;
-  \item[$\bullet$] enfin, la répartition des probabilités pour les types de lignes change au cours du temps, pour tendre vers de plus en plus de lignes "dynamiques", telles que les routes ou les rivières.
+  \item \textbf{Le système de tick} : chaque type d’acteur est mis à jour à une fréquence spécifique via des fonctions \texttt{setInterval}. Cela permet de différencier la cadence de déplacement des voitures, bûches, projectiles, etc.
+  \item \textbf{La génération d’acteurs} : la fonction \texttt{make\_actor} crée des entités selon leur type, leur position et leur comportement à partir de modèles réutilisables.
+  \item \textbf{La génération de lignes} : des motifs prédéfinis (pattern) permettent de générer dynamiquement des obstacles selon une probabilité qui augmente avec la progression du joueur. Cela assure un équilibre entre imprévisibilité et jouabilité.
 \end{itemize}
-
-\subsection*{Vitesse de déroulement}
-
-La progression du jeu se fait par un défilement automatique des lignes, mais le comportement du joueur influe sur ce défilement de deux manières différentes :
-\begin{itemize}
-  \item[$\bullet$] si le joueur est à l'aise avec la difficulté actuelle du niveau, il ira plus vite que le défilement. Ainsi, il risque de sortir du jeu. Pour éviter cela, le rythme de défilement suit la cadence du joueur, l'empêchant d'aller plus haut que le milieu de l'écran ;
-  \item[$\bullet$] dans le cas contraire, le joueur est sous pression et doit rattraper son retard. Dans ce cas-là, la vitesse n'est ni plus ni moins que le défilement automatique.
-\end{itemize}
-
-\vspace{1em}
-
-Cela permet de maintenir une tension permanente sur le joueur.
-
-\vspace{1em}
-
-Nous n'avons pas implémenté de système garantissant qu'un chemin praticable existe toujours. Premièrement, cette garantie n'est pas nécessaire, car le joueur a la capacité de tirer des projectiles permettant de détruire les obstacles. Ainsi, il peut facilement se tirer d'une impasse. Deuxièmement, ces impasses arrivent relativement rarement grâce à la génération aléatoire de lignes.
-
 
 \section{Affichage}
 
@@ -270,24 +286,29 @@ La solution trouvée a été de regrouper toutes les boucles en une seule. Comme
   \label{fig:acc_tab}
 \end{figure}
 
-Le figure \ref{fig:acc_tab} montre les différentes fréquences des sous-boucles de jeu. Les accumulateurs associés sont incrémentés de une unité de temps (~17 ms) à chaque boucle de jeu. Lorsqu'ils atteignent la valeur de leur fréquence, ils sont réinitialisés à 0. De cette manière, chaque action ne s'effectue que si son accumulateur associé dépasse la fréquence. Cela est équivalent à effectuer l'action à cette même fréquence. 
+La figure ~\ref{fig:acc_tab} montre les différentes fréquences des sous-boucles de jeu. Les accumulateurs associés sont incrémentés de une unité de temps (~17 ms) à chaque boucle de jeu. Lorsqu'ils atteignent la valeur de leur fréquence, ils sont réinitialisés à 0. De cette manière, chaque action ne s'effectue que si son accumulateur associé dépasse la fréquence. Cela est équivalent à effectuer l'action à cette même fréquence. 
 \subsection*{Efficacité des projectiles}
 
-Les projectiles ayant été implémentés de manière simple dans un premier temps, il y avait des incohérences lors de collision entre un projectile et un acteur (autre que le poulet, les bûches et l'eau). Dans cette ancienne version, afin de trouver quel acteur a collisioné le projectile, un parcours sur tous les acteurs est fait en regardant quel acteur possède les mêmes coordonnées x et y que le projectile. Chaque acteur concerné par ces séries de tests se verra être supprimé de manière impure car supprimé du tableau le contenant en commettant des effets de bord. De plus, la vérification de collision n'était pas synchronisée avec les ticks de déplacements, ce qui peut déclencher des bugs et ne pas supprimer correctement les deux acteurs (projectile et cible).\\
+Les projectiles ayant été implémentés de manière simple dans un premier temps, il y avait des incohérences lors de collision entre un projectile et un acteur (autre que le poulet, les bûches et l'eau). Dans cette ancienne version, un parcours sur tous les acteurs est fait en regardant quel acteur possède les mêmes coordonnées x et y que le projectile afin de trouver quel acteur a collisioné le projectile. Chaque acteur concerné par ces séries de tests se verra être supprimé de manière impure car supprimé du tableau le contenant en commettant des effets de bord. De plus, la vérification de collision n'était pas synchronisée avec les ticks de déplacements, ce qui peut déclencher des bugs et ne pas supprimer correctement les deux acteurs (projectile et cible).\\
 La solution apportée pour traiter ce problème a été de créer une fonction \texttt{collisionProj} qui renvoie un nouveau monde qui est une copie de l'ancien monde en ayant remplacé les acteurs collisionnés et le projectile par des acteurs vides. Le nouveau monde renvoyé remplace l'ancien et l'affichage est rechargé sur ce nouveau monde. Ce changement traite non seulement le problème de synchronisation car la vérification se fait en même temps que les déplacements, mais également le problème d'impureté du code en renvoyant un nouveau monde basé sur l'ancien mais avec des nouveaux acteurs fraîchement créés.
+\begin{itemize}
+  \item Collisions sans effets de bord
+  \item Identification des acteurs et passage de tick
+  \item Débogage et visualisation du comportement
+\end{itemize}
 
 \section{Évaluation}
 A la fin du projet, on peut vérifier si les principes de la programmation fonctionnelle sont respectés à toutes les étapes du jeu.
 \subsection*{Pureté}
 Un des enjeux majeurs est de respecter le principe de pureté en programmation. Ce principe proscrit la modification de variables par effet de bord. Les fonctions doivent suivre la définition mathématique et respecter la transparence référentielle.\\
-Dans le code, la plupart des fonctions respectent ces principes. On peut prendre comme exemple la génération d'un nouveau monde à chaque modification ou le stockage des acteurs dans des listes de taille fixe. Cependant, la structure du code apporte certaines limites à ce type de programmation. Il existe dans le code des variables dont la modification ne peut pas être traduite autrement qu'avec un effet de bord. Le stockage d'informations générale du jeu est plus difficelement implémentable de manière pure. Il faut alors pensé ces varibles comme des arguments d'une structure qui représentente tout le jeu.\\
-On retrouve notament la file des mondes du jeu qui est modifiée par effet de bord au moment du défilement du terrain. De plus, cette file ne peut pas être traitée comme une constance car elle est intégralement recréée dans certains cas particuliers.
+Dans le code, la plupart des fonctions respectent ces principes. On peut prendre comme exemple la génération d'un nouveau monde à chaque modification ou le stockage des acteurs dans des listes de taille fixe. Cependant, la structure du code apporte certaines limites à ce type de programmation. Il existe dans le code des variables dont la modification ne peut pas être traduite autrement qu'avec un effet de bord. Le stockage d'informations générale du jeu est plus difficilement implémentable de manière pure. Il faut alors penser ces variables comme des arguments d'une structure qui représente tout le jeu.\\
+On retrouve notamment la file des mondes du jeu qui est modifiée par effet de bord au moment du défilement du terrain. De plus, cette file ne peut pas être traitée comme une constante car elle est intégralement recréée dans certains cas particuliers.
 
 \subsection*{Performances}
 
 Le jeu est capable d'effectuer toutes les modifications du monde sans générer d'erreur de synchronisation jusqu'à une certaine de vitesse de jeu. 
 e risque en laissant trop peu de temps pour effectuer chaque étape est provoqué un retard dans l'arrivée des informations du monde et donc que certaines 
-fonctions s'éxecutent avec des entrées erronées ou obsoltères. Cela jusitifie les fréquences des différentes boucles de jeu illustrées dans le figure \ref{fig:acc_tab}. 
+fonctions s'éxecutent avec des entrées erronées ou obsoltères. Cela justifie les fréquences des différentes boucles de jeu illustrées dans la figure \ref{fig:acc_tab}. 
 Pour le cas des collisions, on ne peut pas véritablement baisser plus la fréquence de la vérification car cette action nécessite de parcourir plusieurs acteurs. 
 Ce traitement prend donc un temps minimum durant lequel aucune autre fonction ne doit engagé un calcul.
 
